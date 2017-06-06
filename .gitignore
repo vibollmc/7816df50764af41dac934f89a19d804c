@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/javtool/.vs
+/javtool/javtool/bin
+/javtool/javtool/wwwroot/lib
+/javtool/javtool/obj/Debug
