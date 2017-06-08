@@ -41,10 +41,14 @@ namespace JavCrawl.Dal
         public virtual DbSet<FilmTags> FilmTags { get; set; }
         public virtual DbSet<Images> Images { get; set; }
 
+        public MySqlContext(DbContextOptions options) : base(options)
+        {
+
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-            optionsBuilder.UseMySql(@"Server=localhost;User Id=root;Password=Thuyng@12;Database=jav_new;");
+            //optionsBuilder.UseMySql(@"Server=localhost;User Id=root;Password=Thuyng@12;Database=jav_new;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -1368,6 +1372,10 @@ namespace JavCrawl.Dal
             {
                 entity.ToTable("film_countries");
 
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
+
                 entity.Property(e => e.FilmId)
                     .HasColumnName("film_id")
                     .HasColumnType("int(11)");
@@ -1381,6 +1389,10 @@ namespace JavCrawl.Dal
             {
                 entity.ToTable("film_directors");
 
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
+
                 entity.Property(e => e.FilmId)
                     .HasColumnName("film_id")
                     .HasColumnType("int(11)");
@@ -1393,6 +1405,10 @@ namespace JavCrawl.Dal
             modelBuilder.Entity<FilmGenres>(entity =>
             {
                 entity.ToTable("film_genres");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
 
                 entity.Property(e => e.FilmId)
                     .HasColumnName("film_id")
@@ -1411,6 +1427,10 @@ namespace JavCrawl.Dal
                     .HasColumnName("id")
                     .HasColumnType("int(11)");
 
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
+
                 entity.Property(e => e.FilmId)
                     .HasColumnName("film_id")
                     .HasColumnType("int(11)");
@@ -1423,6 +1443,10 @@ namespace JavCrawl.Dal
             modelBuilder.Entity<FilmTags>(entity =>
             {
                 entity.ToTable("film_tags");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
 
                 entity.Property(e => e.FilmId)
                     .HasColumnName("film_id")

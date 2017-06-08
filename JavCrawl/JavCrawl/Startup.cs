@@ -9,6 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using JavCrawl.Dal;
+using JavCrawl.Dal.Context;
+using JavCrawl.Dal.Implement;
+using JavCrawl.Utility.Context;
+using JavCrawl.Utility.Implement;
 
 namespace JavCrawl
 {
@@ -34,6 +38,10 @@ namespace JavCrawl
 
             services.AddDbContext<MySqlContext>(options =>
             options.UseMySql(Configuration.GetConnectionString("MySqlConnection")));
+
+            services.AddTransient<IHtmlHelper, HtmlHelper>();
+            services.AddTransient<IFtpHelper, FtpHelper>();
+            services.AddTransient<IDbRepository, DbRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
