@@ -23,6 +23,7 @@ namespace JavCrawl.Controllers
             var model = new JavHiHiMovies();
             var number = 0;
             var err = string.Empty;
+            ViewBag.StartTime = DateTime.Now;
             if (!string.IsNullOrWhiteSpace(link))
             {
                 try
@@ -37,6 +38,7 @@ namespace JavCrawl.Controllers
                     err = ex.Message;
                 }
             }
+            ViewBag.EndTime = DateTime.Now;
             ViewBag.Number = number;
             ViewBag.Err = err;
 
