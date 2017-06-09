@@ -24,6 +24,61 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public async Task<bool> RunJobCrawl()
+        {
+            var jobs = _dbContext.JobListCrawl
+                        .OrderBy(x => x.ScheduleAt)
+                        .FirstOrDefault(x => (x.StartAt == null && x.ScheduleAt <= DateTime.Now) || x.Always == true);
+
+            if (jobs == null) return true;
+
+            jobs.StartAt = DateTime.Now;
+
+            await _dbContext.SaveChangesAsync();
+
+            var movies = await _htmlHelper.GetJavHiHiMovies(jobs.Link);
+
+            if (movies == null || movies.movies == null || movies.movies.Count == 0)
+            {
+                jobs.FinishAt = DateTime.Now;
+                jobs.Complete = 0;
+                jobs.UnComplete = 0;
+
+                await _dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+            var total = movies.movies.Count;
+
+            var complete = await CrawlJavHiHiMovies(movies);
+
+            jobs.FinishAt = DateTime.Now;
+            jobs.Complete += complete;
+            jobs.UnComplete += total - complete;
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> SaveSchedule(JobListCrawl job)
+        {
+            if (job == null) return false;
+
+            _dbContext.JobListCrawl.Add(job);
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+        public IList<JobListCrawl> GetSchedule()
+        {
+            var results = _dbContext.JobListCrawl.OrderByDescending(x => x.ScheduleAt).Take(50);
+
+            return results.ToList();
+        }
+
         public async Task<int> CrawlJavHiHiMovies(JavHiHiMovies javHiHiMovies)
         {
             if (javHiHiMovies == null || javHiHiMovies.movies == null || javHiHiMovies.movies.Count == 0) return 0;
@@ -332,7 +387,7 @@ namespace JavCrawl.Dal.Implement
                     dbTransaction.Commit();
                     return true;
                 }
-                catch(Exception ex)
+                catch
                 {
                     dbTransaction.Rollback();
                     return false;

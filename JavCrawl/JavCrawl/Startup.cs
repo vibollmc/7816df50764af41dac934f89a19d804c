@@ -13,6 +13,9 @@ using JavCrawl.Dal.Context;
 using JavCrawl.Dal.Implement;
 using JavCrawl.Utility.Context;
 using JavCrawl.Utility.Implement;
+using JavCrawl.Utility;
+using FluentScheduler;
+using System.Threading;
 
 namespace JavCrawl
 {
@@ -29,7 +32,6 @@ namespace JavCrawl
         }
 
         public IConfigurationRoot Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -42,14 +44,15 @@ namespace JavCrawl
             services.AddTransient<IHtmlHelper, HtmlHelper>();
             services.AddTransient<IFtpHelper, FtpHelper>();
             services.AddTransient<IDbRepository, DbRepository>();
+            services.AddTransient<JobCrawl, JobCrawl>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -68,6 +71,15 @@ namespace JavCrawl
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            var autoEvent = new AutoResetEvent(false);
+            var timer = new Timer((o) =>
+            {
+                var crawler = serviceProvider.GetService<JobCrawl>();
+                crawler.Execute();
+
+            }, autoEvent, 1000, 60000);
+
         }
     }
 }

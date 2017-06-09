@@ -1,40 +1,56 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-@model JavCrawl.Models.JavHiHiMovies
+@model IList<JavCrawl.Models.DbEntity.JobListCrawl>
 <div>
-    @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+    @using (Html.BeginForm("SetSchedule", "Home", FormMethod.Post))
     {
-        @Html.ValidationSummary(true)
-        <br />
-        <br />
-        <span>Link:</span>
-        <br />
-        <input style="width: 100%; max-width:none; margin-bottom:5px;" type="url" name="link" placeholder="http://javhihi.com/movie?sort=published&page=137&ajax=1" />
-        
-        <br />
-        <input type="submit" value="Crawl Now" />
-    }
-    <ul>
-        <li>
-            @if (!string.IsNullOrWhiteSpace(ViewBag.Err)) { 
-            <b>@ViewBag.Err</b>
-            }
-            <b>@ViewBag.Number Has Crawl Successful.</b>
+        <fieldset>
+            @Html.ValidationSummary(true)
             <br />
-            <b>@ViewBag.StartTime - @ViewBag.EndTime</b>
-            <hr />
-            <hr />
-        </li>
-        @if (Model.movies != null)
-        {
-            @foreach (var mov in Model.movies)
+            <br />
+            <span>Link:</span>
+            <br />
+            <input class="form-control" type="url" style="width:100%; max-width:none;" name="link" placeholder="http://javhihi.com/movie?sort=published&page=137&ajax=1" />
+            <br />
+            <span>Schedule:</span>
+            <br />
+            <input class="form-control" name="schedule" style="width:200px;" type="datetime" value="@DateTime.Now" /> <input name="always" type="checkbox" /><span>Nonstop</span>
+            <br />
+            <br />
+            <input type="submit" value="Set Schedule" class="btn btn-danger" />
+            <br />
+            <br />
+        </fieldset>
+    }
+    <hr />
+    <br />
+    <br />
+    <table class="table table-responsive table-bordered">
+        <thead>
+            <tr style="font-weight:bold; text-align:center">
+                <td>Link</td>
+                <td>Schedule Time</td>
+                <td>Start Time</td>
+                <td>Finish Time</td>
+                <td>Nonstop</td>
+                <td>Complete</td>
+                <td>Uncomplete</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
             {
-                <li>
-                    @mov.name
-                </li>
+            <tr>
+                <td>@item.Link</td>
+                <td>@item.ScheduleAt</td>
+                <td>@item.StartAt</td>
+                <td>@item.FinishAt</td>
+                <td><input type="checkbox" disabled checked="@(item.Always)" /></td>
+                <td>@item.Complete</td>
+                <td>@item.UnComplete</td>
+            </tr>
             }
-        }
-        
-    </ul>
+        </tbody>
+    </table>
 </div>

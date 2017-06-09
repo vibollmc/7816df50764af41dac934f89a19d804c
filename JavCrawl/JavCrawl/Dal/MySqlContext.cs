@@ -33,13 +33,13 @@ namespace JavCrawl.Dal
         public virtual DbSet<Tags> Tags { get; set; }
         public virtual DbSet<UserGroups> UserGroups { get; set; }
         public virtual DbSet<Users> Users { get; set; }
-
         public virtual DbSet<FilmCountries> FilmCountries { get; set; }
         public virtual DbSet<FilmDirectors> FilmDirectors { get; set; }
         public virtual DbSet<FilmGenres> FilmGenres { get; set; }
         public virtual DbSet<FilmStars> FilmStars { get; set; }
         public virtual DbSet<FilmTags> FilmTags { get; set; }
         public virtual DbSet<Images> Images { get; set; }
+        public virtual DbSet<JobListCrawl> JobListCrawl { get; set; }
 
         public MySqlContext(DbContextOptions options) : base(options)
         {
@@ -1500,6 +1500,43 @@ namespace JavCrawl.Dal
                 entity.Property(e => e.DeletedAt)
                     .HasColumnName("deleted_at")
                     .HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<JobListCrawl>(entity =>
+            {
+                entity.ToTable("job_list_crawl");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(10)");
+
+                entity.Property(e => e.Link)
+                    .HasColumnName("link")
+                    .HasColumnType("varchar(255)");
+
+                entity.Property(e => e.ScheduleAt)
+                    .HasColumnName("schedule_at")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.StartAt)
+                    .HasColumnName("start_at")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.FinishAt)
+                    .HasColumnName("finish_at")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Complete)
+                    .HasColumnName("complete")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.UnComplete)
+                    .HasColumnName("uncomplete")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Always)
+                    .HasColumnName("always")
+                    .HasColumnType("tinyint(1)");
             });
         }
     }

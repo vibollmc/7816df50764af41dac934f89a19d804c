@@ -18,31 +18,57 @@ namespace JavCrawl.Controllers
             _htmlHelper = htmlHelper;
             _dbRepository = dbRepository;
         }
-        public async Task<IActionResult> Index(string link)
+        public IActionResult Index(string message)
         {
-            var model = new JavHiHiMovies();
-            var number = 0;
-            var err = string.Empty;
-            ViewBag.StartTime = DateTime.Now;
-            if (!string.IsNullOrWhiteSpace(link))
+            var model = _dbRepository.GetSchedule();
+            if (!string.IsNullOrWhiteSpace(message))
             {
-                try
-                {
-                    model = await _htmlHelper.GetJavHiHiMovies(link);
-
-                    number = await _dbRepository.CrawlJavHiHiMovies(model);
-
-                }
-                catch(Exception ex)
-                {
-                    err = ex.Message;
-                }
+                ModelState.AddModelError("Error", message);
             }
-            ViewBag.EndTime = DateTime.Now;
-            ViewBag.Number = number;
-            ViewBag.Err = err;
+            //ViewBag.StartTime = DateTime.Now;
+            //if (!string.IsNullOrWhiteSpace(link))
+            //{
+            //    try
+            //    {
+            //        model = await _htmlHelper.GetJavHiHiMovies(link);
+
+            //        number = await _dbRepository.CrawlJavHiHiMovies(model);
+
+            //    }
+            //    catch(Exception ex)
+            //    {
+            //        err = ex.Message;
+            //    }
+            //}
+            //ViewBag.EndTime = DateTime.Now;
+            //ViewBag.Number = number;
 
             return View(model);
+        }
+
+        public async Task<IActionResult> SetSchedule(string link, DateTime? schedule, bool always)
+        {
+            if (string.IsNullOrWhiteSpace(link)) return RedirectToAction("Index", new { message = "[Link] cannot be null." });
+            if (!schedule.HasValue) return RedirectToAction("Index", new { message = "[Schedule] cannot be null." });
+
+            try
+            {
+                var newSchedule = new JavCrawl.Models.DbEntity.JobListCrawl
+                {
+                    Link = link,
+                    ScheduleAt = schedule,
+                    Always = always
+                };
+
+                var results = await _dbRepository.SaveSchedule(newSchedule);
+
+                return RedirectToAction("Index", new { message = "Save successful." });
+
+            }
+            catch(Exception ex)
+            {
+                return RedirectToAction("Index", new { message = ex.Message });
+            }
         }
 
         public IActionResult About()
