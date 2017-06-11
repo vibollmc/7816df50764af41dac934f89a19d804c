@@ -65,6 +65,11 @@ namespace JavCrawl
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             app.UseStaticFiles();
 
             app.UseMvc(routes =>
