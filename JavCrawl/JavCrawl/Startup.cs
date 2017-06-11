@@ -14,8 +14,8 @@ using JavCrawl.Dal.Implement;
 using JavCrawl.Utility.Context;
 using JavCrawl.Utility.Implement;
 using JavCrawl.Utility;
-using FluentScheduler;
 using System.Threading;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace JavCrawl
 {
@@ -32,6 +32,8 @@ namespace JavCrawl
         }
 
         public IConfigurationRoot Configuration { get; }
+        public Timer Timer;
+        private AutoResetEvent _autoEvent;
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -72,13 +74,17 @@ namespace JavCrawl
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            var autoEvent = new AutoResetEvent(false);
-            var timer = new Timer((o) =>
+            _autoEvent = new AutoResetEvent(false);
+            var isProcessing = false;
+            Timer = new Timer((o) =>
             {
+                if (isProcessing) return;
+                isProcessing = true;
                 var crawler = serviceProvider.GetService<JobCrawl>();
                 crawler.Execute();
+                isProcessing = false;
 
-            }, autoEvent, 1000, 60000);
+            }, _autoEvent, 1000, 600000);
 
         }
     }

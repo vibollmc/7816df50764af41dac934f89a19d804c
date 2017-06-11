@@ -31,10 +31,14 @@ namespace JavCrawl.Utility.Implement
             _dbContext = dbContext;
         }
 
-        public async Task<Stars> GetJavHiHiStar(string name)
+        public async Task<Stars> GetJavHiHiStar(string name, string fromSite)
         {
             Stars results = null;
             var url = string.Format("http://javhihi.com/japanese-av/{0}.html", name.Trim().Replace(" ", "-").ToLower());
+            if (fromSite == "789")
+            {
+                url = string.Format("http://jav789.com/pornstar/{0}.html", name.Trim().Replace(" ", "-").ToLower());
+            }
             var htmlWeb = new HtmlWeb();
 
             var htmlDoc = await htmlWeb.LoadFromWebAsync(url);
@@ -103,13 +107,21 @@ namespace JavCrawl.Utility.Implement
             var json = await httpClient.GetStringAsync(url);
 
             if (json == null) return null;
+            
+            var from789 = url.Contains("jav789.com");
 
             var results = JsonConvert.DeserializeObject<JavHiHiMovies>(json);
+
             foreach (var item in results.movies)
             {
-
-
                 var urlPage = string.Format("http://javhihi.com/{0}", item.url);
+                item.fromsite = "hihi";
+                if (from789)
+                {
+                    urlPage = string.Format("http://jav789.com/{0}", item.url);
+                    item.fromsite = "789";
+                }
+
                 item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
 
                 if (_dbContext.Films.Any(x => x.Slug == item.url))
@@ -118,10 +130,21 @@ namespace JavCrawl.Utility.Implement
                 }
                 else
                 {
-                    var linkEpsAndDecs = await GetJavHiHiMoviesLinkEpisode(urlPage);
+                    if (from789)
+                    {
+                        item.descriptions = item.name;
+                        item.linkepisode = new List<string>
+                        {
+                           urlPage
+                        };
+                    }
+                    else
+                    {
+                        var linkEpsAndDecs = await GetJavHiHiMoviesLinkEpisode(urlPage);
 
-                    item.descriptions = linkEpsAndDecs.Description;
-                    item.linkepisode = linkEpsAndDecs.LinkEps;
+                        item.descriptions = linkEpsAndDecs.Description;
+                        item.linkepisode = linkEpsAndDecs.LinkEps;
+                    }
                 }
             }
             results.movies = results.movies.Where(x => x.url != string.Empty).ToList();

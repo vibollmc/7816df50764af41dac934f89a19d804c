@@ -1537,6 +1537,14 @@ namespace JavCrawl.Dal
                 entity.Property(e => e.Always)
                     .HasColumnName("always")
                     .HasColumnType("tinyint(1)");
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Error)
+                    .HasColumnName("error")
+                    .HasColumnType("varchar(1024)");
             });
         }
     }

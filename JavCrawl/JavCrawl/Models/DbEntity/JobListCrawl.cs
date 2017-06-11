@@ -15,5 +15,7 @@ namespace JavCrawl.Models.DbEntity
         public int Complete { get; set; }
         public int UnComplete { get; set; }
         public bool Always { get; set; }
+        public int Status { get; set; }
+        public string Error { get; set; }
     }
 }

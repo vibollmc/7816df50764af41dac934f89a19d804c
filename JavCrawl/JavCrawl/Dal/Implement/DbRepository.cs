@@ -28,36 +28,48 @@ namespace JavCrawl.Dal.Implement
         {
             var jobs = _dbContext.JobListCrawl
                         .OrderBy(x => x.ScheduleAt)
-                        .FirstOrDefault(x => (x.StartAt == null && x.ScheduleAt <= DateTime.Now) || x.Always == true);
+                        .FirstOrDefault(x => (x.Status == 0 && x.ScheduleAt <= DateTime.Now) || x.Always == true);
 
             if (jobs == null) return true;
 
-            jobs.StartAt = DateTime.Now;
-
-            await _dbContext.SaveChangesAsync();
-
-            var movies = await _htmlHelper.GetJavHiHiMovies(jobs.Link);
-
-            if (movies == null || movies.movies == null || movies.movies.Count == 0)
+            try
             {
-                jobs.FinishAt = DateTime.Now;
-                jobs.Complete = 0;
-                jobs.UnComplete = 0;
+
+                jobs.StartAt = DateTime.Now;
+                jobs.Status = 1;
 
                 await _dbContext.SaveChangesAsync();
 
-                return true;
+                var movies = await _htmlHelper.GetJavHiHiMovies(jobs.Link);
+
+                if (movies == null || movies.movies == null || movies.movies.Count == 0)
+                {
+                    jobs.FinishAt = DateTime.Now;
+                    jobs.Complete = 0;
+                    jobs.UnComplete = 0;
+                    jobs.Status = 2;
+                    await _dbContext.SaveChangesAsync();
+
+                    return true;
+                }
+
+                var total = movies.movies.Count;
+
+                var complete = await CrawlJavHiHiMovies(movies);
+
+                jobs.FinishAt = DateTime.Now;
+                jobs.Complete += complete;
+                jobs.UnComplete += total - complete;
+                jobs.Status = 2;
+                await _dbContext.SaveChangesAsync();
+
             }
-
-            var total = movies.movies.Count;
-
-            var complete = await CrawlJavHiHiMovies(movies);
-
-            jobs.FinishAt = DateTime.Now;
-            jobs.Complete += complete;
-            jobs.UnComplete += total - complete;
-
-            await _dbContext.SaveChangesAsync();
+            catch(Exception ex)
+            {
+                jobs.Status = 3;
+                jobs.Error = ex.Message;
+                await _dbContext.SaveChangesAsync();
+            }
 
             return true;
         }
@@ -151,7 +163,7 @@ namespace JavCrawl.Dal.Implement
             return newGenre.Id;
         }
 
-        private async Task<int> GetStar(string name)
+        private async Task<int> GetStar(string name, string fromSite)
         {
             name = name.Replace("-", " ").ToTitleCase();
 
@@ -159,7 +171,7 @@ namespace JavCrawl.Dal.Implement
 
             if (star != null) return star.Id;
 
-            var newStar = await _htmlHelper.GetJavHiHiStar(name);
+            var newStar = await _htmlHelper.GetJavHiHiStar(name, fromSite);
 
             if (newStar == null)
             {
@@ -277,7 +289,7 @@ namespace JavCrawl.Dal.Implement
 
                     var newFilm = new Films
                     {
-                        CategoryId = 1,
+                        CategoryId = movie.fromsite == "hihi" ? 1 : 2,
                         ThumbName = thumb_name,
                         CoverName = thumb_cover,
                         Title = movie.name,
@@ -355,7 +367,7 @@ namespace JavCrawl.Dal.Implement
                         var filmStars = new List<FilmStars>();
                         foreach (var star in movie.pornstars)
                         {
-                            var idStar = await GetStar(star);
+                            var idStar = await GetStar(star, movie.fromsite);
                             filmStars.Add(new FilmStars
                             {
                                 FilmId = newFilm.Id,

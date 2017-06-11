@@ -10,6 +10,6 @@ namespace JavCrawl.Utility.Context
     public interface IHtmlHelper
     {
         Task<JavHiHiMovies> GetJavHiHiMovies(string url);
-        Task<Stars> GetJavHiHiStar(string name);
+        Task<Stars> GetJavHiHiStar(string name, string fromSite);
     }
 }

@@ -25,25 +25,18 @@ namespace JavCrawl.Controllers
             {
                 ModelState.AddModelError("Error", message);
             }
-            //ViewBag.StartTime = DateTime.Now;
-            //if (!string.IsNullOrWhiteSpace(link))
-            //{
-            //    try
-            //    {
-            //        model = await _htmlHelper.GetJavHiHiMovies(link);
 
-            //        number = await _dbRepository.CrawlJavHiHiMovies(model);
-
-            //    }
-            //    catch(Exception ex)
-            //    {
-            //        err = ex.Message;
-            //    }
-            //}
-            //ViewBag.EndTime = DateTime.Now;
-            //ViewBag.Number = number;
+            ViewBag.Message = message;
 
             return View(model);
+        }
+
+        public async Task<IActionResult> Test(string link)
+        {
+            var movies = await _htmlHelper.GetJavHiHiMovies("http://jav789.com/movie?sort=published&page=28&ajax=1");
+            var results = await _dbRepository.CrawlJavHiHiMovies(movies);
+
+            return Json(new { OK = results });
         }
 
         public async Task<IActionResult> SetSchedule(string link, DateTime? schedule, bool always)
