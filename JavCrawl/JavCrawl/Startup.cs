@@ -45,6 +45,7 @@ namespace JavCrawl
             services.AddTransient<IFtpHelper, FtpHelper>();
             services.AddTransient<IDbRepository, DbRepository>();
             services.AddTransient<JobCrawl, JobCrawl>();
+            services.AddTransient<IOpenloadHelper, OpenloadHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
