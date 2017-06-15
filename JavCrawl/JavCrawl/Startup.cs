@@ -16,6 +16,7 @@ using JavCrawl.Utility.Implement;
 using JavCrawl.Utility;
 using System.Threading;
 using Microsoft.AspNetCore.HttpOverrides;
+using JavCrawl.Models;
 
 namespace JavCrawl
 {
@@ -78,18 +79,24 @@ namespace JavCrawl
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            _autoEvent = new AutoResetEvent(false);
-            var isProcessing = false;
-            Timer = new Timer((o) =>
+            
+            var timerSetting = Configuration.GetSection("TimerSettings").Get<TimerSettings>();
+            if (timerSetting != null && timerSetting.Enabled)
             {
-                if (isProcessing) return;
-                isProcessing = true;
-                var crawler = serviceProvider.GetService<JobCrawl>();
-                crawler.Execute();
-                isProcessing = false;
+                _autoEvent = new AutoResetEvent(false);
+                var isProcessing = false;
 
-            }, _autoEvent, 1000, 600000);
+                Timer = new Timer((o) =>
+                {
+                    if (isProcessing) return;
+                    isProcessing = true;
+                    var crawler = serviceProvider.GetService<JobCrawl>();
+                    crawler.Execute();
+                    isProcessing = false;
+
+                }, _autoEvent, 1000, timerSetting.Interval);
+
+            }
 
         }
     }

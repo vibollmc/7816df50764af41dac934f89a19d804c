@@ -31,6 +31,33 @@ namespace JavCrawl.Utility.Implement
             _dbContext = dbContext;
         }
 
+        public async Task<JavHiHiMovies> GetJavMovies(string url)
+        {
+            var httpClient = new HttpClient();
+
+            var json = await httpClient.GetStringAsync(url);
+
+            if (json == null) return null;
+
+            var from789 = url.Contains("jav789.com");
+
+            var results = JsonConvert.DeserializeObject<JavHiHiMovies>(json);
+
+            foreach (var item in results.movies)
+            {
+                item.fromsite = "hihi";
+                if (from789)
+                {
+                    item.fromsite = "789";
+                }
+
+                item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
+            }
+            results.movies = results.movies.Where(x => x.url != string.Empty).ToList();
+            return results;
+        }
+
+
         public async Task<Stars> GetJavHiHiStar(string name, string fromSite)
         {
             Stars results = null;
@@ -165,7 +192,8 @@ namespace JavCrawl.Utility.Implement
                 x => x.Attributes.Contains("class") 
                     && x.Attributes["class"].Value == "player-size");
 
-            if (playerSize != null && playerSize.ChildNodes != null && playerSize.ChildNodes.Count > 0)
+            if (playerSize != null && playerSize.ChildNodes != null && playerSize.ChildNodes.Count > 0
+                && playerSize.ChildNodes["iframe"] != null)
                 results = playerSize.ChildNodes["iframe"].Attributes["src"].Value;
 
             return results;
@@ -199,7 +227,8 @@ namespace JavCrawl.Utility.Implement
                             x => x.Attributes.Contains("class") 
                                 && x.Attributes["class"].Value == "player-size");
 
-                        if (playerSize != null && playerSize.ChildNodes != null && playerSize.ChildNodes.Count > 0)
+                        if (playerSize != null && playerSize.ChildNodes != null && playerSize.ChildNodes.Count > 0
+                            && playerSize.ChildNodes["iframe"] != null)
                             results.LinkEps.Add(playerSize.ChildNodes["iframe"].Attributes["src"].Value);
                     }
                     else if (serverNode.ChildNodes != null && serverNode.ChildNodes.Count > 1)

@@ -24,6 +24,71 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public async Task<bool> UpdateImage()
+        {
+            try
+            {
+                //var jobs = _dbContext.JobListCrawl.Where(x => x.Id == 89 && x.Complete > 0);
+
+                //foreach (var job in jobs)
+                //{
+                    var movies = await _htmlHelper.GetJavMovies("http://jav789.com/movie?q=mira+hasegawa+sex+party+with+dick+craving+girls&ajax=1");
+
+                    if (movies == null || movies.movies == null || movies.movies.Count == 0) return true;
+
+                    foreach (var movie in movies.movies)
+                    {
+
+                        if (!_dbContext.Films.Any(x => x.Slug == movie.url)) continue;
+
+                        string thumb_cover = null;
+                        string thumb_name = null;
+                        int? ftpId = null;
+                        if (!string.IsNullOrWhiteSpace(movie.image_small))
+                        {
+                            var ftpUpload = await _ftpHelper.RemoteFiles(movie.image_small, movie.url);
+                            if (ftpUpload.IsSuccessful)
+                            {
+                                thumb_name = ftpUpload.FileName;
+                                ftpId = ftpUpload.ServerId;
+                            }
+                        }
+
+                        if (movie.image == movie.image_small)
+                        {
+                            thumb_cover = thumb_name;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(movie.image))
+                        {
+                            var ftpUpload = await _ftpHelper.RemoteFiles(movie.image, movie.url + "-cover");
+                            if (ftpUpload.IsSuccessful)
+                            {
+                                thumb_cover = ftpUpload.FileName;
+                                ftpId = ftpUpload.ServerId;
+                            }
+                        }
+
+                        foreach (var star in movie.pornstars)
+                        {
+                            var newStar = await _htmlHelper.GetJavHiHiStar(star, movie.fromsite);
+
+                            if (!string.IsNullOrWhiteSpace(newStar.ThumbName))
+                            {
+                                var uploadResults = await _ftpHelper.RemoteFiles(newStar.ThumbName, star.ToLower().Trim().Replace(" ", "-"));
+                            }
+                        }
+                    }
+                //}
+
+                return true;
+
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task<bool> RunJobCrawl()
         {
             var jobs = _dbContext.JobListCrawl
@@ -86,7 +151,7 @@ namespace JavCrawl.Dal.Implement
         }
         public IList<JobListCrawl> GetSchedule()
         {
-            var results = _dbContext.JobListCrawl.OrderByDescending(x => x.ScheduleAt).Take(50);
+            var results = _dbContext.JobListCrawl.OrderByDescending(x => x.ScheduleAt).Take(200);
 
             return results.ToList();
         }

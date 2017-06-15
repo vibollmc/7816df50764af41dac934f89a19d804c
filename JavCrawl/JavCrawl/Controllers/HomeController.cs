@@ -33,8 +33,24 @@ namespace JavCrawl.Controllers
 
         public async Task<IActionResult> Test(string link)
         {
-            var movies = await _htmlHelper.GetJavHiHiMovies("http://jav789.com/movie?sort=published&page=28&ajax=1");
-            var results = await _dbRepository.CrawlJavHiHiMovies(movies);
+            var results = true;
+            //var movies = await _htmlHelper.GetJavHiHiMovies(link);
+            //var results = await _dbRepository.CrawlJavHiHiMovies(movies);
+
+            //for (var i = 72; i > 0; i--)
+            //{
+
+            //    var newSchedule = new JavCrawl.Models.DbEntity.JobListCrawl
+            //    {
+            //        Link = string.Format("http://javhihi.com/movie?sort=published&page={0}&ajax=1", i),
+            //        ScheduleAt = DateTime.Now.AddMinutes((89-i) * 10),
+            //        Always = false
+            //    };
+
+            //    results = await _dbRepository.SaveSchedule(newSchedule);
+            //}
+
+            await _dbRepository.UpdateImage();
 
             return Json(new { OK = results });
         }
