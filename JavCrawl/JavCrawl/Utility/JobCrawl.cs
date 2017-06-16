@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FluentScheduler;
-using JavCrawl.Dal.Context;
+﻿using JavCrawl.Dal.Context;
 
 namespace JavCrawl.Utility
 {
-    public class JobCrawl : IJob
+    public class JobCrawl
     {
         private readonly IDbRepository _dbRepository;
         public JobCrawl(IDbRepository dbRepository)

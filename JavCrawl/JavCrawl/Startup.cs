@@ -14,8 +14,9 @@ using JavCrawl.Dal.Implement;
 using JavCrawl.Utility.Context;
 using JavCrawl.Utility.Implement;
 using JavCrawl.Utility;
-using FluentScheduler;
 using System.Threading;
+using Microsoft.AspNetCore.HttpOverrides;
+using JavCrawl.Models;
 
 namespace JavCrawl
 {
@@ -32,6 +33,8 @@ namespace JavCrawl
         }
 
         public IConfigurationRoot Configuration { get; }
+        public Timer Timer;
+        private AutoResetEvent _autoEvent;
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -64,6 +67,11 @@ namespace JavCrawl
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             app.UseStaticFiles();
 
             app.UseMvc(routes =>
@@ -72,14 +80,24 @@ namespace JavCrawl
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            var autoEvent = new AutoResetEvent(false);
-            var timer = new Timer((o) =>
+            
+            var timerSetting = Configuration.GetSection("TimerSettings").Get<TimerSettings>();
+            if (timerSetting != null && timerSetting.Enabled)
             {
-                var crawler = serviceProvider.GetService<JobCrawl>();
-                crawler.Execute();
+                _autoEvent = new AutoResetEvent(false);
+                var isProcessing = false;
 
-            }, autoEvent, 1000, 60000);
+                Timer = new Timer((o) =>
+                {
+                    if (isProcessing) return;
+                    isProcessing = true;
+                    var crawler = serviceProvider.GetService<JobCrawl>();
+                    crawler.Execute();
+                    isProcessing = false;
+
+                }, _autoEvent, 1000, timerSetting.Interval);
+
+            }
 
         }
     }

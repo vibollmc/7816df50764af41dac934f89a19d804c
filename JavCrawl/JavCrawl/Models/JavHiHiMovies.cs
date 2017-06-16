@@ -36,5 +36,7 @@ namespace JavCrawl.Models
 
         public string descriptions { get; set; }
         public IList<string> linkepisode { get; set; }
+
+        public string fromsite { get; set; }
     }
 }

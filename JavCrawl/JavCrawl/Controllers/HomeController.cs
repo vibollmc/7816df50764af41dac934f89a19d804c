@@ -25,25 +25,34 @@ namespace JavCrawl.Controllers
             {
                 ModelState.AddModelError("Error", message);
             }
-            //ViewBag.StartTime = DateTime.Now;
-            //if (!string.IsNullOrWhiteSpace(link))
-            //{
-            //    try
-            //    {
-            //        model = await _htmlHelper.GetJavHiHiMovies(link);
 
-            //        number = await _dbRepository.CrawlJavHiHiMovies(model);
-
-            //    }
-            //    catch(Exception ex)
-            //    {
-            //        err = ex.Message;
-            //    }
-            //}
-            //ViewBag.EndTime = DateTime.Now;
-            //ViewBag.Number = number;
+            ViewBag.Message = message;
 
             return View(model);
+        }
+
+        public async Task<IActionResult> Test(string link)
+        {
+            var results = true;
+            //var movies = await _htmlHelper.GetJavHiHiMovies(link);
+            //var results = await _dbRepository.CrawlJavHiHiMovies(movies);
+
+            //for (var i = 72; i > 0; i--)
+            //{
+
+            //    var newSchedule = new JavCrawl.Models.DbEntity.JobListCrawl
+            //    {
+            //        Link = string.Format("http://javhihi.com/movie?sort=published&page={0}&ajax=1", i),
+            //        ScheduleAt = DateTime.Now.AddMinutes((89-i) * 10),
+            //        Always = false
+            //    };
+
+            //    results = await _dbRepository.SaveSchedule(newSchedule);
+            //}
+
+            await _dbRepository.UpdateImage();
+
+            return Json(new { OK = results });
         }
 
         public async Task<IActionResult> SetSchedule(string link, DateTime? schedule, bool always)

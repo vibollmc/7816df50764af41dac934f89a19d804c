@@ -24,40 +24,117 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public async Task<bool> UpdateImage()
+        {
+            try
+            {
+                //var jobs = _dbContext.JobListCrawl.Where(x => x.Id == 89 && x.Complete > 0);
+
+                //foreach (var job in jobs)
+                //{
+                    var movies = await _htmlHelper.GetJavMovies("http://jav789.com/movie?q=mira+hasegawa+sex+party+with+dick+craving+girls&ajax=1");
+
+                    if (movies == null || movies.movies == null || movies.movies.Count == 0) return true;
+
+                    foreach (var movie in movies.movies)
+                    {
+
+                        if (!_dbContext.Films.Any(x => x.Slug == movie.url)) continue;
+
+                        string thumb_cover = null;
+                        string thumb_name = null;
+                        int? ftpId = null;
+                        if (!string.IsNullOrWhiteSpace(movie.image_small))
+                        {
+                            var ftpUpload = await _ftpHelper.RemoteFiles(movie.image_small, movie.url);
+                            if (ftpUpload.IsSuccessful)
+                            {
+                                thumb_name = ftpUpload.FileName;
+                                ftpId = ftpUpload.ServerId;
+                            }
+                        }
+
+                        if (movie.image == movie.image_small)
+                        {
+                            thumb_cover = thumb_name;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(movie.image))
+                        {
+                            var ftpUpload = await _ftpHelper.RemoteFiles(movie.image, movie.url + "-cover");
+                            if (ftpUpload.IsSuccessful)
+                            {
+                                thumb_cover = ftpUpload.FileName;
+                                ftpId = ftpUpload.ServerId;
+                            }
+                        }
+
+                        foreach (var star in movie.pornstars)
+                        {
+                            var newStar = await _htmlHelper.GetJavHiHiStar(star, movie.fromsite);
+
+                            if (!string.IsNullOrWhiteSpace(newStar.ThumbName))
+                            {
+                                var uploadResults = await _ftpHelper.RemoteFiles(newStar.ThumbName, star.ToLower().Trim().Replace(" ", "-"));
+                            }
+                        }
+                    }
+                //}
+
+                return true;
+
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task<bool> RunJobCrawl()
         {
             var jobs = _dbContext.JobListCrawl
                         .OrderBy(x => x.ScheduleAt)
-                        .FirstOrDefault(x => (x.StartAt == null && x.ScheduleAt <= DateTime.Now) || x.Always == true);
+                        .FirstOrDefault(x => (x.Status == 0 && x.ScheduleAt <= DateTime.Now) || x.Always == true);
 
             if (jobs == null) return true;
 
-            jobs.StartAt = DateTime.Now;
-
-            await _dbContext.SaveChangesAsync();
-
-            var movies = await _htmlHelper.GetJavHiHiMovies(jobs.Link);
-
-            if (movies == null || movies.movies == null || movies.movies.Count == 0)
+            try
             {
-                jobs.FinishAt = DateTime.Now;
-                jobs.Complete = 0;
-                jobs.UnComplete = 0;
+
+                jobs.StartAt = DateTime.Now;
+                jobs.Status = 1;
 
                 await _dbContext.SaveChangesAsync();
 
-                return true;
+                var movies = await _htmlHelper.GetJavHiHiMovies(jobs.Link);
+
+                if (movies == null || movies.movies == null || movies.movies.Count == 0)
+                {
+                    jobs.FinishAt = DateTime.Now;
+                    jobs.Complete = 0;
+                    jobs.UnComplete = 0;
+                    jobs.Status = 2;
+                    await _dbContext.SaveChangesAsync();
+
+                    return true;
+                }
+
+                var total = movies.movies.Count;
+
+                var complete = await CrawlJavHiHiMovies(movies);
+
+                jobs.FinishAt = DateTime.Now;
+                jobs.Complete += complete;
+                jobs.UnComplete += total - complete;
+                jobs.Status = 2;
+                await _dbContext.SaveChangesAsync();
+
             }
-
-            var total = movies.movies.Count;
-
-            var complete = await CrawlJavHiHiMovies(movies);
-
-            jobs.FinishAt = DateTime.Now;
-            jobs.Complete += complete;
-            jobs.UnComplete += total - complete;
-
-            await _dbContext.SaveChangesAsync();
+            catch(Exception ex)
+            {
+                jobs.Status = 3;
+                jobs.Error = ex.Message;
+                await _dbContext.SaveChangesAsync();
+            }
 
             return true;
         }
@@ -74,7 +151,7 @@ namespace JavCrawl.Dal.Implement
         }
         public IList<JobListCrawl> GetSchedule()
         {
-            var results = _dbContext.JobListCrawl.OrderByDescending(x => x.ScheduleAt).Take(50);
+            var results = _dbContext.JobListCrawl.OrderByDescending(x => x.ScheduleAt).Take(200);
 
             return results.ToList();
         }
@@ -151,7 +228,7 @@ namespace JavCrawl.Dal.Implement
             return newGenre.Id;
         }
 
-        private async Task<int> GetStar(string name)
+        private async Task<int> GetStar(string name, string fromSite)
         {
             name = name.Replace("-", " ").ToTitleCase();
 
@@ -159,7 +236,7 @@ namespace JavCrawl.Dal.Implement
 
             if (star != null) return star.Id;
 
-            var newStar = await _htmlHelper.GetJavHiHiStar(name);
+            var newStar = await _htmlHelper.GetJavHiHiStar(name, fromSite);
 
             if (newStar == null)
             {
@@ -277,7 +354,7 @@ namespace JavCrawl.Dal.Implement
 
                     var newFilm = new Films
                     {
-                        CategoryId = 1,
+                        CategoryId = movie.fromsite == "hihi" ? 1 : 2,
                         ThumbName = thumb_name,
                         CoverName = thumb_cover,
                         Title = movie.name,
@@ -355,7 +432,7 @@ namespace JavCrawl.Dal.Implement
                         var filmStars = new List<FilmStars>();
                         foreach (var star in movie.pornstars)
                         {
-                            var idStar = await GetStar(star);
+                            var idStar = await GetStar(star, movie.fromsite);
                             filmStars.Add(new FilmStars
                             {
                                 FilmId = newFilm.Id,

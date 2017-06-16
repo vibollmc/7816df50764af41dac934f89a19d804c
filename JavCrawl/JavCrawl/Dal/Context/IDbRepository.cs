@@ -14,5 +14,7 @@ namespace JavCrawl.Dal.Context
         IList<JobListCrawl> GetSchedule();
 
         Task<bool> RunJobCrawl();
+
+        Task<bool> UpdateImage();
     }
 }
