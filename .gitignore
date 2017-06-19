@@ -12,3 +12,5 @@
 /JavCrawl/JavCrawl/wwwroot/Uploads
 /JavCrawl/JavCrawl/*.user
 /JavCrawl/JavCrawl/Properties/PublishProfiles
+/javmile.com/public_html/storage/logs
+/javmile.com/public_html/app/Policies/*.gitkeep

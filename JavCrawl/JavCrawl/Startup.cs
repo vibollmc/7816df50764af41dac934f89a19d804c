@@ -26,7 +26,7 @@ namespace JavCrawl
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
@@ -44,10 +44,13 @@ namespace JavCrawl
             services.AddDbContext<MySqlContext>(options =>
             options.UseMySql(Configuration.GetConnectionString("MySqlConnection")));
 
+            services.Configure<OpenloadSettings>(Configuration.GetSection("OpenloadSettings"));
+
             services.AddTransient<IHtmlHelper, HtmlHelper>();
             services.AddTransient<IFtpHelper, FtpHelper>();
             services.AddTransient<IDbRepository, DbRepository>();
-            services.AddTransient<JobCrawl, JobCrawl>();
+            services.AddTransient<JobAuto, JobAuto>();
+            services.AddTransient<IOpenloadHelper, OpenloadHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -81,6 +84,7 @@ namespace JavCrawl
             });
             
             var timerSetting = Configuration.GetSection("TimerSettings").Get<TimerSettings>();
+
             if (timerSetting != null && timerSetting.Enabled)
             {
                 _autoEvent = new AutoResetEvent(false);
@@ -90,8 +94,19 @@ namespace JavCrawl
                 {
                     if (isProcessing) return;
                     isProcessing = true;
-                    var crawler = serviceProvider.GetService<JobCrawl>();
-                    crawler.Execute();
+                    
+                    var crawler = serviceProvider.GetService<JobAuto>();
+
+                    if (timerSetting.EnabledCrawler)
+                    {
+                        crawler.ExecuteCrawl();
+                    }
+
+                    if (timerSetting.EnabledOpenload)
+                    {
+                        crawler.ExecuteOpenloadRemote();
+                    }
+
                     isProcessing = false;
 
                 }, _autoEvent, 1000, timerSetting.Interval);

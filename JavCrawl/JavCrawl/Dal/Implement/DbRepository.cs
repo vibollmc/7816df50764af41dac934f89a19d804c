@@ -24,6 +24,63 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public IList<Episodes> GetEpisodesRemoted()
+        {
+            var episode = _dbContext.Episodes.Where(x => x.FileName.Contains("openload.co") && x.FileName.Contains("javmile.com")).OrderByDescending(x=>x.Id).Take(100);
+
+            return episode.ToList();
+        }
+        public IList<Episodes> GetEpisodesRemoting()
+        {
+            var episode = _dbContext.Episodes.Where(x => x.FileName.Contains("openload.co") && !x.FileName.Contains("javmile.com") && x.CustomerId != null).OrderByDescending(x => x.Id);
+
+            return episode.ToList();
+        }
+
+        public async Task<bool> UpdateEpisodeWithNewLink(int id, string link)
+        {
+            var eps = _dbContext.Episodes.FirstOrDefault(x => x.Id == id);
+            if (eps == null) return true;
+
+            eps.FileName = link;
+
+            eps.CustomerId = null;
+
+            eps.UpdatedAt = DateTime.Now;
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public Episodes GetEpisodeToCheckStatusRemote()
+        {
+            var episode = _dbContext.Episodes.OrderBy(x => x.Id).FirstOrDefault(x => x.FileName.Contains("openload.co") && !x.FileName.Contains("javmile.com") && x.CustomerId != null);
+
+            return episode;
+        }
+
+        public async Task<bool> UpdateEpisodeRemoteId(int id, int remoteid)
+        {
+            var eps = _dbContext.Episodes.FirstOrDefault(x => x.Id == id);
+            if (eps == null) return true;
+
+            eps.CustomerId = remoteid;
+
+            eps.UpdatedAt = DateTime.Now;
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public Episodes GetEpisodeToTranferOpenload()
+        {
+            var episode = _dbContext.Episodes.OrderBy(x=>x.Id).FirstOrDefault(x => x.FileName.Contains("openload.co") && !x.FileName.Contains("javmile.com") && x.CustomerId == null);
+
+            return episode;
+        }
+
         public async Task<bool> UpdateImage()
         {
             try
