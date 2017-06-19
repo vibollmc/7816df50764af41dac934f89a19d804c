@@ -31,6 +31,76 @@ namespace JavCrawl.Utility.Implement
             _dbContext = dbContext;
         }
 
+        public async Task<IList<VideoApi>> GetRedirectLinkVideo(string url)
+        {
+            var from789 = url.Contains("jav789.com");
+
+            var htmlWeb = new HtmlWeb();
+
+            var htmlDoc = await htmlWeb.LoadFromWebAsync(url);
+
+            var sourceNodes = htmlDoc.DocumentNode.Descendants("source");
+
+            if (sourceNodes == null || sourceNodes.Count() == 0)
+            {
+                var aNodes = htmlDoc.DocumentNode.Descendants("a").Where(x => x.Attributes.Contains("href") && x.Attributes["href"].Value.Contains(".googlevideo.com"));
+
+                if (aNodes == null) return null;
+                var resulta = new List<VideoApi>();
+                foreach (var a in aNodes)
+                {
+                    var label = a.InnerText.Trim();
+
+                    var file = a.Attributes["href"].Value;
+
+                    file = file.Substring(file.IndexOf(".googlevideo.com"));
+
+                    file = file.Substring(0, file.IndexOf("&title="));
+
+                    file = "https://redirector" + file;
+
+                    resulta.Add(new VideoApi
+                    {
+                        Default = label.Contains("720").ToString(),
+                        File = file,
+                        Src = file,
+                        Label = label,
+                        Type = "video/mp4"
+                    });
+                }
+                return resulta;
+            }
+
+            var sourceLinks = sourceNodes.Where(
+                x => 
+                    x.Attributes.Contains("type") && x.Attributes["type"].Value == "video/mp4" &&
+                    x.Attributes.Contains("src") && x.Attributes["src"].Value != string.Empty);
+
+            var result = new List<VideoApi>();
+
+            foreach(var nodeLink in sourceLinks)
+            {
+                var label = nodeLink.Attributes.Contains("data-res") ? nodeLink.Attributes["data-res"].Value : "HD";
+
+                var file = nodeLink.Attributes["src"].Value;
+
+                file = file.Substring(file.IndexOf(".googlevideo.com"));
+
+                file = "https://redirector" + file;
+
+                result.Add(new VideoApi
+                {
+                    Default = label.Contains("720").ToString(),
+                    File = file,
+                    Src = file,
+                    Label = label,
+                    Type = nodeLink.Attributes["type"].Value
+                });
+            }
+
+            return result;
+        }
+
         public async Task<JavHiHiMovies> GetJavMovies(string url)
         {
             var httpClient = new HttpClient();

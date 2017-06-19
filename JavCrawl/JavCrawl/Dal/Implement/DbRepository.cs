@@ -32,7 +32,7 @@ namespace JavCrawl.Dal.Implement
 
                 //foreach (var job in jobs)
                 //{
-                    var movies = await _htmlHelper.GetJavMovies("http://jav789.com/movie?q=mira+hasegawa+sex+party+with+dick+craving+girls&ajax=1");
+                    var movies = await _htmlHelper.GetJavMovies("http://jav789.com/movie?q=yuka+minami+temptation+to+a+dirty+housewife&ajax=1");
 
                     if (movies == null || movies.movies == null || movies.movies.Count == 0) return true;
 

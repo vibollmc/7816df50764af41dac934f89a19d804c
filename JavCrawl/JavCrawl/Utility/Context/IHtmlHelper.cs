@@ -12,5 +12,7 @@ namespace JavCrawl.Utility.Context
         Task<JavHiHiMovies> GetJavHiHiMovies(string url);
         Task<Stars> GetJavHiHiStar(string name, string fromSite);
         Task<JavHiHiMovies> GetJavMovies(string url);
+
+        Task<IList<VideoApi>> GetRedirectLinkVideo(string url);
     }
 }

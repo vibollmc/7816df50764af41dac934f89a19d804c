@@ -4,14 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using JavCrawl.Models;
+using JavCrawl.Utility.Context;
 
 namespace JavCrawl.Controllers
 {
     public class VideoController : Controller
     {
-        public IActionResult Index(string link)
+        private readonly IHtmlHelper _htmlHelper;
+        public VideoController(IHtmlHelper htmlHelper)
         {
-            var model = new List<VideoApi>();
+            _htmlHelper = htmlHelper;
+        }
+        public async Task<IActionResult> Index(string link)
+        {
+            var model = await _htmlHelper.GetRedirectLinkVideo(link);
 
             return Json(model);
         }
