@@ -16,5 +16,16 @@ namespace JavCrawl.Dal.Context
         Task<bool> RunJobCrawl();
 
         Task<bool> UpdateImage();
+
+        Episodes GetEpisodeToTranferOpenload();
+
+        Task<bool> UpdateEpisodeRemoteId(int id, int remoteid);
+
+        Episodes GetEpisodeToCheckStatusRemote();
+
+        Task<bool> UpdateEpisodeWithNewLink(int id, string link);
+
+        IList<Episodes> GetEpisodesRemoted();
+        IList<Episodes> GetEpisodesRemoting();
     }
 }

@@ -1,0 +1,70 @@
+@{
+    ViewData["Title"] = "Openload";
+}
+@model JavCrawl.Models.OpenloadView
+
+<h2>Openload tool</h2>
+<div>
+    <fieldset>
+        <h3>
+            Remoting
+        </h3>
+        <table class="table table-responsive table-bordered">
+            <thead>
+                <tr style="font-weight:bold; text-align:center">
+                    <td>No.</td>
+                    <td>Id</td>
+                    <td>Link</td>
+                    <td>Remote Time</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{ 
+                    var i = 0;
+                }
+                @foreach (var ep in Model.Remoting)
+                {
+                    i++;
+                    <tr>
+                        <td>@i</td>
+                        <td>@ep.Id</td>
+                        <td>@ep.FileName</td>
+                        <td>@ep.UpdatedAt</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </fieldset>
+    
+    <fieldset>
+        <h3>
+            Remoted
+        </h3>
+        <table class="table table-responsive table-bordered">
+            <thead>
+                <tr style="font-weight:bold; text-align:center">
+                    <td>No.</td>
+                    <td>Id</td>
+                    <td>Link</td>
+                    <td>Remote Time</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    i = 0;
+                }
+                @foreach (var ep in Model.Remoted)
+                {
+                    i++;
+                    <tr>
+                        <td>@i</td>
+                        <td>@ep.Id</td>
+                        <td>@ep.FileName</td>
+                        <td>@ep.UpdatedAt</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </fieldset>
+</div>
+

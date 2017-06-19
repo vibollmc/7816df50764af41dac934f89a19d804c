@@ -9,5 +9,7 @@ namespace JavCrawl.Models
     {
         public int Interval { get; set; }
         public bool Enabled { get; set; }
+        public bool EnabledOpenload { get; set; }
+        public bool EnabledCrawler { get; set; }
     }
 }
