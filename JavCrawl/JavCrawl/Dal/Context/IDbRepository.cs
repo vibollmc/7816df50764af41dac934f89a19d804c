@@ -27,5 +27,10 @@ namespace JavCrawl.Dal.Context
 
         IList<Episodes> GetEpisodesRemoted();
         IList<Episodes> GetEpisodesRemoting();
+        IList<Episodes> GetEpisodesRemoteError();
+
+        IList<Films> GetFilmsToGenerateBigSlide();
+
+        Task<bool> NewSlide(IList<int> filmIds);
     }
 }

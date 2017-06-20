@@ -1,0 +1,46 @@
+
+@{
+    ViewData["Title"] = "Generate Views";
+}
+
+@model IList<JavCrawl.Models.DbEntity.Films>
+
+<h2>Generate Views</h2>
+
+<fieldset>
+    <h3>
+        Generate slides
+    </h3>
+    @using (Html.BeginForm("Index", "ViewFilm", FormMethod.Post))
+    {
+        <input type="submit" class="btn btn-danger" value="Generate" />
+        <br />
+        @ViewBag.Message
+        <br />
+        <table class="table table-responsive table-bordered">
+            <thead>
+                <tr style="font-weight:bold; text-align:center">
+                    <td>No.</td>
+                    <td>Movie</td>
+                    <td>Image</td>
+                    <td>Select</td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var i = 0;
+                }
+                @foreach (var film in Model)
+                {
+                    i++;
+                    <tr>
+                        <td>@i</td>
+                        <td>@film.Title</td>
+                        <td><img height="50" src="http://cdn.javmile.com/images/@film.CoverName" /></td>
+                        <td><input type="checkbox" name="film" value="@film.Id" /></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</fieldset>

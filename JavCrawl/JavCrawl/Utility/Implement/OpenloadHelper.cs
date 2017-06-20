@@ -48,10 +48,7 @@ namespace JavCrawl.Utility.Implement
             {
                 var idRemote = await RemoteFile(epsNeedToRemote.FileName);
 
-                if (idRemote > 0)
-                {
-                    await _dbRepository.UpdateEpisodeRemoteId(epsNeedToRemote.Id, idRemote);
-                }
+                await _dbRepository.UpdateEpisodeRemoteId(epsNeedToRemote.Id, idRemote);
             }
 
             return true;

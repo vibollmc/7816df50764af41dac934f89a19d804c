@@ -26,6 +26,7 @@ namespace JavCrawl.Controllers
 
             model.Remoted = _dbRepository.GetEpisodesRemoted();
             model.Remoting = _dbRepository.GetEpisodesRemoting();
+            model.Error = _dbRepository.GetEpisodesRemoteError();
 
             return View(model);
         }

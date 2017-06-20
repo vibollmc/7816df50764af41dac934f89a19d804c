@@ -19,6 +19,7 @@ namespace JavCrawl.Models.Openload
         PermissionDenined = 403,
         FileNotFound = 404,
         Unavailable = 451,
+        FileRemoteNotFound = 500,
         BandwidthExceeded = 509
     }
 }

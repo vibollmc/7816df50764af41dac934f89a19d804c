@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace JavCrawl.Dal.Implement
 {
@@ -17,6 +18,13 @@ namespace JavCrawl.Dal.Implement
         private readonly IFtpHelper _ftpHelper;
         private readonly IHtmlHelper _htmlHelper;
 
+        private class Slide
+        {
+            public string url { get; set; }
+            public string content { get; set; }
+            public string img { get; set; }
+        }
+
         public DbRepository(MySqlContext dbContext, IFtpHelper ftpHelper, IHtmlHelper htmlHelper)
         {
             _dbContext = dbContext;
@@ -24,15 +32,97 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public async Task<bool> NewSlide(IList<int> filmIds)
+        {
+            var films = _dbContext.Films
+                    .Where(x => filmIds.Contains(x.Id))
+                    .OrderByDescending(x => x.Date);
+
+            var slides = new List<Slide>();
+
+            foreach(var film in films )
+            {
+                var slide = new Slide();
+
+                var ftp = _dbContext.Servers.FirstOrDefault(x => x.Id == film.FtpId);
+                if (ftp == null) continue;
+                
+                var cat = _dbContext.Categories.FirstOrDefault(x => x.Id == film.CategoryId);
+                if (cat == null) continue;
+
+                slide.content = string.Format("<p>{0}</p>", film.Title);
+
+                var ftpAccount = JsonConvert.DeserializeObject<FtpAccount>(ftp.Data);
+
+                slide.img = string.Format("{0}/{1}{2}", ftpAccount.public_url, ftpAccount.dir, film.CoverName);
+
+                slide.url = string.Format("{0}/{1}", cat.Slug, film.Slug);
+
+                slides.Add(slide);
+            }
+
+            var setting = _dbContext.Settings.FirstOrDefault(x => x.Title == "Slide");
+
+            if (setting == null)
+            {
+                setting = new Settings
+                {
+                    Title = "Slide",
+                    Type = "slide",
+                    Status = 1,
+                    DataType = "json",
+                    CreatedAt = DateTime.Now
+                };
+
+                _dbContext.Settings.Add(setting);
+            }
+
+            setting.UpdatedAt = DateTime.Now;
+            setting.Data = JsonConvert.SerializeObject(slides);
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public IList<Films> GetFilmsToGenerateBigSlide()
+        {
+            var result = _dbContext.Films
+                    .Where(x => x.ThumbName != x.CoverName && x.Online == 1 && x.DeletedAt == null)
+                    .OrderByDescending(x => x.Date)
+                    .Take(100)
+                    .ToList();
+
+            return result;
+        }
+
         public IList<Episodes> GetEpisodesRemoted()
         {
-            var episode = _dbContext.Episodes.Where(x => x.FileName.Contains("openload.co") && x.FileName.Contains("javmile.com")).OrderByDescending(x=>x.Id).Take(100);
+            var episode = _dbContext.Episodes.Where(
+                    x => 
+                        x.FileName.Contains("openload.co") && 
+                        x.FileName.Contains("javmile.com")).OrderByDescending(x=>x.Id).Take(100);
 
             return episode.ToList();
         }
+
+        public IList<Episodes> GetEpisodesRemoteError()
+        {
+            var episode = _dbContext.Episodes.Where(
+                    x => 
+                        x.FileName.Contains("openload.co") && 
+                        x.CustomerId == 0).OrderByDescending(x => x.Id);
+
+            return episode.ToList();
+        }
+
         public IList<Episodes> GetEpisodesRemoting()
         {
-            var episode = _dbContext.Episodes.Where(x => x.FileName.Contains("openload.co") && !x.FileName.Contains("javmile.com") && x.CustomerId != null).OrderByDescending(x => x.Id);
+            var episode = _dbContext.Episodes.Where(
+                    x => 
+                        x.FileName.Contains("openload.co") && 
+                        !x.FileName.Contains("javmile.com") && 
+                        x.CustomerId != null && x.CustomerId != 0).OrderByDescending(x => x.Id);
 
             return episode.ToList();
         }
@@ -55,7 +145,13 @@ namespace JavCrawl.Dal.Implement
 
         public Episodes GetEpisodeToCheckStatusRemote()
         {
-            var episode = _dbContext.Episodes.OrderBy(x => x.Id).FirstOrDefault(x => x.FileName.Contains("openload.co") && !x.FileName.Contains("javmile.com") && x.CustomerId != null);
+            var episode = _dbContext.Episodes
+                    .OrderBy(x => x.Id)
+                    .FirstOrDefault(
+                        x => 
+                            x.FileName.Contains("openload.co") && 
+                            !x.FileName.Contains("javmile.com") && 
+                            x.CustomerId != null && x.CustomerId != 0);
 
             return episode;
         }
@@ -76,7 +172,13 @@ namespace JavCrawl.Dal.Implement
 
         public Episodes GetEpisodeToTranferOpenload()
         {
-            var episode = _dbContext.Episodes.OrderBy(x=>x.Id).FirstOrDefault(x => x.FileName.Contains("openload.co") && !x.FileName.Contains("javmile.com") && x.CustomerId == null);
+            var episode = _dbContext.Episodes
+                    .OrderBy(x=>x.Id)
+                    .FirstOrDefault(
+                        x => 
+                            x.FileName.Contains("openload.co") && 
+                            !x.FileName.Contains("javmile.com") && 
+                            x.CustomerId == null);
 
             return episode;
         }
