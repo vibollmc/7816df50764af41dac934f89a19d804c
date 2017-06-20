@@ -280,7 +280,7 @@ class CategoryController extends Controller {
             $data = [
                 'result' => $films,
                 'pagination' => $films->render(),
-                'title' => 'Phim Hot'
+                'title' => 'JAV Hot'
                 ];
             Cache::put('hot_page_'.$current_page.$by.$sort, $data, $minutes);
         }
