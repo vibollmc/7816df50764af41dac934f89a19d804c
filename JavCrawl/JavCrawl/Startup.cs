@@ -51,6 +51,7 @@ namespace JavCrawl
             services.AddTransient<IDbRepository, DbRepository>();
             services.AddTransient<JobAuto, JobAuto>();
             services.AddTransient<IOpenloadHelper, OpenloadHelper>();
+            services.AddTransient<IYoutubeHelper, YoutubeHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

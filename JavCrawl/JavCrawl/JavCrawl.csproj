@@ -14,8 +14,14 @@
     <EmbeddedResource Remove="Uploads\**" />
     <None Remove="Uploads\**" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="wwwroot\client_secrets.json" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentFTP" Version="17.4.2" />
+    <PackageReference Include="Google.Apis" Version="1.27.1" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.27.1.760" />
     <PackageReference Include="HtmlAgilityPack" Version="1.4.9.5" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
@@ -36,6 +42,7 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Views\Youtube\" />
     <Folder Include="Views\ViewFilm\" />
     <Folder Include="Views\Openload\" />
   </ItemGroup>

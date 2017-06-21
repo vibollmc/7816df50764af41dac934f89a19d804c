@@ -1,0 +1,83 @@
+@model IEnumerable<JavCrawl.Models.YoutubeVideo>
+
+@{
+    ViewData["Title"] = "Youtube Commenter";
+}
+
+<h2>Youtube Commenter</h2>
+
+@using (Html.BeginForm("Index", "Youtube"))
+{
+    <fieldset>
+        <br />
+        <span>Keyword:</span>
+        <br />
+        <input class="form-control" type="text" style="width:100%; max-width:none;" name="keyword" value="@ViewBag.Keyword" placeholder="Search" />
+        <br />
+        <span>Max Results:</span>
+        <br />
+        <input class="form-control" name="max" style="width:100px;" type="number" value="@ViewBag.max" />
+        <br />
+        <br />
+        <input type="submit" value="Submit" class="btn btn-danger" />
+        <br />
+        <br />
+    </fieldset>
+
+
+    @if (Model == null)
+    {
+        <div>
+            No results.
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>
+                        No.
+                    </th>
+                    <th>
+                        Video Id
+                    </th>
+                    <th>
+                        Title
+                    </th>
+                    <th>
+                        Published At
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var i = 0;
+                }
+                @foreach (var item in Model)
+                {
+                    i++;
+
+                    <tr>
+                        <td>
+                            @i
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.VideoId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PublishedAt)
+                        </td>
+                        <td>
+                            <input type="checkbox" value="@item.VideoId" name="video" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
