@@ -15,22 +15,20 @@ namespace JavCrawl.Utility.Implement
 {
     public class YoutubeHelper : IYoutubeHelper
     {
-        public async Task<bool> Comment(string videoId, string commentText)
+        public async Task<bool> Comment(string videoId, string channelId, string commentText)
         {
-
-            UserCredential credential;
-            using (var stream = new FileStream("client_secrets.json", FileMode.Open, FileAccess.Read))
-            {
-                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
+            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    new ClientSecrets {
+                        ClientId = "723450826839-pri20hqbueba3f7je99b1mbd73pgj2ul.apps.googleusercontent.com",
+                        ClientSecret = "WzsiiOdI52r4RsAHd7q8a1wO"
+                    },
                     // This OAuth 2.0 access scope allows for full read/write access to the
                     // authenticated user's account.
-                    new[] { YouTubeService.Scope.Youtube },
+                    new[] { YouTubeService.Scope.Youtube, YouTubeService.Scope.YoutubeForceSsl },
                     "user",
-                    CancellationToken.None,
-                    new FileDataStore(this.GetType().ToString())
+                    CancellationToken.None
                 );
-            }
+            
 
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
@@ -39,16 +37,21 @@ namespace JavCrawl.Utility.Implement
                 ApplicationName = "YTCommenter"
             });
 
-            var commentRequest = youtubeService.Comments.Insert(new Google.Apis.YouTube.v3.Data.Comment()
+            var commentRequest = youtubeService.CommentThreads.Insert(new Google.Apis.YouTube.v3.Data.CommentThread()
             {
-                Kind = "youtube#comment",
-                Snippet = new Google.Apis.YouTube.v3.Data.CommentSnippet()
+                Snippet = new Google.Apis.YouTube.v3.Data.CommentThreadSnippet
                 {
+                    ChannelId = channelId,
                     VideoId = videoId,
-                    TextDisplay = commentText
+                    TopLevelComment = new Google.Apis.YouTube.v3.Data.Comment()
+                    {
+                        Snippet = new Google.Apis.YouTube.v3.Data.CommentSnippet()
+                        {
+                            TextOriginal = commentText
+                        }
+                    }
                 }
-            }
-            , "snippet");
+            }, "snippet");
 
             var commentResponse = await commentRequest.ExecuteAsync();
 
@@ -82,6 +85,7 @@ namespace JavCrawl.Utility.Implement
                             Title = searchResult.Snippet.Title,
                             VideoId = searchResult.Id.VideoId,
                             PublishedAt = searchResult.Snippet.PublishedAt,
+                            ChannelId = searchResult.Snippet.ChannelId
                         };
 
                         results.Add(video);

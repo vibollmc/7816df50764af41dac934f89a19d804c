@@ -26,7 +26,9 @@ FREE JAVHD, DOWNLOAD JAV, Video Asian Sexy, JAV Streaming
 #javhd #jav #xxx #asianvideo #porn #asiansex #sex #18+﻿";
                 foreach(var e in video)
                 {
-                    await _youtubeHelper.Comment(e, commentText);
+                    var arr = e.Split('|');
+
+                    await _youtubeHelper.Comment(arr[0], arr[1], commentText);
                 }
             }
 

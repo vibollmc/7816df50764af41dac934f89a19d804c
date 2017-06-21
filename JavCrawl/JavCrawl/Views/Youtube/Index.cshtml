@@ -40,9 +40,6 @@
                         No.
                     </th>
                     <th>
-                        Video Id
-                    </th>
-                    <th>
                         Title
                     </th>
                     <th>
@@ -55,7 +52,7 @@
                 @{
                     var i = 0;
                 }
-                @foreach (var item in Model)
+                @foreach (var item in Model.OrderByDescending(x=>x.PublishedAt))
                 {
                     i++;
 
@@ -64,16 +61,13 @@
                             @i
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.VideoId)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Title)
+                            <a href="https://www.youtube.com/watch?v=@item.VideoId" target="_blank">@Html.DisplayFor(modelItem => item.Title)</a>
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.PublishedAt)
                         </td>
                         <td>
-                            <input type="checkbox" value="@item.VideoId" name="video" />
+                            <input type="checkbox" value="@item.VideoId|@item.ChannelId" name="video" />
                         </td>
                     </tr>
                 }
