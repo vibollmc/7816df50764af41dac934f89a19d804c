@@ -10,66 +10,102 @@ using Google.Apis.Auth.OAuth2;
 using System.Threading;
 using System.IO;
 using Google.Apis.Util.Store;
+using Microsoft.AspNetCore.Hosting;
+using Google.Apis.YouTube.v3.Data;
+using Microsoft.Extensions.Options;
 
 namespace JavCrawl.Utility.Implement
 {
     public class YoutubeHelper : IYoutubeHelper
     {
-        public async Task<bool> Comment(string videoId, string channelId, string commentText)
+        private readonly IHostingEnvironment _hostingEnv;
+        private readonly YoutubeSettings _youtubeSettings;
+        public YoutubeHelper(IHostingEnvironment hostingEnv, IOptions<YoutubeSettings> youtubeSettings)
         {
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    new ClientSecrets {
-                        ClientId = "723450826839-pri20hqbueba3f7je99b1mbd73pgj2ul.apps.googleusercontent.com",
-                        ClientSecret = "WzsiiOdI52r4RsAHd7q8a1wO"
-                    },
-                    // This OAuth 2.0 access scope allows for full read/write access to the
-                    // authenticated user's account.
-                    new[] { YouTubeService.Scope.Youtube, YouTubeService.Scope.YoutubeForceSsl },
-                    "user",
-                    CancellationToken.None
-                );
-            
+            _hostingEnv = hostingEnv;
+            _youtubeSettings = youtubeSettings.Value;
+        }
 
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+        public async Task<bool> Comment(IList<string> videoId, string commentText)
+        {
+            try
             {
-                //ApiKey = "AIzaSyBLMWRrG0IrQefrbZ6-usjawv0GU4Xkg4s",
-                HttpClientInitializer = credential,
-                ApplicationName = "YTCommenter"
-            });
-
-            var commentRequest = youtubeService.CommentThreads.Insert(new Google.Apis.YouTube.v3.Data.CommentThread()
-            {
-                Snippet = new Google.Apis.YouTube.v3.Data.CommentThreadSnippet
+                using (var stream = new FileStream(_hostingEnv.WebRootPath + "\\client_secrets.json", FileMode.Open, FileAccess.Read))
                 {
-                    ChannelId = channelId,
-                    VideoId = videoId,
-                    TopLevelComment = new Google.Apis.YouTube.v3.Data.Comment()
+                    var dirUploads = string.Format("{0}\\{1}", _hostingEnv.WebRootPath, "Uploads");
+
+                    if (!Directory.Exists(dirUploads)) Directory.CreateDirectory(dirUploads);
+
+                    var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                        stream,
+                        new[] { YouTubeService.Scope.YoutubeForceSsl
+                        },
+                        "user",
+                        CancellationToken.None,
+                        new FileDataStore(dirUploads)
+                    );
+
+                    var youtubeService = new YouTubeService(new BaseClientService.Initializer()
                     {
-                        Snippet = new Google.Apis.YouTube.v3.Data.CommentSnippet()
+                        ApiKey = _youtubeSettings.ApiKey,
+                        HttpClientInitializer = credential,
+                        ApplicationName = _youtubeSettings.ApplicationName
+                    });
+
+                    foreach (var vi in videoId)
+                    {
+                        try
                         {
-                            TextOriginal = commentText
+                            var arr = vi.Split('|');
+
+                            var commentThread = new CommentThread();
+                            commentThread.Snippet = new CommentThreadSnippet();
+                            commentThread.Snippet.VideoId = arr[0];
+                            commentThread.Snippet.ChannelId = arr[1];
+                            commentThread.Snippet.TopLevelComment = new Comment();
+                            commentThread.Snippet.TopLevelComment.Snippet = new CommentSnippet();
+                            commentThread.Snippet.TopLevelComment.Snippet.TextOriginal = commentText;
+
+                            var request = youtubeService.CommentThreads.Insert(commentThread, "snippet");
+
+                            var response = await request.ExecuteAsync();
+                        }
+                        catch
+                        {
+                            //Do Nothing to skip video do not allow comment
                         }
                     }
                 }
-            }, "snippet");
 
-            var commentResponse = await commentRequest.ExecuteAsync();
-
-            return true;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public async Task<IList<YoutubeVideo>> Search(string keyword, int maxResult)
+        public async Task<IList<YoutubeVideo>> Search(string keyword, int maxResult, int? lat, int? lon, string radius, DateTime? publishedAfter)
         {
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = "AIzaSyBLMWRrG0IrQefrbZ6-usjawv0GU4Xkg4s",
-                ApplicationName = "YTCommenter"
+                ApiKey = _youtubeSettings.ApiKey,
+                ApplicationName = _youtubeSettings.ApplicationName
             });
 
             var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = keyword;
             searchListRequest.Type = "video";
             searchListRequest.MaxResults = maxResult;
+
+            if (lat != null && lon != null)
+            {
+                searchListRequest.Location = string.Format("{0:0.00},{1:0.00}", lat, lon);
+            }
+
+            if (!string.IsNullOrWhiteSpace(radius)) searchListRequest.LocationRadius = radius;
+
+            if (publishedAfter != null) searchListRequest.PublishedAfter = publishedAfter;
 
             var searchListResponse = await searchListRequest.ExecuteAsync();
 

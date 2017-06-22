@@ -45,6 +45,7 @@ namespace JavCrawl
             options.UseMySql(Configuration.GetConnectionString("MySqlConnection")));
 
             services.Configure<OpenloadSettings>(Configuration.GetSection("OpenloadSettings"));
+            services.Configure<YoutubeSettings>(Configuration.GetSection("YoutubeSettings"));
 
             services.AddTransient<IHtmlHelper, HtmlHelper>();
             services.AddTransient<IFtpHelper, FtpHelper>();
