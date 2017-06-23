@@ -40,6 +40,7 @@ namespace JavCrawl.Dal
         public virtual DbSet<FilmTags> FilmTags { get; set; }
         public virtual DbSet<Images> Images { get; set; }
         public virtual DbSet<JobListCrawl> JobListCrawl { get; set; }
+        public virtual DbSet<YoutubeComment> YoutubeComment { get; set; }
 
         public MySqlContext(DbContextOptions options) : base(options)
         {
@@ -1545,6 +1546,27 @@ namespace JavCrawl.Dal
                 entity.Property(e => e.Error)
                     .HasColumnName("error")
                     .HasColumnType("varchar(1024)");
+            });
+
+            modelBuilder.Entity<YoutubeComment>(entity =>
+            {
+                entity.ToTable("youtube_comment");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.VideoId)
+                    .HasColumnName("videoid")
+                    .HasColumnType("varchar(45)");
+
+                entity.Property(e => e.ChannelId)
+                    .HasColumnName("channelid")
+                    .HasColumnType("varchar(45)");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasColumnType("datetime");
             });
         }
     }

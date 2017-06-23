@@ -32,6 +32,24 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public IList<YoutubeComment> GetYoutubeComment(IList<string> videoId)
+        {
+            return _dbContext.YoutubeComment.Where(x => videoId.Contains(x.VideoId)).ToList();
+        }
+
+        public async Task<bool> AddNewYoutubeComment(YoutubeComment youtube)
+        {
+            var comment = _dbContext.YoutubeComment.FirstOrDefault(x => x.VideoId == youtube.VideoId);
+
+            if (comment == null) _dbContext.YoutubeComment.Add(youtube);
+
+            else comment.CreatedAt = DateTime.Now;
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<bool> NewSlide(IList<int> filmIds)
         {
             var films = _dbContext.Films

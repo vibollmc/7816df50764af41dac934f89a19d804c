@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="wwwroot\client_secret.json" />
     <Content Include="wwwroot\client_secrets.json" />
   </ItemGroup>
   <ItemGroup>

@@ -26,7 +26,7 @@ namespace JavCrawl.Utility.Implement
         }
         public async Task<FtpResults> RemoteFiles(string fileUrl, string saveAsName)
         {
-            var dirUploads = string.Format("{0}\\{1}", _hostingEnv.WebRootPath, "Uploads");
+            var dirUploads = string.Format("{0}/{1}", _hostingEnv.WebRootPath, "Uploads");
 
             if (!Directory.Exists(dirUploads)) Directory.CreateDirectory(dirUploads);
 
@@ -34,7 +34,7 @@ namespace JavCrawl.Utility.Implement
             
             //if (!uri.IsFile) return new FtpResults { IsSuccessful = false };
             
-            var filePath = string.Format("{0}\\{1}", dirUploads, Path.GetFileName(uri.LocalPath));
+            var filePath = string.Format("{0}/{1}", dirUploads, Path.GetFileName(uri.LocalPath));
 
             using (var httpClient = new HttpClient())
             {

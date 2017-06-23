@@ -4,13 +4,13 @@
 @model IList<JavCrawl.Models.DbEntity.JobListCrawl>
 <div>
     <h3>@ViewBag.Message</h3>
-
+    <br />
+    <a target="_blank" href="/Video?link=http://jav789.com/movie/matsuri-kadota-knocked-a-beautiful-wife-down-let-s-have-your-dirty-dream-come-true-261.html">Check GetLink</a>
+    <hr />
     @using (Html.BeginForm("SetSchedule", "Home", FormMethod.Post))
     {
         <fieldset>
             @Html.ValidationSummary(true)
-            <br />
-            <br />
             <span>Link:</span>
             <br />
             <input class="form-control" type="url" style="width:100%; max-width:none;" name="link" placeholder="http://javhihi.com/movie?sort=published&page=137&ajax=1" />

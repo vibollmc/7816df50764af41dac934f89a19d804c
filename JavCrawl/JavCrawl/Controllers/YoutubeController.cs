@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using JavCrawl.Utility.Context;
 using JavCrawl.Models;
 using Microsoft.Extensions.Options;
+using JavCrawl.Dal.Context;
+using JavCrawl.Models.DbEntity;
 
 namespace JavCrawl.Controllers
 {
@@ -13,26 +15,51 @@ namespace JavCrawl.Controllers
     {
         private readonly IYoutubeHelper _youtubeHelper;
         private readonly YoutubeSettings _youtubeSettings;
-        public YoutubeController(IYoutubeHelper youtubeHelper, IOptions<YoutubeSettings> youtubeSettings)
+        private readonly IDbRepository _dbRepository;
+        public YoutubeController(IYoutubeHelper youtubeHelper, IOptions<YoutubeSettings> youtubeSettings, IDbRepository dbRepository)
         {
             _youtubeHelper = youtubeHelper;
             _youtubeSettings = youtubeSettings.Value;
+            _dbRepository = dbRepository;
         }
-        public async Task<IActionResult> Index(string keyword, int? max, IList<string> video)
+        public async Task<IActionResult> OAuth()
         {
-            if (video != null && video.Count > 0)
+            ViewBag.Message = await _youtubeHelper.Authorization();
+
+            return View();
+        }
+
+        public async Task<IActionResult> Index(YoutubeModel model)
+        {
+            if (model == null) model = new YoutubeModel();
+
+            if (string.IsNullOrWhiteSpace(model.CommentText)) model.CommentText = _youtubeSettings.CommentDefault;
+            if (model.Max == null) model.Max = _youtubeSettings.MaxResultDefault;
+
+            if (model.SelectedVideo != null && model.SelectedVideo.Count > 0)
             {
-                await _youtubeHelper.Comment(video, _youtubeSettings.CommentDefault);
+                await _youtubeHelper.Comment(model.SelectedVideo, model.CommentText);
             }
 
-            IList<YoutubeVideo> model = null;
-
-            ViewBag.Keyword = keyword;
-            ViewBag.max = (max == null || max <= 0) ? 50 : max.Value;
-
-            if (!string.IsNullOrWhiteSpace(keyword) && max != null && max > 0)
+            if (!string.IsNullOrWhiteSpace(model.Search) && model.Max != null && model.Max > 0)
             {
-                model = await _youtubeHelper.Search(keyword, max.Value, null, null, null, null);
+                model.Videos = await _youtubeHelper.Search(model.Search, model.Max.Value, model.Lat, model.Lon, model.Radius, model.PublishedAfter, model.PageToken);
+
+                if (model.Videos != null)
+                {
+                    var videoid = model.Videos.Select(x => x.VideoId).ToList();
+
+                    var commented = _dbRepository.GetYoutubeComment(videoid);
+
+                    foreach(var video in model.Videos)
+                    {
+                        var c = commented.FirstOrDefault(x => x.VideoId == video.VideoId);
+                        if (c!= null)
+                        {
+                            video.CommentedAt = c.CreatedAt;
+                        }
+                    }
+                }
             }
 
             return View(model);

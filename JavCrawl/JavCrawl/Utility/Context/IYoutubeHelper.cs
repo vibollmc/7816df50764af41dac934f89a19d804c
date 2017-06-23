@@ -8,7 +8,8 @@ namespace JavCrawl.Utility.Context
 {
     public interface IYoutubeHelper
     {
+        Task<string> Authorization();
         Task<bool> Comment(IList<string> videoId, string commentText);
-        Task<IList<YoutubeVideo>> Search(string keyword, int maxResult, int? lat, int? lon, string radius, DateTime? publishedAfter);
+        Task<IList<YoutubeVideo>> Search(string keyword, int maxResult, decimal? lat, decimal? lon, string radius, DateTime? publishedAfter, string pageToken);
     }
 }

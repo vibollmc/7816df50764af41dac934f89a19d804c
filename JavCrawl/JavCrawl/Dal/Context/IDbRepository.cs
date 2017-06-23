@@ -32,5 +32,8 @@ namespace JavCrawl.Dal.Context
         IList<Films> GetFilmsToGenerateBigSlide();
 
         Task<bool> NewSlide(IList<int> filmIds);
+
+        IList<YoutubeComment> GetYoutubeComment(IList<string> videoId);
+        Task<bool> AddNewYoutubeComment(YoutubeComment youtube);
     }
 }

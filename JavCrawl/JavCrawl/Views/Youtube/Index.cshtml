@@ -1,4 +1,4 @@
-@model IEnumerable<JavCrawl.Models.YoutubeVideo>
+@model JavCrawl.Models.YoutubeModel
 
 @{
     ViewData["Title"] = "Youtube Commenter";
@@ -9,27 +9,74 @@
 @using (Html.BeginForm("Index", "Youtube"))
 {
     <fieldset>
-        <br />
-        <span>Keyword:</span>
-        <br />
-        <input class="form-control" type="text" style="width:100%; max-width:none;" name="keyword" value="@ViewBag.Keyword" placeholder="Search" />
-        <br />
-        <span>Max Results:</span>
-        <br />
-        <input class="form-control" name="max" style="width:100px;" type="number" value="@ViewBag.max" />
-        <br />
-        <br />
-        <input type="submit" value="Submit" class="btn btn-danger" />
-        <br />
-        <br />
-    </fieldset>
-
-
-    @if (Model == null)
-    {
-        <div>
-            No results.
+        <div class="row">
+            <div class="col-md-4">
+                <label class="control-label">@Html.DisplayNameFor(x => x.Search)</label>
+                @Html.TextBoxFor(x => x.Search, new { Class = "form-control" })
+            </div>
+            <div class="col-md-4">
+                <label class="control-label">@Html.DisplayNameFor(x => x.Max)</label>
+                @Html.TextBoxFor(x => x.Max, new { Class = "form-control" })
+            </div>
+            <div class="col-md-4">
+                <label class="control-label">@Html.DisplayNameFor(x => x.PublishedAfter)</label>
+                @Html.TextBoxFor(x => x.PublishedAfter, new { Class = "form-control" })
+            </div>
         </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label class="control-label">@Html.DisplayNameFor(x => x.Lat)</label>
+                @Html.TextBoxFor(x => x.Lat, new { Class = "form-control" })
+            </div>
+            <div class="col-md-4">
+                <label class="control-label">@Html.DisplayNameFor(x => x.Lon)</label>
+                @Html.TextBoxFor(x => x.Lon, new { Class = "form-control" })
+            </div>
+            <div class="col-md-4">
+                <label class="control-label">@Html.DisplayNameFor(x => x.Radius)</label>
+                @Html.TextBoxFor(x => x.Radius, new { Class = "form-control" })
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <a asp-area="" asp-controller="Youtube" asp-action="OAuth">Authorize</a>
+                <br />
+                <label class="control-label">@Html.DisplayNameFor(x => x.CommentText)</label>
+                @Html.TextAreaFor(x=> x.CommentText, new { Class = "form-control" , Style = "max-width: 100%; height: 100px;" })
+            </div>
+        </div>
+        @if (Model.Videos != null && Model.Videos.Count > 0)
+        {
+            var obj = Model.Videos[0];
+        <div class="row">
+            <div class="col-md-12">
+                <label class="control-label">@Html.DisplayNameFor(x => x.PageToken)</label>
+                @if (!string.IsNullOrWhiteSpace(obj.TokenPrevPage))
+                {
+                    <a class="label label-success" href="javascript:void(0);" onclick="$('#PageToken').val('@obj.TokenPrevPage');">Prev Page</a>
+                }
+                @if (!string.IsNullOrWhiteSpace(obj.TokenNextPage))
+                {
+                    <a class="label label-success" href="javascript:void(0);" onclick="$('#PageToken').val('@obj.TokenNextPage');">Next Page</a>
+                }
+                @Html.TextBoxFor(x => x.PageToken, new { Class = "form-control" })
+            </div>
+        </div>
+        }
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <label class="control-label"> </label>
+                <input type="submit" value="Submit" class="btn btn-danger" />
+            </div>
+        </div>
+    </fieldset>
+<hr />
+<fieldset>
+    @if(Model.Videos == null)
+    {
+        <div>No Results</div>
     }
     else
     {
@@ -45,33 +92,46 @@
                     <th>
                         Published At
                     </th>
-                    <th></th>
+                    <th>
+                        <input name="checkall" type="checkbox" id="checkall" onclick="var ischecked = $(this).is(':checked'); $('input[name=SelectedVideo]').each(function () { if (!$(this).prop('disabled')) $(this).prop('checked', ischecked);});"/>
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 @{
                     var i = 0;
                 }
-                @foreach (var item in Model.OrderByDescending(x=>x.PublishedAt))
+                @foreach (var item in Model.Videos.OrderByDescending(x=>x.PublishedAt))
                 {
                     i++;
-
                     <tr>
                         <td>
                             @i
                         </td>
                         <td>
+                            @if (item.CommentedAt != null)
+                            {
+                            <label class="label label-danger" title="At @item.CommentedAt">Commented</label>
+                            }
+                            else
+                            {
+                            <label class="label label-warning">New</label>
+                            }
                             <a href="https://www.youtube.com/watch?v=@item.VideoId" target="_blank">@Html.DisplayFor(modelItem => item.Title)</a>
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.PublishedAt)
                         </td>
                         <td>
-                            <input type="checkbox" value="@item.VideoId|@item.ChannelId" name="video" />
+                            @if (item.CommentedAt == null)
+                            {
+                            <input type="checkbox" value="@item.VideoId|@item.ChannelId" name="SelectedVideo" />
+                            }
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     }
+</fieldset>
 }
