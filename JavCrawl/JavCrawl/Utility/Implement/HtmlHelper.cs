@@ -227,21 +227,19 @@ namespace JavCrawl.Utility.Implement
                 }
                 else
                 {
+                    var linkEpsAndDecs = await GetJavHiHiMoviesLinkEpisode(urlPage);
+
                     if (from789)
                     {
                         item.descriptions = item.name;
-                        item.linkepisode = new List<string>
-                        {
-                           urlPage
-                        };
                     }
                     else
                     {
-                        var linkEpsAndDecs = await GetJavHiHiMoviesLinkEpisode(urlPage);
-
                         item.descriptions = linkEpsAndDecs.Description;
-                        item.linkepisode = linkEpsAndDecs.LinkEps;
                     }
+
+                    item.linkepisode = linkEpsAndDecs.LinkEps;
+                    
                 }
             }
             results.movies = results.movies.Where(x => x.url != string.Empty).ToList();
@@ -281,34 +279,40 @@ namespace JavCrawl.Utility.Implement
 
             var serverNodes = divNodes.Where(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "server");
 
-            if (serverNodes == null || serverNodes.Count() == 0) return results;
-
-            foreach(var serverNode in serverNodes)
+            if (serverNodes == null || serverNodes.Count() == 0)
             {
-                if (serverNode.InnerText.Contains("Server YT") && serverNode.ChildNodes != null && serverNode.ChildNodes.Count > 1)
+                results.LinkEps.Add(url);
+                return results;
+            }
+            else
+            {
+                foreach (var serverNode in serverNodes)
                 {
-                    results.LinkEps.Add(serverNode.ChildNodes["a"].Attributes["href"].Value);
-                }
-                else
-                {
-                    if (serverNode.ChildNodes["a"].Attributes["href"].Value == url)
+                    if (serverNode.InnerText.Contains("Server YT") && serverNode.ChildNodes != null && serverNode.ChildNodes.Count > 1)
                     {
-                        var playerSize = divNodes.FirstOrDefault(
-                            x => x.Attributes.Contains("class") 
-                                && x.Attributes["class"].Value == "player-size");
-
-                        if (playerSize != null && playerSize.ChildNodes != null && playerSize.ChildNodes.Count > 0
-                            && playerSize.ChildNodes["iframe"] != null)
-                            results.LinkEps.Add(playerSize.ChildNodes["iframe"].Attributes["src"].Value);
+                        results.LinkEps.Add(serverNode.ChildNodes["a"].Attributes["href"].Value);
                     }
-                    else if (serverNode.ChildNodes != null && serverNode.ChildNodes.Count > 1)
+                    else
                     {
-                        var urlEps = serverNode.ChildNodes["a"].Attributes["href"].Value;
-                        var linkEps = await GetLinkHiddenEps(urlEps);
-
-                        if (linkEps != null)
+                        if (serverNode.ChildNodes["a"].Attributes["href"].Value == url)
                         {
-                            results.LinkEps.Add(linkEps);
+                            var playerSize = divNodes.FirstOrDefault(
+                                x => x.Attributes.Contains("class")
+                                    && x.Attributes["class"].Value == "player-size");
+
+                            if (playerSize != null && playerSize.ChildNodes != null && playerSize.ChildNodes.Count > 0
+                                && playerSize.ChildNodes["iframe"] != null)
+                                results.LinkEps.Add(playerSize.ChildNodes["iframe"].Attributes["src"].Value);
+                        }
+                        else if (serverNode.ChildNodes != null && serverNode.ChildNodes.Count > 1)
+                        {
+                            var urlEps = serverNode.ChildNodes["a"].Attributes["href"].Value;
+                            var linkEps = await GetLinkHiddenEps(urlEps);
+
+                            if (linkEps != null)
+                            {
+                                results.LinkEps.Add(linkEps);
+                            }
                         }
                     }
                 }
