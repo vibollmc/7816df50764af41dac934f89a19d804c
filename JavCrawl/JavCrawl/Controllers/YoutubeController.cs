@@ -45,7 +45,7 @@ namespace JavCrawl.Controllers
             {
                 model.Videos = await _youtubeHelper.Search(model.Search, model.Max.Value, model.Lat, model.Lon, model.Radius, model.PublishedAfter, model.PageToken);
 
-                if (model.Videos != null)
+                if (model.Videos != null && model.Videos.Count > 0)
                 {
                     var videoid = model.Videos.Select(x => x.VideoId).ToList();
 

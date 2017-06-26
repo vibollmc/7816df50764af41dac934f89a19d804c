@@ -43,7 +43,7 @@
                 <a asp-area="" asp-controller="Youtube" asp-action="OAuth">Authorize</a>
                 <br />
                 <label class="control-label">@Html.DisplayNameFor(x => x.CommentText)</label>
-                @Html.TextAreaFor(x=> x.CommentText, new { Class = "form-control" , Style = "max-width: 100%; height: 100px;" })
+                @Html.TextAreaFor(x => x.CommentText, new { Class = "form-control", Style = "max-width: 100%; height: 100px;" })
             </div>
         </div>
         @if (Model.Videos != null && Model.Videos.Count > 0)
@@ -63,12 +63,43 @@
                 @Html.TextBoxFor(x => x.PageToken, new { Class = "form-control" })
             </div>
         </div>
+        @section Scripts {
+        <script>
+            
+            $(document).ready(function () {
+
+                var issubmiting = false;
+                
+                var intervalobj = setInterval(() => {
+                    if ($('#PageToken').val() != '@obj.TokenNextPage' && $('input[name=SelectedVideo]').length > 0) {
+
+                        $('#PageToken').val('@obj.TokenNextPage');
+
+                        $('form').submit();
+
+                        issubmiting = true;
+
+                        console.log('submiting...')
+                    }
+                    else {
+                        if (!issubmiting)
+                            console.log('no results, please change your keywords');
+
+                        clearInterval(intervalobj);
+                    }
+
+                }, 3000);
+            });
+
+        </script>
         }
+        }
+        
         <br />
         <div class="row">
             <div class="col-md-12">
                 <label class="control-label"> </label>
-                <input type="submit" value="Submit" class="btn btn-danger" />
+                <input type="submit" value="Submit" class="btn btn-danger" id="btnsubmit" />
             </div>
         </div>
     </fieldset>
@@ -93,7 +124,7 @@
                         Published At
                     </th>
                     <th>
-                        <input name="checkall" type="checkbox" id="checkall" onclick="var ischecked = $(this).is(':checked'); $('input[name=SelectedVideo]').each(function () { if (!$(this).prop('disabled')) $(this).prop('checked', ischecked);});"/>
+                        <input name="checkall" checked type="checkbox" id="checkall" onclick="var ischecked = $(this).is(':checked'); $('input[name=SelectedVideo]').each(function () { if (!$(this).prop('disabled')) $(this).prop('checked', ischecked);});"/>
                     </th>
                 </tr>
             </thead>
@@ -125,7 +156,7 @@
                         <td>
                             @if (item.CommentedAt == null)
                             {
-                            <input type="checkbox" value="@item.VideoId|@item.ChannelId" name="SelectedVideo" />
+                            <input type="checkbox" checked value="@item.VideoId|@item.ChannelId" name="SelectedVideo" />
                             }
                         </td>
                     </tr>

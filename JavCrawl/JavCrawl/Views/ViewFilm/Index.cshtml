@@ -11,9 +11,14 @@
     <h3>
         Generate slides
     </h3>
+@using (Html.BeginForm("Member", "ViewFilm", FormMethod.Post))
+{
+    <input type="submit" class="btn btn-danger" value="Generate Film Member" />
+}
+    <hr />
     @using (Html.BeginForm("Index", "ViewFilm", FormMethod.Post))
     {
-        <input type="submit" class="btn btn-danger" value="Generate" />
+        <input type="submit" class="btn btn-danger" value="Generate Slide" />
         <br />
         @ViewBag.Message
         <br />

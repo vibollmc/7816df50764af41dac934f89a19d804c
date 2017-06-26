@@ -32,5 +32,13 @@ namespace JavCrawl.Controllers
 
             return View(model);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Member()
+        {
+            await _dbRepository.GenerateMemberVideo();
+
+            return RedirectToAction("Index");
+        }
     }
 }

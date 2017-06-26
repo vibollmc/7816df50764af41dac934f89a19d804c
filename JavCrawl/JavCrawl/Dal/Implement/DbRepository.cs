@@ -32,20 +32,57 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public async Task<bool> GenerateMemberVideo()
+        {
+            var filmMember = _dbContext.Films.Where(x => x.Member != null);
+            foreach(var film in filmMember)
+            {
+                film.Member = null;
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            var min = _dbContext.Films.OrderBy(x => x.Id).FirstOrDefault().Id;
+            var max = _dbContext.Films.OrderByDescending(x => x.Id).FirstOrDefault().Id;
+
+            var idRandoms = new List<int>();
+            var value = 0;
+            for(var i = 0; i < 500; i++)
+            {
+                while(value == 0 || idRandoms.Contains(value))
+                {
+                    var random = new Random();
+                    value = random.Next(min, max);
+                }
+
+                idRandoms.Add(value);
+            }
+
+            var newfilmMember = _dbContext.Films.Where(x => idRandoms.Contains(x.Id));
+
+            foreach (var film in newfilmMember)
+            {
+                film.Member = 1;
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
         public IList<YoutubeComment> GetYoutubeComment(IList<string> videoId)
         {
             return _dbContext.YoutubeComment.Where(x => videoId.Contains(x.VideoId)).ToList();
         }
 
-        public async Task<bool> AddNewYoutubeComment(YoutubeComment youtube)
+        public async Task<bool> AddNewYoutubeComment(IList<YoutubeComment> youtube)
         {
-            var comment = _dbContext.YoutubeComment.FirstOrDefault(x => x.VideoId == youtube.VideoId);
+            if (youtube != null)
+            {
+                await _dbContext.YoutubeComment.AddRangeAsync(youtube);
 
-            if (comment == null) _dbContext.YoutubeComment.Add(youtube);
-
-            else comment.CreatedAt = DateTime.Now;
-
-            await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
+            }
 
             return true;
         }

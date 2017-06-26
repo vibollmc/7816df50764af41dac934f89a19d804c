@@ -14,6 +14,7 @@ using Google.Apis.YouTube.v3.Data;
 using Microsoft.Extensions.Options;
 using JavCrawl.Dal.Context;
 using Google.Apis.Auth.OAuth2;
+using JavCrawl.Models.DbEntity;
 
 namespace JavCrawl.Utility.Implement
 {
@@ -86,6 +87,9 @@ namespace JavCrawl.Utility.Implement
                         ApplicationName = _youtubeSettings.ApplicationName
                     });
 
+                    var commented = new List<YoutubeComment>();
+
+
                     foreach (var vi in videoId)
                     {
                         try
@@ -104,7 +108,7 @@ namespace JavCrawl.Utility.Implement
 
                             var response = await request.ExecuteAsync();
 
-                            await _dbRepository.AddNewYoutubeComment(new Models.DbEntity.YoutubeComment
+                            commented.Add(new YoutubeComment
                             {
                                 CreatedAt = DateTime.Now,
                                 ChannelId = arr[1],
@@ -117,6 +121,8 @@ namespace JavCrawl.Utility.Implement
                             //Do Nothing to skip video do not allow comment
                         }
                     }
+
+                    await _dbRepository.AddNewYoutubeComment(commented);
                 }
 
                 return true;
