@@ -31,7 +31,7 @@ namespace JavCrawl.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Test(string link)
+        public async Task<IActionResult> Test()
         {
             var results = true;
             //var movies = await _htmlHelper.GetJavHiHiMovies(link);
@@ -50,7 +50,9 @@ namespace JavCrawl.Controllers
             //    results = await _dbRepository.SaveSchedule(newSchedule);
             //}
 
-            await _dbRepository.UpdateImage();
+            //await _dbRepository.UpdateImage();
+
+            await _htmlHelper.GetJavHiHiMovies("http://jav789.com/movie?q=airi+minami+amazing+boobs&ajax=1");
 
             return Json(new { OK = results });
         }

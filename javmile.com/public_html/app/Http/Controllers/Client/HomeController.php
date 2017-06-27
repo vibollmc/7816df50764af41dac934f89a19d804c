@@ -46,7 +46,8 @@ class HomeController extends Controller {
         $recent_hot = Cache::get('recent_hot_block');
         // recent Gameshow
         if (!\Cache::has('recent_gameshow_block')) {
-            $genre = Genre::where(['id' => 23])->first();
+            $genreid = rand(1, 75);
+            $genre = Genre::where(['id' => $genreid])->first();
             $films = $genre->films()->where(['online' => 1, 'member' => NULL])->where('quality_id', '<>', 11)->orderBy('order', 'desc')->take(env('PERBLOCK_HOME'))->get();
             Cache::put('recent_gameshow_block', ['films' => $films, 'genre' => $genre], env('CACHE_TIME'));
         }
