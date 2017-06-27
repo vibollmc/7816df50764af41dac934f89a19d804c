@@ -307,7 +307,7 @@ namespace JavCrawl.Dal.Implement
         {
             var jobs = _dbContext.JobListCrawl
                         .OrderBy(x => x.ScheduleAt)
-                        .FirstOrDefault(x => (x.Status == 0 && x.ScheduleAt <= DateTime.Now) || x.Always == true);
+                        .FirstOrDefault(x => (x.Status == 0 && x.ScheduleAt <= DateTime.Now) || (x.Always == true && x.ScheduleAt <= DateTime.Now));
 
             if (jobs == null) return true;
 
@@ -327,6 +327,13 @@ namespace JavCrawl.Dal.Implement
                     jobs.Complete = 0;
                     jobs.UnComplete = 0;
                     jobs.Status = 2;
+
+                    if (jobs.Always)
+                    {
+                        jobs.ScheduleAt = DateTime.Now.AddDays(1);
+                    }
+            
+
                     await _dbContext.SaveChangesAsync();
 
                     return true;
@@ -340,6 +347,12 @@ namespace JavCrawl.Dal.Implement
                 jobs.Complete += complete;
                 jobs.UnComplete += total - complete;
                 jobs.Status = 2;
+
+                if (jobs.Always)
+                {
+                    jobs.ScheduleAt = DateTime.Now.AddDays(1);
+                }
+
                 await _dbContext.SaveChangesAsync();
 
             }
@@ -533,9 +546,9 @@ namespace JavCrawl.Dal.Implement
                     string thumb_cover = null;
                     string thumb_name = null;
                     int? ftpId = null;
-                    if (!string.IsNullOrWhiteSpace(movie.image_small))
+                    if (!string.IsNullOrWhiteSpace(movie.image))
                     {
-                        var ftpUpload = await _ftpHelper.RemoteFiles(movie.image_small, movie.url);
+                        var ftpUpload = await _ftpHelper.RemoteFiles(movie.image, movie.url);
                         if (ftpUpload.IsSuccessful)
                         {
                             thumb_name = ftpUpload.FileName;
@@ -547,9 +560,9 @@ namespace JavCrawl.Dal.Implement
                     {
                         thumb_cover = thumb_name;
                     }
-                    else if (!string.IsNullOrWhiteSpace(movie.image))
+                    else if (!string.IsNullOrWhiteSpace(movie.image_small))
                     {
-                        var ftpUpload = await _ftpHelper.RemoteFiles(movie.image, movie.url + "-cover");
+                        var ftpUpload = await _ftpHelper.RemoteFiles(movie.image_small, movie.url + "-cover");
                         if (ftpUpload.IsSuccessful)
                         {
                             thumb_cover = ftpUpload.FileName;
@@ -576,7 +589,7 @@ namespace JavCrawl.Dal.Implement
                         TitleAscii = movie.name,
                         Slug = movie.url,
                         Date = movie.published,
-                        Order = 1,
+                        Order = movie.published.UnixTicks(),
                         Online = 1,
                         Hot = 0,
                         Free = 0,

@@ -89,6 +89,8 @@ namespace JavCrawl
 
             if (timerSetting != null && timerSetting.Enabled)
             {
+                Console.WriteLine("JobAuto is running...");
+
                 _autoEvent = new AutoResetEvent(false);
                 var isProcessing = false;
 

@@ -1,0 +1,5 @@
+<?
+$text=$HTTP_SERVER_VARS['QUERY_STRING'];
+$text = preg_replace("#php\&#si",'php?',$text);
+echo('<center><a href=http://tendomain.com'.$text.'>[Click vao day]</a><br>de vao dien dan.</center>');
+?>

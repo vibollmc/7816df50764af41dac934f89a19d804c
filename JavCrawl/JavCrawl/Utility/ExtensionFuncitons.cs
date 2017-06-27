@@ -21,6 +21,29 @@ namespace JavCrawl.Utility
 
             return results.Trim();
         }
-        
+
+        public static int UnixTicks(this DateTime dt)
+        {
+            var d1 = new DateTime(1970, 1, 1);
+            var d2 = dt.ToUniversalTime();
+            var ts = new TimeSpan(d2.Ticks - d1.Ticks);
+            return (int)ts.TotalMilliseconds;
+        }
+
+        public static int UnixTicks(this string str)
+        {
+            return str.UnixTicks("yyyy-MM-dd");
+        }
+
+        public static int UnixTicks(this string str, string format)
+        {
+            DateTime outd;
+            if (DateTime.TryParseExact(str, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out outd))
+            {
+                return outd.UnixTicks();
+            }
+
+            return 0;
+        }
     }
 }

@@ -1,0 +1,3 @@
+RewriteEngine on
+RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?tendomain.com [NC]
+RewriteRule !antiddos.phtml http://tendomain.com/antiddos.phtml?%{REQUEST_URI} [QSA]

@@ -24,68 +24,55 @@
             <br />
             <br />
         </fieldset>
-    }
+    }   
     <hr />
-    @using (Html.BeginForm("Index", "Video", FormMethod.Get))
-    {
-        <input name="link" type="url" class="form-control" style="width:100%;max-width:none" />
-        <input type="submit" value="View video" class="btn btn-default" />
-    }
-    <hr />
-    <br />
     <br />
     <table class="table table-responsive table-bordered">
         <thead>
             <tr style="font-weight:bold; text-align:center">
                 <td>Link</td>
-                <td>Schedule Time</td>
-                <td>Start Time</td>
-                <td>Finish Time</td>
-                <td>Nonstop</td>
-                <td>Complete</td>
-                <td>Uncomplete</td>
-                <td>Status</td>
+                <td>Start/ Finish</td>
+                <td>Comp/ Uncomp</td>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
             <tr>
-                <td>@item.Link</td>
-                <td>@item.ScheduleAt</td>
-                <td>@item.StartAt</td>
-                <td>@item.FinishAt</td>
-                <td><input type="checkbox" disabled checked="@(item.Always)" /></td>
-                <td>@item.Complete</td>
-                <td>@item.UnComplete</td>
                 <td>
-                    @switch (item.Status)
+                    <label class="label label-danger" title="@item.Error">
+                        @switch (item.Status)
+                        {
+                            case 1:
+                                <i>Inprocessing</i>
+                                break;
+
+                            case 2:
+                                <i>Completed</i>
+                                break;
+
+                            case 3:
+                                <i>Error</i>
+                                break;
+                            default:
+                                <i>New</i>
+                                break;
+                        }
+                    </label>
+
+                    @if (item.Always)
                     {
-                        case 1:
-                            <i>Inprocessing</i>
-                            break;
-
-                        case 2:
-                            <i>Completed</i>
-                            break;
-
-                        case 3:
-                            <i>Error</i>
-                            @Html.Hidden("Error", item.Error)
-                            break;
-                        default:
-                            <i>New</i>
-                            break;
+                        <label class="label label-info">run daily</label>
                     }
+                    @item.Link
+                    <label class="label label-default">@item.ScheduleAt</label>
+                </td>
+                <td><label class="label label-warning">@item.StartAt - @item.FinishAt</label></td>
+                <td>
+                    <label class="label label-success">@item.Complete/@item.UnComplete</label>
                 </td>
             </tr>
             }
         </tbody>
     </table>
 </div>
-
-@*<script>
-    setTimeout(function () {
-                        window.location.reload(1);
-                    }, 30000);
-</script>*@

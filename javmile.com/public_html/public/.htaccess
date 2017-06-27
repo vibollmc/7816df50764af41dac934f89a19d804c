@@ -1,0 +1,42 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews
+    </IfModule>
+
+    RewriteEngine On
+
+    # Redirect www to none...
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^(.*)$ http://%1/$1 [R=301,QSA,L]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+#RewriteEngine On
+#RewriteCond %{HTTPS} !on
+#RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+#RewriteBase /
+redirect 301 /phim/biet-doi-gijoe-cuoc-chien-mang-xa-gi-joe-the-rise-of-cobra-2009 /phim-le/biet-doi-gijoe-cuoc-chien-mang-xa-gi-joe-the-rise-of-cobra-2009
+redirect 301 /phim/nguoi-dan-ba-cuong-dam-phan-1-nymphomaniac-vol-i-2013 /phim-le/nguoi-dan-ba-cuong-dam-phan-1-nymphomaniac-vol-i-2013
+redirect 301 /phim/spartacus-phan-3-cuoc-chien-no-le-spartacus-season-3-war-of-the-damned-2013 /phim-bo/spartacus-phan-3-cuoc-chien-no-le-spartacus-season-3-war-of-the-damned-2013
+redirect 301 /phim/nhung-ten-trom-the-ky-the-thieves-2012 /phim-le/nhung-ten-trom-the-ky-the-thieves-2012
+redirect 301 /phim/thiet-quyen-vuong-the-man-with-the-iron-fists-2012 /phim-le/thiet-quyen-vuong-the-man-with-the-iron-fists-2012
+redirect 301 /phim/spartacus-phan-2-bao-thu-spartacus-season-2-vengeance-2012 /phim-bo/spartacus-phan-2-bao-thu-spartacus-season-2-vengeance-2012
+redirect 301 /phim/thanh-pho-toi-loi-phan-2-gotham-season-2-2015 /phim-bo/thanh-pho-toi-loi-phan-2-gotham-season-2-2015
+redirect 301 /phim/tham-tu-lung-danh-conan-ngon-lua-hoa-mat-troi-detective-conan-sunflowers-of-inferno-2015 /phim-le/tham-tu-conan-movie-19-hoa-huong-duong-cua-bien-lua-detective-conan-movie-19-sunflowers-of-inferno-2015
+redirect 301 /phim/tri-luc-sieu-pham-phan-1-limitless-season-1-2015 /phim-bo/tri-luc-sieu-pham-limitless-2015
+redirect 301 /phim/sat-thu-nikita-phan-1-nikita-season-1-2010 /phim-bo/sat-thu-nikita-phan-1-nikita-season-1-2010
+redirect 301 /phim/sat-thu-nikita-phan-2-nikita-season-2-2011 /phim-bo/sat-thu-nikita-phan-2-nikita-season-2-2011
+redirect 301 /phim/sat-thu-nikita-phan-3-nikita-season-3-2012 /phim-bo/sat-thu-nikita-phan-3-nikita-season-3-2012
+redirect 301 /phim/giang-ho-dam-mau-phan-5-sons-of-anarchy-season-5-2012 /phim-bo/giang-ho-dam-mau-phan-5-sons-of-anarchy-season-5-2012
+redirect 301 /phim/mui-ten-xanh-phan-4-arrow-season-4-2015 /phim-bo/mui-ten-xanh-phan-4-arrow-season-4-2015
+redirect 301 /phim/chang-vang-4-hung-dong-phan-2-the-twilight-saga-4-breaking-dawn-part-2-2012 /phim-le/chang-vang-4-hung-dong-phan-2-the-twilight-saga-4-breaking-dawn-part-2-2012
+redirect 301 /phim/chang-vang-4-hung-dong-phan-1-the-twilight-saga-4-breaking-dawn-part-1 /phim-le/chang-vang-4-hung-dong-phan-1-the-twilight-saga-4-breaking-dawn-part-1
+redirect 301 /phim/chang-vang-3-nhat-thuc-the-twilight-saga-3-eclipse-2010 /phim-le/chang-vang-3-nhat-thuc-the-twilight-saga-3-eclipse-2010
+redirect 301 /phim-le/bao-mau-sieu-quay /phim-le/bao-mau-sieu-quay-2015
