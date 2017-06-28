@@ -36,13 +36,30 @@ namespace JavCrawl.Controllers
             if (string.IsNullOrWhiteSpace(model.CommentText)) model.CommentText = _youtubeSettings.CommentDefault;
             if (model.Max == null) model.Max = _youtubeSettings.MaxResultDefault;
 
+            Stars star = new Stars();
+
             if (model.SelectedVideo != null && model.SelectedVideo.Count > 0)
             {
                 await _youtubeHelper.Comment(model.SelectedVideo, model.CommentText);
             }
 
+            if (string.IsNullOrWhiteSpace(model.Search))
+            {
+                star = await _dbRepository.GetStar();
+
+                if (star != null)
+                {
+                    model.Search = star.Title + " jav star";
+                    model.CommentText = string.Format(@"http://javmile.com/pornstar/{0}
+{1} Video Sex, {1} JAV HD, Videos {1}, {1} sex
+
+#{0} #javhd #jav #xxx #asianvideo #porn #asiansex #sex #18+﻿",star.Slug, star.Title);
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(model.Search) && model.Max != null && model.Max > 0)
             {
+
                 model.Videos = await _youtubeHelper.Search(model.Search, model.Max.Value, model.Lat, model.Lon, model.Radius, model.PublishedAfter, model.PageToken);
 
                 if (model.Videos != null && model.Videos.Count > 0)

@@ -37,5 +37,7 @@ namespace JavCrawl.Dal.Context
         Task<bool> AddNewYoutubeComment(IList<YoutubeComment> youtube);
 
         Task<bool> GenerateMemberVideo();
+
+        Task<Stars> GetStar();
     }
 }

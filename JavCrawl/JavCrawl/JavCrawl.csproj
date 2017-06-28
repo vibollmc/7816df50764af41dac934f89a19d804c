@@ -45,6 +45,7 @@
     <Folder Include="Views\Youtube\" />
     <Folder Include="Views\ViewFilm\" />
     <Folder Include="Views\Openload\" />
+    <Folder Include="wwwroot\Uploads\" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="wwwroot/client_secrets.json">

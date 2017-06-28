@@ -50,12 +50,7 @@
         <script src="{{asset('themes/client/js/vendor/bootstrap.min.js')}}"></script>
         <script src="{{asset('themes/client/js/owl.carousel.min.js')}}"></script>
         {{-- <script type="text/javascript" src="{{asset('themes/client/js/tooltipster.bundle.min.js')}}"></script> --}}
- 	
- 	      <!-- <script type="text/javascript">
-                var uid = '120988';
-                var wid = '246839';
-        </script>
-        <script type="text/javascript" src="//cdn.popcash.net/pop.js"></script> -->
+
  	</head>
     <body>
         <!-- Page Container -->
@@ -77,9 +72,18 @@
                             <div class="header-section">
                             @if(\URL::current() == route('home'))
                                 <div class="col-xs-12">
-                                
-                                    @include('client.block.slider')
-                                
+                                    <div class="mini-slide-box">
+                                        @include('client.block.slider')
+                                    </div>
+                                    <div class="facebook-box hidden-xs">
+                                        <script type="text/javascript">
+                                        var ad_idzone = "2673506",
+                                            ad_width = "300",
+                                            ad_height = "250";
+                                        </script>
+                                        <script type="text/javascript" src="https://ads.exoclick.com/ads.js"></script>
+                                        <noscript><a href="https://main.exoclick.com/img-click.php?idzone=2673506" target="_blank"><img src="https://syndication.exoclick.com/ads-iframe-display.php?idzone=2673506&output=img&type=300x250"></a></noscript>
+                                    </div>
                                 </div>
                                 @include('client.block.slide-bottom')
                                 @include('client.block.mini-slider')
@@ -103,7 +107,6 @@
             <!-- END Page Container -->
         </div>
         <!-- END Page Container -->
-        @include('client.modal.advance-fill')
         @if(!\Session::has('user'))
             @include('client.modal.auth')
         @endif

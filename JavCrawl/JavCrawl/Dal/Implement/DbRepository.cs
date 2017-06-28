@@ -32,6 +32,17 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public async Task<Stars> GetStar()
+        {
+            var star = _dbContext.Stars.OrderByDescending(x => x.Id).FirstOrDefault(x => x.UpdatedAt == null);
+
+            star.UpdatedAt = DateTime.Now;
+
+            await _dbContext.SaveChangesAsync();
+
+            return star;
+        }
+
         public async Task<bool> GenerateMemberVideo()
         {
             var filmMember = _dbContext.Films.Where(x => x.Member != null);
