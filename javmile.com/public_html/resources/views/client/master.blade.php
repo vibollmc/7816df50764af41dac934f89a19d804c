@@ -83,6 +83,14 @@
                                         </script>
                                         <script type="text/javascript" src="https://ads.exoclick.com/ads.js"></script>
                                         <noscript><a href="https://main.exoclick.com/img-click.php?idzone=2673506" target="_blank"><img src="https://syndication.exoclick.com/ads-iframe-display.php?idzone=2673506&output=img&type=300x250"></a></noscript>
+
+                                        <script type="text/javascript">
+                                        var ad_idzone = "2674092",
+                                            ad_width = "300",
+                                            ad_height = "250";
+                                        </script>
+                                        <script type="text/javascript" src="https://ads.exoclick.com/ads.js"></script>
+                                        <noscript><a href="https://main.exoclick.com/img-click.php?idzone=2674092" target="_blank"><img src="https://syndication.exoclick.com/ads-iframe-display.php?idzone=2674092&output=img&type=300x250"></a></noscript>
                                     </div>
                                 </div>
                                 @include('client.block.slide-bottom')

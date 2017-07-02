@@ -27,7 +27,7 @@ namespace JavCrawl.Utility
             var d1 = new DateTime(1970, 1, 1);
             var d2 = dt.ToUniversalTime();
             var ts = new TimeSpan(d2.Ticks - d1.Ticks);
-            return (int)ts.TotalMilliseconds;
+            return (int)(ts.TotalMilliseconds/1000);
         }
 
         public static int UnixTicks(this string str)

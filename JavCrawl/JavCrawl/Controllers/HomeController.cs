@@ -56,7 +56,53 @@ namespace JavCrawl.Controllers
 
             var complete = await _dbRepository.CrawlJavHiHiMovies(movies);
 
+            //var x = await _dbRepository.UpdateCrossImage();
+
             return Json(new { OK = results });
+        }
+
+        [HttpGet]
+        public IActionResult AddMovie()
+        {
+            var movie = new JavHiHiMovie();
+            ViewBag.Message = "";
+            return View(movie);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddMovie(JavHiHiMovie movie)
+        {
+            if (movie != null)
+            {
+                if (string.IsNullOrWhiteSpace(movie.name)) ModelState.AddModelError("name", "name is required.");
+                if (string.IsNullOrWhiteSpace(movie.image)) ModelState.AddModelError("name", "image is required.");
+
+                if (string.IsNullOrWhiteSpace(movie.image_small)) movie.image_small = movie.image;
+
+                if (string.IsNullOrWhiteSpace(movie.descriptions)) movie.descriptions = movie.name;
+
+                movie.published = string.Format("{0:yyyy-MM-dd}", DateTime.Now);
+
+                movie.url = movie.name.Trim().ToLower().Replace(":", "-").Replace(" ", "-");
+
+                var random = new Random();
+
+                movie.view = random.Next(5000, 10000).ToString();
+
+                var results = await _dbRepository.SaveJavHiHiMovie(movie);
+
+                if (results)
+                {
+                    ViewBag.Message = "Save done.";
+                }
+                else
+                {
+                    ViewBag.Message = "Error.";
+                }
+
+            }
+
+            return View(movie);
         }
 
         public async Task<IActionResult> SetSchedule(string link, DateTime? schedule, bool always)

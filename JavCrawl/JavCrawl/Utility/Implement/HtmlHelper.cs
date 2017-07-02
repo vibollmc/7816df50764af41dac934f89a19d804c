@@ -221,12 +221,12 @@ namespace JavCrawl.Utility.Implement
 
                 item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
 
-                if (_dbContext.Films.Any(x => x.Slug == item.url))
-                {
-                    item.url = string.Empty; //Marked Remove;
-                }
-                else
-                {
+                //if (_dbContext.Films.Any(x => x.Slug == item.url))
+                //{
+                //    item.url = string.Empty; //Marked Remove;
+                //}
+                //else
+                //{
                     var linkEpsAndDecs = await GetJavHiHiMoviesLinkEpisode(urlPage);
 
                     if (from789)
@@ -235,12 +235,12 @@ namespace JavCrawl.Utility.Implement
                     }
                     else
                     {
-                        item.descriptions = linkEpsAndDecs.Description;
+                        item.descriptions = string.IsNullOrWhiteSpace(linkEpsAndDecs.Description) ? item.name : linkEpsAndDecs.Description;
                     }
 
                     item.linkepisode = linkEpsAndDecs.LinkEps;
                     
-                }
+                //}
             }
             results.movies = results.movies.Where(x => x.url != string.Empty).ToList();
             return results;
@@ -282,7 +282,6 @@ namespace JavCrawl.Utility.Implement
             if (serverNodes == null || serverNodes.Count() == 0)
             {
                 results.LinkEps.Add(url);
-                return results;
             }
             else
             {

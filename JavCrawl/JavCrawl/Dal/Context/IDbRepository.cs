@@ -10,6 +10,8 @@ namespace JavCrawl.Dal.Context
     public interface IDbRepository
     {
         Task<int> CrawlJavHiHiMovies(JavHiHiMovies javHiHiMovies);
+        Task<bool> SaveJavHiHiMovie(JavHiHiMovie movie);
+
         Task<bool> SaveSchedule(JobListCrawl job);
         IList<JobListCrawl> GetSchedule();
 
@@ -39,5 +41,7 @@ namespace JavCrawl.Dal.Context
         Task<bool> GenerateMemberVideo();
 
         Task<Stars> GetStar();
+
+        Task<bool> UpdateCrossImage();
     }
 }

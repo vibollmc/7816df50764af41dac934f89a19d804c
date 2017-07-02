@@ -1,0 +1,108 @@
+
+@{
+    ViewData["Title"] = "Add Movie";
+}
+
+@model JavCrawl.Models.JavHiHiMovie
+
+<h2>AddMovie</h2>
+
+@using (Html.BeginForm("AddMovie", "Home", FormMethod.Post))
+{
+    <fieldset>
+        <div class="row">
+            <div class="col-md-6">
+                <label class="control-label">@Html.DisplayNameFor(x => x.name)</label>
+                @Html.TextBoxFor(x => x.name, new { Class = "form-control", Style = "width:100%;max-width:none" })
+            </div>
+            <div class="col-md-3">
+                <label class="control-label">@Html.DisplayNameFor(x => x.duration)</label>
+                @Html.TextBoxFor(x => x.duration, new { Class = "form-control", Style = "width:100%;max-width:none" })
+            </div>
+            <div class="col-md-3">
+                <label class="control-label">Type</label>
+                <select name="fromsite" class="form-control">
+                    <option value="789">DVD</option>
+                    <option value="hihi">Video Clip</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label class="control-label">description</label>
+                @Html.TextAreaFor(x => x.descriptions, new { Class = "form-control", Style = "width:100%;max-width:none" })
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label class="control-label">Star</label>
+                        <input type="text" id="txtstar" class="form-control" />
+                        <ul></ul>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="control-label"></label><br />
+                        <button type="button" class="btn btn-default" onclick="var value = $('#txtstar').val(); $('#txtstar').val(''); var html =  '<li onclick=\'$(this).remove();\'><input type=\'hidden\' name=\'pornstars\' value=\'' + value + '\'>' + value + '</li>'; $('#txtstar').next().append(html);">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label class="control-label">Thumbnail</label>
+                @Html.TextBoxFor(x => x.image, new { Class = "form-control", Style = "width:100%;max-width:none" })
+            </div>
+            <div class="col-md-6">
+                <label class="control-label">Cover</label>
+                @Html.TextBoxFor(x => x.image_small, new { Class = "form-control", Style = "width:100%;max-width:none" })
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label class="control-label">Tags</label>
+                        <input type="text" id="txttag" class="form-control" />
+                        <ul></ul>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="control-label"></label><br />
+                        <button type="button" class="btn btn-default" onclick="var value = $('#txttag').val(); $('#txttag').val(''); var html =  '<li onclick=\'$(this).remove();\'><input type=\'hidden\' name=\'tags\' value=\'' + value + '\'>' + value + '</li>'; $('#txttag').next().append(html);">Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label class="control-label">Categories</label>
+                        <input type="text" id="txtcategory" class="form-control" />
+                        <ul>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="control-label"></label><br />
+                        <button type="button" class="btn btn-default" onclick="var value = $('#txtcategory').val(); $('#txtcategory').val(''); var html = '<li onclick=\'$(this).remove();\'><input type=\'hidden\' name=\'categories\' value=\'' + value + '\'>' + value + '</li>'; $('#txtcategory').next().append(html);" >Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label class="control-label">Episodes</label>
+                        <input type="text" id="txtepisode" class="form-control" /> 
+                        <ul></ul>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="control-label"></label><br />
+                        <button type="button" class="btn btn-default" onclick="var value = $('#txtepisode').val(); $('#txtepisode').val(''); var html = '<li onclick=\'$(this).remove();\'><input type=\'hidden\' name=\'linkepisode\' value=\'' + value + '\'>' + value + '</li>'; $('#txtepisode').next().append(html);">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-danger" type="submit"> Save </button>
+                @ViewBag.Message
+            </div>
+        </div>
+    </fieldset>
+}

@@ -32,6 +32,22 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public async Task<bool> UpdateCrossImage()
+        {
+            var films = _dbContext.Films.Where(x => x.Id < 3868 && x.ThumbName != x.CoverName);
+
+            foreach(var film in films)
+            {
+                var thumbTemp = film.ThumbName;
+                film.ThumbName = film.CoverName;
+                film.CoverName = thumbTemp;
+
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
         public async Task<Stars> GetStar()
         {
             var star = _dbContext.Stars.OrderByDescending(x => x.Id).FirstOrDefault(x => x.UpdatedAt == null);
@@ -335,8 +351,6 @@ namespace JavCrawl.Dal.Implement
                 if (movies == null || movies.movies == null || movies.movies.Count == 0)
                 {
                     jobs.FinishAt = DateTime.Now;
-                    jobs.Complete = 0;
-                    jobs.UnComplete = 0;
                     jobs.Status = 2;
 
                     if (jobs.Always)
@@ -529,9 +543,13 @@ namespace JavCrawl.Dal.Implement
             return newTag.Id;
         }
 
-        private async Task<bool> SaveJavHiHiMovie(JavHiHiMovie movie)
+        public async Task<bool> SaveJavHiHiMovie(JavHiHiMovie movie)
         {
-            if (_dbContext.Films.Any(x => x.Slug == movie.url)) return false;
+            var film = _dbContext.Films.FirstOrDefault(x => x.Slug == movie.url);
+            if (film != null)
+            {
+                return await UpdateEpisode(film.Id, movie.linkepisode);
+            }
 
             using (var dbTransaction = await _dbContext.Database.BeginTransactionAsync())
             {
@@ -702,11 +720,58 @@ namespace JavCrawl.Dal.Implement
                     dbTransaction.Commit();
                     return true;
                 }
-                catch
+                catch(Exception ex)
                 {
+                    Console.WriteLine("SaveJavHiHiMovie: " + ex.Message);
+
                     dbTransaction.Rollback();
                     return false;
                 }
+            }
+        }
+
+        private async Task<bool> UpdateEpisode(int? filmId, IList<string> epsLinks)
+        {
+            try
+            {
+                var episodes = new List<Episodes>();
+
+                foreach (var eps in epsLinks)
+                {
+
+                    var exsits = _dbContext.Episodes.Any(
+                        x => x.FilmId == filmId
+                            && ((eps.Contains("openload") && x.FileName.Contains("openload")) ||
+                                (!eps.Contains("openload") && x.FileName == eps))
+                        );
+
+                    if (!exsits)
+                    {
+                        episodes.Add(new Episodes
+                        {
+                            Title = "FULL",
+                            FilmId = filmId,
+                            FileName = eps,
+                            Type = "Full",
+                            Viewed = 0,
+                            CreatedAt = DateTime.Now
+                        });
+                    }
+                }
+
+                if (episodes.Count > 0)
+                {
+                    await _dbContext.Episodes.AddRangeAsync(episodes);
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("UpdateEpisode: " + ex.Message);
+
+                return false;
             }
         }
     }
