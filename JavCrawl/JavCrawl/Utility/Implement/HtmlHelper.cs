@@ -221,26 +221,33 @@ namespace JavCrawl.Utility.Implement
 
                 item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
 
-                //if (_dbContext.Films.Any(x => x.Slug == item.url))
-                //{
-                //    item.url = string.Empty; //Marked Remove;
-                //}
-                //else
-                //{
-                    var linkEpsAndDecs = await GetJavHiHiMoviesLinkEpisode(urlPage);
-
-                    if (from789)
+                if (_dbContext.Films.Any(x => x.Slug == item.url))
+                {
+                    item.url = string.Empty; //Marked Remove;
+                }
+                else
+                {
+                    try
                     {
-                        item.descriptions = item.name;
-                    }
-                    else
-                    {
-                        item.descriptions = string.IsNullOrWhiteSpace(linkEpsAndDecs.Description) ? item.name : linkEpsAndDecs.Description;
-                    }
+                        var linkEpsAndDecs = await GetJavHiHiMoviesLinkEpisode(urlPage);
 
-                    item.linkepisode = linkEpsAndDecs.LinkEps;
+                        if (from789)
+                        {
+                            item.descriptions = item.name;
+                        }
+                        else
+                        {
+                            item.descriptions = string.IsNullOrWhiteSpace(linkEpsAndDecs.Description) ? item.name : linkEpsAndDecs.Description;
+                        }
+
+                        item.linkepisode = linkEpsAndDecs.LinkEps;
+                    }
+                    catch(Exception ex)
+                    {
+                        item.url = string.Empty;
+                    }
                     
-                //}
+                }
             }
             results.movies = results.movies.Where(x => x.url != string.Empty).ToList();
             return results;
@@ -276,6 +283,12 @@ namespace JavCrawl.Utility.Implement
             var divNodes = htmlDoc.DocumentNode.Descendants("div");
 
             if (divNodes == null || divNodes.Count() == 0) return results;
+            
+
+            if (divNodes.Any(
+                    x => x.Attributes.Contains("class") 
+                        && x.Attributes["class"].Value.Contains("video-comming-soon")))
+                throw new Exception("Video comming soon");
 
             var serverNodes = divNodes.Where(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "server");
 
