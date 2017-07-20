@@ -74,7 +74,7 @@ class SitemapController extends Controller {
         // Level 2
         $category = Category::where('slug',  $slug)->with('films')->first();
         foreach ($category->films as $key => $value) {
-            $sitemap->add(route('film_show',['category' => $category->slug, 'slug' => $value->slug]), $currentTime, self::RATE_VIDEO, self::FREQUENCY_VIDEO);
+            $sitemap->add(route('film_detail',['category' => $category->slug, 'slug' => $value->slug]), $currentTime, self::RATE_VIDEO, self::FREQUENCY_VIDEO);
         }
         return $sitemap->render('xml');
     }
@@ -94,7 +94,7 @@ class SitemapController extends Controller {
         // Level 2
         $genre = Genre::where('slug',  $slug)->with('films')->first();
         foreach ($genre->films as $key => $value) {
-            $sitemap->add(route('film_show',['category' => $value->category->slug, 'slug' => $value->slug]), $currentTime, self::RATE_VIDEO, self::FREQUENCY_VIDEO);
+            $sitemap->add(route('film_detail',['category' => $value->category->slug, 'slug' => $value->slug]), $currentTime, self::RATE_VIDEO, self::FREQUENCY_VIDEO);
         }
         return $sitemap->render('xml');
     }
@@ -114,7 +114,7 @@ class SitemapController extends Controller {
         // Level 2
         $country = Country::where('slug',  $slug)->with('films')->first();
         foreach ($country->films as $key => $value) {
-            $sitemap->add(route('film_show',['category' => $value->category->slug, 'slug' => $value->slug]), $currentTime, self::RATE_VIDEO, self::FREQUENCY_VIDEO);
+            $sitemap->add(route('film_detail',['category' => $value->category->slug, 'slug' => $value->slug]), $currentTime, self::RATE_VIDEO, self::FREQUENCY_VIDEO);
         }
         return $sitemap->render('xml');
     }
@@ -134,7 +134,7 @@ class SitemapController extends Controller {
         // Level 2
         $year = Film::where('date', 'like', "%$slug")->with('category')->get();
         foreach ($year as $key => $value) {
-            $sitemap->add(route('film_show',['category' => $value->category->slug, 'slug' => $value->slug]), $currentTime, self::RATE_VIDEO, self::FREQUENCY_VIDEO);
+            $sitemap->add(route('film_detail',['category' => $value->category->slug, 'slug' => $value->slug]), $currentTime, self::RATE_VIDEO, self::FREQUENCY_VIDEO);
         }
         return $sitemap->render('xml');
     }
@@ -184,7 +184,7 @@ class SitemapController extends Controller {
         $film_ids = Cache::get('film_tag_'.$slug);
         $result = Film::whereIn('id', $film_ids)->with('category')->orderBy('order', 'desc')->get();
         foreach ($result as $key => $value) {
-            $sitemap->add(route('film_show',['category' => $value->category->slug, 'slug' => $value->slug]), $currentTime, self::RATE_CATEGORY, self::FREQUENCY_VIDEO);
+            $sitemap->add(route('film_detail',['category' => $value->category->slug, 'slug' => $value->slug]), $currentTime, self::RATE_CATEGORY, self::FREQUENCY_VIDEO);
         }
         return $sitemap->render('xml');
     }

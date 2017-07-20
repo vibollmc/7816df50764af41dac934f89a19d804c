@@ -30,17 +30,19 @@ namespace JavCrawl.Utility.Implement
             _dbRepository = dbRepository;
         }
 
-        public async Task<string> Authorization()
+        public async Task<string> Authorization(int apiId)
         {
             try
             {
-                Console.WriteLine(_hostingEnv.WebRootPath + "/client_secrets.json");
+                var api = _dbRepository.GetGoogleApi(apiId);
 
-                using (var stream = new FileStream(_hostingEnv.WebRootPath + "/client_secrets.json", FileMode.Open, FileAccess.Read))
+                var dirUploads = string.Format("{0}/{1}/{2}", _hostingEnv.WebRootPath, "Uploads", "GoogleApi");
+
+                using (var stream = new FileStream(dirUploads + "/" + api.FileName, FileMode.Open, FileAccess.Read))
                 {
-                    var dirUploads = string.Format("{0}\\{1}", _hostingEnv.WebRootPath, "Uploads");
+                    var dirStore = dirUploads + "/Api" + api.Id;
 
-                    if (!Directory.Exists(dirUploads)) Directory.CreateDirectory(dirUploads);
+                    if (!Directory.Exists(dirStore)) Directory.CreateDirectory(dirStore);
 
                     var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                         stream,
@@ -48,8 +50,20 @@ namespace JavCrawl.Utility.Implement
                         },
                         "user",
                         CancellationToken.None,
-                        new FileDataStore(dirUploads)
+                        new FileDataStore(dirStore)
                     );
+
+                    var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+                    {
+                        ApiKey = _youtubeSettings.ApiKey,
+                        HttpClientInitializer = credential,
+                        ApplicationName = _youtubeSettings.ApplicationName
+                    });
+
+                    if (credential != null)
+                    {
+                        await _dbRepository.GoogleAuthorized(apiId);
+                    }
                 }
 
                 return "Authorized";
@@ -65,11 +79,15 @@ namespace JavCrawl.Utility.Implement
         {
             try
             {
-                using (var stream = new FileStream(_hostingEnv.WebRootPath + "/client_secrets.json", FileMode.Open, FileAccess.Read))
-                {
-                    var dirUploads = string.Format("{0}/{1}", _hostingEnv.WebRootPath, "Uploads");
+                var api = _dbRepository.GetGoogleApiToUse();
 
-                    if (!Directory.Exists(dirUploads)) Directory.CreateDirectory(dirUploads);
+                var dirUploads = string.Format("{0}/{1}/{2}", _hostingEnv.WebRootPath, "Uploads", "GoogleApi");
+
+                using (var stream = new FileStream(dirUploads + "/" + api.FileName, FileMode.Open, FileAccess.Read))
+                {
+                    var dirStore = dirUploads + "/Api" + api.Id;
+
+                    if (!Directory.Exists(dirStore)) Directory.CreateDirectory(dirStore);
 
                     var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                         stream,
@@ -77,14 +95,14 @@ namespace JavCrawl.Utility.Implement
                         },
                         "user",
                         CancellationToken.None,
-                        new FileDataStore(dirUploads)
+                        new FileDataStore(dirStore)
                     );
 
                     var youtubeService = new YouTubeService(new BaseClientService.Initializer()
                     {
-                        ApiKey = _youtubeSettings.ApiKey,
+                        ApiKey = api.ApiKey,
                         HttpClientInitializer = credential,
-                        ApplicationName = _youtubeSettings.ApplicationName
+                        ApplicationName = api.Name
                     });
 
                     var commented = new List<YoutubeComment>();
@@ -123,6 +141,8 @@ namespace JavCrawl.Utility.Implement
                     }
 
                     await _dbRepository.AddNewYoutubeComment(commented);
+
+                    await _dbRepository.UpdateGoogleApiLastUsed(api.Id);
                 }
 
                 return true;
@@ -135,10 +155,12 @@ namespace JavCrawl.Utility.Implement
 
         public async Task<IList<YoutubeVideo>> Search(string keyword, int maxResult, decimal? lat, decimal? lon, string radius, DateTime? publishedAfter, string pageToken)
         {
+            var api = _dbRepository.GetGoogleApiToUse();
+
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = _youtubeSettings.ApiKey,
-                ApplicationName = _youtubeSettings.ApplicationName
+                ApiKey = api.ApiKey,
+                ApplicationName = api.Name
             });
 
             var searchListRequest = youtubeService.Search.List("snippet");

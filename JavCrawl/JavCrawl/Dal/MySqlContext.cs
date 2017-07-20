@@ -41,6 +41,7 @@ namespace JavCrawl.Dal
         public virtual DbSet<Images> Images { get; set; }
         public virtual DbSet<JobListCrawl> JobListCrawl { get; set; }
         public virtual DbSet<YoutubeComment> YoutubeComment { get; set; }
+        public virtual DbSet<GoogleApi> GoogleApi { get; set; }
 
         public MySqlContext(DbContextOptions options) : base(options)
         {
@@ -1566,6 +1567,39 @@ namespace JavCrawl.Dal
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
+                    .HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<GoogleApi>(entity =>
+            {
+                entity.ToTable("google_api");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasColumnType("varchar(45)");
+
+                entity.Property(e => e.ApiKey)
+                    .HasColumnName("api_key")
+                    .HasColumnType("varchar(255)");
+
+                entity.Property(e => e.FileName)
+                    .HasColumnName("file_name")
+                    .HasColumnType("varchar(255)");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.AuthorizedAt)
+                    .HasColumnName("authorized_at")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.LastUsed)
+                    .HasColumnName("last_used")
                     .HasColumnType("datetime");
             });
         }

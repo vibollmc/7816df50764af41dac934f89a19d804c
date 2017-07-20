@@ -4,7 +4,10 @@
     ViewData["Title"] = "Youtube Commenter";
 }
 
-<h2>Youtube Commenter</h2>
+<h2>
+    Youtube Commenter
+    <a class="btn btn-info" asp-area="" asp-controller="Youtube" asp-action="Api">Google Api</a>
+</h2>
 
 @using (Html.BeginForm("Index", "Youtube"))
 {
@@ -40,7 +43,6 @@
         <hr />
         <div class="row">
             <div class="col-md-12">
-                <a asp-area="" asp-controller="Youtube" asp-action="OAuth">Authorize</a>
                 <br />
                 <label class="control-label">@Html.DisplayNameFor(x => x.CommentText)</label>
                 @Html.TextAreaFor(x => x.CommentText, new { Class = "form-control", Style = "max-width: 100%; height: 100px;" })

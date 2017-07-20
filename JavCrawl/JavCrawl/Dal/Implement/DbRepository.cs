@@ -32,6 +32,68 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public async Task<bool> AddGoogleApi(GoogleApi api)
+        {
+            var googleApi = _dbContext.GoogleApi.FirstOrDefault(x => x.ApiKey == api.ApiKey);
+
+            if (googleApi != null)
+            {
+                googleApi.Name = api.Name;
+                googleApi.FileName = api.FileName;
+                googleApi.AuthorizedAt = null;
+                googleApi.LastUsed = null;
+
+                await _dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+            _dbContext.GoogleApi.Add(api);
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public GoogleApi GetGoogleApi(int id)
+        {
+            return _dbContext.GoogleApi.FirstOrDefault(x => x.Id == id);
+        }
+
+        public GoogleApi GetGoogleApiToUse()
+        {
+            return _dbContext.GoogleApi.OrderBy(x => x.LastUsed).FirstOrDefault(x => x.AuthorizedAt != null && x.AuthorizedAt > DateTime.Now.AddDays(-1));
+        }
+
+        public IList<GoogleApi> GetGoogleApi()
+        {
+            return _dbContext.GoogleApi.ToList();
+        }
+
+        public async Task<bool> UpdateGoogleApiLastUsed(int? apiId)
+        {
+            var api = _dbContext.GoogleApi.FirstOrDefault(x => x.Id == apiId);
+
+            if (api != null)
+            {
+                api.LastUsed = DateTime.Now;
+                await _dbContext.SaveChangesAsync();
+            }
+            return true;
+        }
+
+        public async Task<bool> GoogleAuthorized(int apiId)
+        {
+            var api = _dbContext.GoogleApi.FirstOrDefault(x => x.Id == apiId);
+
+            if (api != null)
+            {
+                api.AuthorizedAt = DateTime.Now;
+                await _dbContext.SaveChangesAsync();
+            }
+            return true;
+        }
+
         public async Task<bool> UpdateCrossImage()
         {
             var films = _dbContext.Films.Where(x => x.Id < 3868 && x.ThumbName != x.CoverName);

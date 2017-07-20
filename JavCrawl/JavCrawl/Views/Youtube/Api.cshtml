@@ -1,0 +1,91 @@
+
+@{
+    ViewData["Title"] = "Api";
+}
+@model IList<JavCrawl.Models.DbEntity.GoogleApi>
+
+<h2>Google Api List</h2>
+
+@using (Html.BeginForm("AddApi", "Youtube", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+<fieldset>
+    <div class="row">
+        <div class="col-md-4">
+            <label class="control-label">Name</label>
+            <input type="text" name="name" class="form-control" style="width:100%; max-width:none" />
+        </div>
+        <div class="col-md-4">
+            <label class="control-label">ApiKey</label>
+            <input type="text" name="apikey" class="form-control" style="width:100%; max-width:none" />
+        </div>
+        <div class="col-md-4">
+            <label class="control-label">File</label>
+            <input type="file" name="file" style="width:100%; max-width:none" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <input class="btn btn-danger" type="submit" value="Save Api" />
+        </div>
+    </div>
+</fieldset>
+}
+<hr />
+@if(Model == null || Model.Count == 0)
+{
+    <div>No data.</div>
+}
+else
+{
+    var i = 0;
+
+    <table class="table table-bordered table-hover table-responsive">
+        <thead>
+            <tr>
+                <th>
+                    No.
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Api Key
+                </th>
+                <th>
+                    File Name
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var api in Model)
+            {
+                i++;
+                <tr>
+                    <td>
+                        @i
+                    </td>
+                    <td>
+                        @if (api.AuthorizedAt != null && api.AuthorizedAt > DateTime.Now.AddDays(-1))
+                        {
+                            <label class="label label-info">Authorized</label>
+                        }
+                        @api.Name
+                    </td>
+                    <td>
+                        @api.ApiKey
+                    </td>
+                    <td>
+                        @api.FileName
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-warning" asp-area="" asp-controller="Youtube" asp-action="OAuth" asp-route-id="@api.Id">Authorize</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -115,9 +115,6 @@
             <!-- END Page Container -->
         </div>
         <!-- END Page Container -->
-        @if(!\Session::has('user'))
-            @include('client.modal.auth')
-        @endif
         @include('client.layouts.js')
         <!-- Scroll to top link, initialized in - scrollToTop() -->
         <a href="#" id="to-top"><i class="fa fa-angle-up"></i></a>

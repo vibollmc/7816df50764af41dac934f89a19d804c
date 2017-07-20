@@ -43,5 +43,15 @@ namespace JavCrawl.Dal.Context
         Task<Stars> GetStar();
 
         Task<bool> UpdateCrossImage();
+
+        Task<bool> AddGoogleApi(GoogleApi api);
+
+        IList<GoogleApi> GetGoogleApi();
+        GoogleApi GetGoogleApi(int id);
+
+        Task<bool> GoogleAuthorized(int apiId);
+        Task<bool> UpdateGoogleApiLastUsed(int? apiId);
+
+        GoogleApi GetGoogleApiToUse();
     }
 }
