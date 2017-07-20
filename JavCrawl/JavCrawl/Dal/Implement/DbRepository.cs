@@ -234,7 +234,7 @@ namespace JavCrawl.Dal.Implement
             var result = _dbContext.Films
                     .Where(x => x.ThumbName != x.CoverName && x.Online == 1 && x.DeletedAt == null)
                     .OrderByDescending(x => x.Date)
-                    .Take(100)
+                    .Take(400)
                     .ToList();
 
             return result;
