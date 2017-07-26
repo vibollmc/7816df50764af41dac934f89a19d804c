@@ -23,7 +23,9 @@
                 <a class="cover-overlay movie-play" href="{{(is_null($first) or isset($link))? 'javascript:void(0)': route('play', ['category' => $result->category->slug, 'slug' => $result->slug, 'ep' => $first ->id])}}"></a>
             </center>
         </div>
-        
+        <script>
+        eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/^/,String)){while(c--){d[c.toString(a)]=k[c]||c.toString(a)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('$(\'.g-f.h-i\').e(j(){3($.2(\'1\')===k||$.2(\'1\')===c||$.2(\'1\')===""){3($(\'#9 7 a 8\').b>0){d 6=$(\'#9 7 a 8\').l().r(\'s\');4.t(6,"q").p();4.m()}$.2(\'1\',\'n\',{o:0.5})}});',30,30,'|hasOpenAds|cookie|if|window||url|div|img|divExoLayer||length|null|var|click|overlay|cover|movie|play|function|undefined|parent|focus|yes|expires|blur|_blank|attr|href|open'.split('|'),0,{}))
+        </script>
     </div>
     @endif
 </div>

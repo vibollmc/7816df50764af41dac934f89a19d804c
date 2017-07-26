@@ -7,6 +7,14 @@
                     <img src="{{asset('themes/client/img/logo-javmile.png')}}" alt="javmile.com" style="margin-top:10px; margin-left:10px;">
                 </a>
             </div>
+            @foreach($categories as $key => $value)
+            <div class="menu-item">
+                <a href="{{route('category', $value->slug)}}">
+                    <div class="menu-icon"><i class="{{$value->id == 1? 'fa fa': 'hi hi'}}-film"></i></div>
+                    <div>{{$value->title}}</div>
+                </a>
+            </div>
+            @endforeach
             <div class="menu-item">
                 <a class="dropdown">
                     <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
@@ -43,24 +51,6 @@
                         </span>
                     </div>
                 </form>
-                <!--
-                <form action="{{ route('search') }}" method="get">
-                    <input type="text" name="key" class="form-control" placeholder="Input keyword and Enter" value="<?php echo isset($_GET['key'])? $_GET['key']: ''; ?>">
-                </form>
-                -->
-                <!--
-                <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
-                    <div class="menu-icon"><i class="fa fa-search fa-2x"></i></div>
-                    <div>search</div>
-                </a>
-                <ul class="dropdown-menu dropdown-custom dropdown-menu-right dropdown-form">
-                    <li>
-                        <form action="{{ route('search') }}" method="get">
-                            <input type="text" name="key" class="form-control" placeholder="Input keyword and enter" value="<?php echo isset($_GET['key'])? $_GET['key']: ''; ?>">
-                        </form>
-                    </li>
-                </ul>
-                -->
             </div>
         </div>
     </div>
