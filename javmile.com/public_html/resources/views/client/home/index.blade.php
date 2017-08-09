@@ -67,7 +67,6 @@
             @include('client.block.popular')
             @include('client.block.action')
             @include('client.block.actor')
-            @include('client.block.thiller')
         </div>
         <div class="clearfix"></div>
     </div>
