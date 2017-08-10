@@ -21,6 +21,7 @@
         <meta property="og:type" content="{{ MetaTag::get('og_type') }}" />
         <meta property="og:site_name" content="{{ MetaTag::get('title') }}" />
         <meta property="fb:app_id" content="{{ env('SOCIAL_FB_ID') }}" />
+        <meta name="ero_verify" content="9518e91e20da175f29c54f6fde507ba0" />
         
         <link rel="shortcut icon" href="{{asset('favicon.ico')}}">
         <link rel="image_src" type="{{ MetaTag::get('image_type') }}" href="{{ MetaTag::get('image_src') }}"/>
@@ -50,7 +51,6 @@
         <script src="{{asset('themes/client/js/vendor/bootstrap.min.js')}}"></script>
         <script src="{{asset('themes/client/js/owl.carousel.min.js')}}"></script>
         {{-- <script type="text/javascript" src="{{asset('themes/client/js/tooltipster.bundle.min.js')}}"></script> --}}
-
  	</head>
     <body>
         <!-- Page Container -->

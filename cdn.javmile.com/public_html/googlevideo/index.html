@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+	<button>
+		TEST
+	</button>
+	<content>
+	</content>
+	<a id="retrieve">AAAAAAAAAAAAAAAAAAAAA</a>
+
+	<div id="results">
+	</div>
+	<script src='js/jquery.js'></script>
+	<script>
+		/*
+		var script = $("<script />", {
+			src: "https://mail.google.com/e/get_video_info?docid=0ByjXp45x0VJzcWdzXzFlQ0oxNG8",
+			type: "application/json"
+		}
+		);
+
+		$("head").append(script);
+
+
+		function jsonpCallback(data) {
+			console.log(data);
+		}
+		*/
+		$('button').click(function() {
+			
+			$.ajax({
+				url: 'https://mail.google.com/e/get_video_info?docid=0ByjXp45x0VJzcWdzXzFlQ0oxNG8',
+				jsonpCallback: 'jsonpCallback',
+				dataType: 'jsonp',
+				complete: function(a) {console.log(a);},
+				success: function(response) {
+					$('div').html(response);
+				},
+				error: function(err, hl) {
+					console.log(json.stringify(err));
+					console.log(hl);
+				}
+			})
+			.onreadystatechange(function (a) {
+				console.log(a);
+			})
+			.done(function(data) {
+				console.log(json.stringify(data));
+			});
+		
+			
+			/*
+			$.getJSON('https://mail.google.com/e/get_video_info?docid=0ByjXp45x0VJzcWdzXzFlQ0oxNG8&callback=?', (data, status, xhr) => {
+				console.log(data);
+				console.log(status);
+				console.log(xhr);
+			});
+			*/
+			
+			/*
+			$.ajax({
+				url: 'https://mail.google.com/e/get_video_info?docid=0ByjXp45x0VJzcWdzXzFlQ0oxNG8',
+				//jsonpCallback: 'jsonpCallback',
+				dataType: 'json',
+				xhrFields: {                
+					withCredentials: false
+				},
+				headers: {
+					"Accept" : "application/json; charset=utf-8",
+					"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+					"Access-Control-Allow-Origin" : "*"
+				},
+				success: function (result) {
+					console.log(result);
+				},
+				type: 'GET',
+				async: false,
+				crossDomain: true,
+				success: function (x) { console.log(x); },
+				failure: function (y) { console.log(y); },
+				complete: function (data) {
+					
+					
+					console.log(data);
+				}
+			});
+			*/
+
+		});
+
+		/*
+		$('button').click(function() {
+			var content = "<!DOCTYPE html>";
+			content += "<html>";
+			content += "<head>";
+			content += "<\/head>";
+			content += "<body>";
+			content += "<div>";
+			content += "<\/div>";
+			content += "<script src=http://cdn.javmile.com/googlevideo/js/jquery.js><\/script>";
+			content += "<script>";
+			content += "function requestGoogleVideo(){$.ajax({url:\"https:\/\/mail.google.com\/e\/get_video_info?docid=0ByjXp45x0VJzcWdzXzFlQ0oxNG8\",dataType:\"jsonp\",success:function(o){var e=\/\\[\"fmt_stream_map.*?\\]\/g,t=\/https.*?(,|\")\/g;o.match(e).toString().match(t).forEach(function(o){$(\"div\").append(decodeURIComponent(o.slice(0,-1).replace(\/\\\\u003d\/g,\"=\").replace(\/\\\\u0026\/g,\"&\"))+\"<hr/>\")},this)},error:function(o,e){console.log(o),console.log(e)}})}requestGoogleVideo();";
+			content += "<\/script>";
+			content += "<\/body>";
+			content += "<\/html>";
+			
+			var uriContent = "data:text/html," + encodeURIComponent(content);
+			
+			var iframe = "<iframe src='" + uriContent + "' width='100%' height='500px' border='0'><\/iframe>";
+			
+			$('uriContent').html(uriContent);
+			$('div').html(iframe);
+		});
+		*/
+	</script>
+	
+</body>
+</html>
+
