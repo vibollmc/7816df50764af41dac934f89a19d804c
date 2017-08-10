@@ -23,7 +23,6 @@
                 <a class="cover-overlay movie-play" href="{{(is_null($first) or isset($link))? 'javascript:void(0)': route('play', ['category' => $result->category->slug, 'slug' => $result->slug, 'ep' => $first ->id])}}"></a>
             </center>
         </div>
-        
     </div>
     @endif
 </div>

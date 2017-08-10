@@ -42,6 +42,10 @@
                 @foreach($result->films as $key => $item)
                     @include('client.block.film-item')
                 @endforeach
+                <div class="clearfix"></div>
+                <hr/>
+                <script type="text/javascript" data-idzone="2726940" src="https://ads.exosrv.com/nativeads.js"></script>
+                <div class="clearfix"></div>
             </div>
         </div>
         <div class="col-md-3 hidden-sm">
