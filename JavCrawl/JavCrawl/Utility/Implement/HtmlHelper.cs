@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using JavCrawl.Utility.Context;
 using JavCrawl.Models.DbEntity;
 using JavCrawl.Dal;
+using Microsoft.Extensions.Options;
 
 namespace JavCrawl.Utility.Implement
 {
@@ -25,10 +26,12 @@ namespace JavCrawl.Utility.Implement
         }
 
         private readonly MySqlContext _dbContext;
+        private readonly TimerSettings _timerSettings;
 
-        public HtmlHelper(MySqlContext dbContext)
+        public HtmlHelper(MySqlContext dbContext, IOptions<TimerSettings> timerSettings)
         {
             _dbContext = dbContext;
+            _timerSettings = timerSettings.Value;
         }
 
         public async Task<IList<VideoApi>> GetRedirectLinkVideo(string url)
@@ -221,7 +224,7 @@ namespace JavCrawl.Utility.Implement
 
                 item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
 
-                if (_dbContext.Films.Any(x => x.Slug == item.url))
+                if (_timerSettings.EnablebReloadEpisodesLink && _dbContext.Films.Any(x => x.Slug == item.url))
                 {
                     item.url = string.Empty; //Marked Remove;
                 }
@@ -294,7 +297,17 @@ namespace JavCrawl.Utility.Implement
 
             if (serverNodes == null || serverNodes.Count() == 0)
             {
-                results.LinkEps.Add(url);
+                var divPlayerSize = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "player-size");
+
+                if (divPlayerSize != null && divPlayerSize.ChildNodes != null && divPlayerSize.ChildNodes.Count > 0
+                            && divPlayerSize.ChildNodes["iframe"] != null)
+                {
+                    results.LinkEps.Add(divPlayerSize.ChildNodes["iframe"].Attributes["src"].Value);
+                }
+                else
+                {
+                    results.LinkEps.Add(url);
+                }
             }
             else
             {

@@ -801,6 +801,10 @@ namespace JavCrawl.Dal.Implement
                 foreach (var eps in epsLinks)
                 {
 
+                    if (eps.Contains("onecloud.media") || 
+                        eps.Contains("javhihi.com") || 
+                        eps.Contains("jav789.com")) continue;
+
                     var exsits = _dbContext.Episodes.Any(
                         x => x.FilmId == filmId
                             && ((eps.Contains("openload") && x.FileName.Contains("openload")) ||

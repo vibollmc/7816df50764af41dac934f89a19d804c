@@ -21,7 +21,7 @@
         }
     }
  ?>
-<div class="col-md-3 col-sm-3 col-xs-6 thumbnail-item">
+<div class="col-md-3 col-sm-4 col-xs-6 thumbnail-item">
     <div class="thumbnail" style="width: 100%;" data-tooltip-content="#{{$tooltip_id}}">
         <a href="{{route('film_detail', ['category' => $item->category->slug, 'slug' => $item->slug])}}">
             <img src="{{$image_prefix.$item->thumb_name}}" alt="{{$item->slug}}" class="cover img-reponsive">
@@ -61,7 +61,7 @@
 @if(($key + 1)%4 == 0)
 <div class="clearfix-md"></div>
 @endif
-@if(($key + 1)%2 == 0)
+@if(($key + 1)%3 == 0)
 <div class="clearfix-sm"></div>
 @endif
 @if(($key + 1)%2 == 0)
