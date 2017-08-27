@@ -11,5 +11,6 @@ namespace JavCrawl.Models
         public bool Enabled { get; set; }
         public bool EnabledOpenload { get; set; }
         public bool EnabledCrawler { get; set; }
+        public bool EnabledBitPorno { get; set; }
     }
 }

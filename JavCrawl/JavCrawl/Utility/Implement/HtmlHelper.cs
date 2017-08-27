@@ -242,7 +242,7 @@ namespace JavCrawl.Utility.Implement
 
                         item.linkepisode = linkEpsAndDecs.LinkEps;
                     }
-                    catch(Exception ex)
+                    catch
                     {
                         item.url = string.Empty;
                     }

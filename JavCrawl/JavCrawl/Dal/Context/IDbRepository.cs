@@ -19,11 +19,11 @@ namespace JavCrawl.Dal.Context
 
         Task<bool> UpdateImage();
 
-        Episodes GetEpisodeToTranferOpenload();
+        Episodes GetEpisodeToTranferOpenload(HostingLink hosting);
 
         Task<bool> UpdateEpisodeRemoteId(int id, int remoteid);
 
-        Episodes GetEpisodeToCheckStatusRemote();
+        Episodes GetEpisodeToCheckStatusRemote(HostingLink hosting);
 
         Task<bool> UpdateEpisodeWithNewLink(int id, string link);
 
