@@ -52,7 +52,7 @@ namespace JavCrawl.Controllers
 
             //await _dbRepository.UpdateImage();
 
-            var movies = await _htmlHelper.GetJavHiHiMovies("http://javhihi.com/movie?sort=published&page=1&ajax=1");
+            var movies = await _htmlHelper.GetJavHiHiMovies("http://javbuz.com/movie?sort=published&page=39&ajax=1");
 
             var complete = await _dbRepository.CrawlJavHiHiMovies(movies);
 

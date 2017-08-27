@@ -10,6 +10,8 @@ using JavCrawl.Utility.Context;
 using JavCrawl.Models.DbEntity;
 using JavCrawl.Dal;
 using Microsoft.Extensions.Options;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace JavCrawl.Utility.Implement
 {
@@ -32,6 +34,16 @@ namespace JavCrawl.Utility.Implement
         {
             _dbContext = dbContext;
             _timerSettings = timerSettings.Value;
+        }
+
+        private string DecodeEncodedNonAsciiCharacters(string value)
+        {
+            return Regex.Replace(
+                value,
+                @"\\u(?<Value>[a-zA-Z0-9]{4})",
+                m => {
+                    return ((char)int.Parse(m.Groups["Value"].Value, NumberStyles.HexNumber)).ToString();
+                });
         }
 
         public async Task<IList<VideoApi>> GetRedirectLinkVideo(string url)
@@ -114,6 +126,8 @@ namespace JavCrawl.Utility.Implement
 
             var from789 = url.Contains("jav789.com");
 
+            var frombuz = url.Contains("javbuz.com");
+
             var results = JsonConvert.DeserializeObject<JavHiHiMovies>(json);
 
             foreach (var item in results.movies)
@@ -122,6 +136,10 @@ namespace JavCrawl.Utility.Implement
                 if (from789)
                 {
                     item.fromsite = "789";
+                }
+                else if(frombuz)
+                {
+                    item.fromsite = "buz";
                 }
 
                 item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
@@ -139,6 +157,11 @@ namespace JavCrawl.Utility.Implement
             {
                 url = string.Format("http://jav789.com/pornstar/{0}.html", name.Trim().Replace(" ", "-").ToLower());
             }
+            else if(fromSite == "buz")
+            {
+                url = string.Format("http://javbuz.com/pornstar/{0}.html", name.Trim().Replace(" ", "-").ToLower());
+            }
+
             var htmlWeb = new HtmlWeb();
 
             var htmlDoc = await htmlWeb.LoadFromWebAsync(url);
@@ -210,6 +233,8 @@ namespace JavCrawl.Utility.Implement
             
             var from789 = url.Contains("jav789.com");
 
+            var frombuz = url.Contains("javbuz.com");
+
             var results = JsonConvert.DeserializeObject<JavHiHiMovies>(json);
 
             foreach (var item in results.movies)
@@ -220,6 +245,13 @@ namespace JavCrawl.Utility.Implement
                 {
                     urlPage = string.Format("http://jav789.com/{0}", item.url);
                     item.fromsite = "789";
+                }
+                else if (frombuz)
+                {
+                    urlPage = string.Format("http://javbuz.com/{0}", item.url);
+                    item.fromsite = "buz";
+
+                    item.name = DecodeEncodedNonAsciiCharacters(item.name);
                 }
 
                 item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
@@ -243,7 +275,10 @@ namespace JavCrawl.Utility.Implement
                             item.descriptions = string.IsNullOrWhiteSpace(linkEpsAndDecs.Description) ? item.name : linkEpsAndDecs.Description;
                         }
 
-                        item.linkepisode = linkEpsAndDecs.LinkEps;
+                        if (linkEpsAndDecs.LinkEps.Any(x => x.Contains("bitporno")))
+                            item.linkepisode = linkEpsAndDecs.LinkEps;
+                        else
+                            item.url = string.Empty;
                     }
                     catch(Exception ex)
                     {
