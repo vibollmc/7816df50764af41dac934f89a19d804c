@@ -280,7 +280,7 @@ namespace JavCrawl.Utility.Implement
                         else
                             item.url = string.Empty;
                     }
-                    catch(Exception ex)
+                    catch
                     {
                         item.url = string.Empty;
                     }

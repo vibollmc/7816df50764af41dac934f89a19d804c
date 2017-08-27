@@ -7,11 +7,15 @@ namespace JavCrawl.Utility
     {
         private readonly IDbRepository _dbRepository;
         private readonly IOpenloadHelper _openloadHelper;
+        private readonly IBitPornoHelper _bitPornoHelper;
 
-        public JobAuto(IDbRepository dbRepository, IOpenloadHelper openloadHelper)
+        public JobAuto(IOpenloadHelper openloadHelper,
+            IBitPornoHelper bitPornoHelper,
+            IDbRepository dbRepository)
         {
             _dbRepository = dbRepository;
             _openloadHelper = openloadHelper;
+            _bitPornoHelper = bitPornoHelper;
         }
         public void ExecuteCrawl()
         {
@@ -30,6 +34,18 @@ namespace JavCrawl.Utility
             try
             {
                 AsyncHelper.RunSync(() => _openloadHelper.JobRemoteFile());
+            }
+            catch
+            {
+
+            }
+        }
+
+        public void ExecuteBitPornoRemote()
+        {
+            try
+            {
+                AsyncHelper.RunSync(() => _bitPornoHelper.JobRemoteFile());
             }
             catch
             {

@@ -3,7 +3,6 @@ using JavCrawl.Models;
 using JavCrawl.Models.DbEntity;
 using JavCrawl.Utility.Context;
 using JavCrawl.Utility;
-using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -243,9 +242,9 @@ namespace JavCrawl.Dal.Implement
         public IList<Episodes> GetEpisodesRemoted()
         {
             var episode = _dbContext.Episodes.Where(
-                    x => 
-                        x.FileName.Contains("openload.co") && 
-                        x.FileName.Contains("javmile.com")).OrderByDescending(x=>x.Id).Take(100);
+                    x => (x.FileName.Contains("bitporno.com") && x.CustomerId == -1) ||
+                        (x.FileName.Contains("openload.co") && 
+                        x.FileName.Contains("javmile.com"))).OrderByDescending(x=>x.Id).Take(100);
 
             return episode.ToList();
         }
@@ -254,7 +253,7 @@ namespace JavCrawl.Dal.Implement
         {
             var episode = _dbContext.Episodes.Where(
                     x => 
-                        x.FileName.Contains("openload.co") && 
+                        (x.FileName.Contains("openload.co") || x.FileName.Contains("bitporno.com")) && 
                         x.CustomerId == 0).OrderByDescending(x => x.Id);
 
             return episode.ToList();
@@ -263,10 +262,12 @@ namespace JavCrawl.Dal.Implement
         public IList<Episodes> GetEpisodesRemoting()
         {
             var episode = _dbContext.Episodes.Where(
-                    x => 
-                        x.FileName.Contains("openload.co") && 
+                    x =>
+                        (x.FileName.Contains("bitporno.com") && x.CustomerId != null && 
+                        x.CustomerId != 0 && x.CustomerId != -1) ||
+                        (x.FileName.Contains("openload.co") && 
                         !x.FileName.Contains("javmile.com") && 
-                        x.CustomerId != null && x.CustomerId != 0).OrderByDescending(x => x.Id);
+                        x.CustomerId != null && x.CustomerId != 0)).OrderByDescending(x => x.Id);
 
             return episode.ToList();
         }
@@ -278,7 +279,7 @@ namespace JavCrawl.Dal.Implement
 
             eps.FileName = link;
 
-            eps.CustomerId = null;
+            eps.CustomerId = -1;
 
             eps.UpdatedAt = DateTime.Now;
 
@@ -287,17 +288,23 @@ namespace JavCrawl.Dal.Implement
             return true;
         }
 
-        public Episodes GetEpisodeToCheckStatusRemote()
+        public Episodes GetEpisodeToCheckStatusRemote(HostingLink hosting)
         {
-            var episode = _dbContext.Episodes
+            if (hosting == HostingLink.Openload)
+                return _dbContext.Episodes
                     .OrderBy(x => x.Id)
                     .FirstOrDefault(
                         x => 
                             x.FileName.Contains("openload.co") && 
                             !x.FileName.Contains("javmile.com") && 
                             x.CustomerId != null && x.CustomerId != 0);
-
-            return episode;
+            else
+                return _dbContext.Episodes
+                    .OrderBy(x => x.Id)
+                    .FirstOrDefault(
+                        x =>
+                            x.FileName.Contains("bitporno.com") &&
+                            x.CustomerId != null && x.CustomerId != 0 && x.CustomerId != -1);
         }
 
         public async Task<bool> UpdateEpisodeRemoteId(int id, int remoteid)
@@ -314,17 +321,25 @@ namespace JavCrawl.Dal.Implement
             return true;
         }
 
-        public Episodes GetEpisodeToTranferOpenload()
+        public Episodes GetEpisodeToTranferOpenload(HostingLink hosting)
         {
-            var episode = _dbContext.Episodes
-                    .OrderBy(x=>x.Id)
+            if (hosting == HostingLink.Openload)
+                return _dbContext.Episodes
+                    .OrderBy(x => x.Id)
                     .FirstOrDefault(
-                        x => 
-                            x.FileName.Contains("openload.co") && 
-                            !x.FileName.Contains("javmile.com") && 
+                        x =>
+                            x.FileName.Contains("openload.co") &&
+                            !x.FileName.Contains("javmile.com") &&
                             x.CustomerId == null);
 
-            return episode;
+            else
+                return _dbContext.Episodes
+                    .OrderBy(x => x.Id)
+                    .FirstOrDefault(
+                        x =>
+                            x.FileName.Contains("bitporno.com") &&
+                            x.FileName.Length < 64 &&
+                            x.CustomerId == null);
         }
 
         public async Task<bool> UpdateImage()

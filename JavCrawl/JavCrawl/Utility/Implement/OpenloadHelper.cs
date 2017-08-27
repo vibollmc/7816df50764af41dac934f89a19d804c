@@ -25,7 +25,7 @@ namespace JavCrawl.Utility.Implement
 
         public async Task<bool> JobRemoteFile()
         {
-            var epsNeedToCheckStatus = _dbRepository.GetEpisodeToCheckStatusRemote();
+            var epsNeedToCheckStatus = _dbRepository.GetEpisodeToCheckStatusRemote(HostingLink.Openload);
 
             if (epsNeedToCheckStatus != null)
             {
@@ -42,7 +42,7 @@ namespace JavCrawl.Utility.Implement
                 }
             }
 
-            var epsNeedToRemote = _dbRepository.GetEpisodeToTranferOpenload();
+            var epsNeedToRemote = _dbRepository.GetEpisodeToTranferOpenload(HostingLink.Openload);
 
             if (epsNeedToRemote != null)
             {

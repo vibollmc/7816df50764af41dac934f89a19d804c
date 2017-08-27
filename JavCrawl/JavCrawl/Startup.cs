@@ -46,6 +46,7 @@ namespace JavCrawl
 
             services.Configure<OpenloadSettings>(Configuration.GetSection("OpenloadSettings"));
             services.Configure<YoutubeSettings>(Configuration.GetSection("YoutubeSettings"));
+            services.Configure<BitPornoSettings>(Configuration.GetSection("BitPornoSettings"));
 
             services.AddTransient<IHtmlHelper, HtmlHelper>();
             services.AddTransient<IFtpHelper, FtpHelper>();
@@ -53,6 +54,7 @@ namespace JavCrawl
             services.AddTransient<JobAuto, JobAuto>();
             services.AddTransient<IOpenloadHelper, OpenloadHelper>();
             services.AddTransient<IYoutubeHelper, YoutubeHelper>();
+            services.AddTransient<IBitPornoHelper, BitPornoHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -109,6 +111,11 @@ namespace JavCrawl
                     if (timerSetting.EnabledOpenload)
                     {
                         crawler.ExecuteOpenloadRemote();
+                    }
+
+                    if (timerSetting.EnabledBitPorno)
+                    {
+                        crawler.ExecuteBitPornoRemote();
                     }
 
                     isProcessing = false;
