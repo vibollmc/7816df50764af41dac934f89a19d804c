@@ -53,5 +53,7 @@ namespace JavCrawl.Dal.Context
         Task<bool> UpdateGoogleApiLastUsed(int? apiId);
 
         GoogleApi GetGoogleApiToUse();
+
+        Task<bool> ReupdateSeoField();
     }
 }

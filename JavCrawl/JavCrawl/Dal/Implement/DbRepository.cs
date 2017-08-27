@@ -620,6 +620,45 @@ namespace JavCrawl.Dal.Implement
             return newTag.Id;
         }
 
+        public async Task<bool> ReupdateSeoField()
+        {
+            var films = _dbContext.Films.Where(x => x.Id > 4047);
+
+            foreach(var film in films)
+            {
+                var keyworks = string.Empty;
+
+                var starFilm = _dbContext.FilmStars.Where(x => x.FilmId == film.Id).Select(x => x.StarId);
+
+                foreach (var star in _dbContext.Stars.Where(x => starFilm.Contains(x.Id)).Select(x=>x.Title))
+                {
+                    keyworks += star + ", ";
+                }
+
+                var tagFilm = _dbContext.FilmTags.Where(x => x.FilmId == film.Id).Select(x => x.TagId);
+                foreach(var tag in _dbContext.Tags.Where(x=>tagFilm.Contains(x.Id)).Select(x=>x.Title))
+                {
+                    keyworks += tag + ", ";
+                }
+
+                var catFilm = _dbContext.FilmGenres.Where(x => x.FilmId == film.Id).Select(x => x.GenreId);
+                foreach(var cat in _dbContext.Genres.Where(x=> catFilm.Contains(x.Id)).Select(x=>x.Title))
+                {
+                    keyworks += cat + ", ";
+                }
+
+                var seo = new JavCrawl.Models.Seo.SeoFilm();
+                seo.keyword = keyworks.Trim().TrimEnd(',');
+                seo.title = film.Title;
+                seo.desc = film.Storyline.Length > 246 ? film.Storyline.Substring(0, 240) + "..." : film.Storyline;
+
+                film.Seo = JsonConvert.SerializeObject(seo);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
         public async Task<bool> SaveJavHiHiMovie(JavHiHiMovie movie)
         {
             var film = _dbContext.Films.FirstOrDefault(x => x.Slug == movie.url);
@@ -685,6 +724,11 @@ namespace JavCrawl.Dal.Implement
                         thumb_name = thumb_cover;
                     }
 
+                    var seo = new JavCrawl.Models.Seo.SeoFilm();
+                    seo.keyword = keyworks.Trim().TrimEnd(',');
+                    seo.title = movie.name;
+                    seo.desc = (movie.descriptions.Length > 246 ? movie.descriptions.Substring(0, 240) + "..." : movie.descriptions);
+
                     var newFilm = new Films
                     {
                         CategoryId = movie.fromsite == "hihi" ? 1 : 2,
@@ -707,7 +751,7 @@ namespace JavCrawl.Dal.Implement
                         Description = movie.name,
                         Storyline = movie.descriptions,
                         Viewed = int.Parse(movie.view.Replace(",","").Replace(".","")),
-                        Seo = "{\"title\":\"" + movie.name + "\",\"desc\":\"" + (movie.descriptions.Length > 246 ? movie.descriptions.Substring(0, 240) + "..." : movie.descriptions) + "\",\"keyword\":\"" + keyworks.Trim().TrimEnd(',') + "\"}",
+                        Seo = JsonConvert.SerializeObject(seo),
                         CreatedAt = DateTime.Now,
                         Reported = 0,
                         FtpId = ftpId

@@ -36,16 +36,6 @@ namespace JavCrawl.Utility.Implement
             _timerSettings = timerSettings.Value;
         }
 
-        private string DecodeEncodedNonAsciiCharacters(string value)
-        {
-            return Regex.Replace(
-                value,
-                @"\\u(?<Value>[a-zA-Z0-9]{4})",
-                m => {
-                    return ((char)int.Parse(m.Groups["Value"].Value, NumberStyles.HexNumber)).ToString();
-                });
-        }
-
         public async Task<IList<VideoApi>> GetRedirectLinkVideo(string url)
         {
             var from789 = url.Contains("jav789.com");
@@ -250,8 +240,6 @@ namespace JavCrawl.Utility.Implement
                 {
                     urlPage = string.Format("http://javbuz.com/{0}", item.url);
                     item.fromsite = "buz";
-
-                    item.name = DecodeEncodedNonAsciiCharacters(item.name);
                 }
 
                 item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
