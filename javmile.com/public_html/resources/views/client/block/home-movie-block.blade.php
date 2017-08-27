@@ -29,8 +29,7 @@
                  <img src="{{$image_prefix.$item->thumb_name}}" alt="{{$item->slug}}" thumb="{{$image_prefix.$item->cover_name}}" class="full-with img-reponsive">
                 <div class="slide-caption hide">
                     <div class="title"><strong>{{$item->title}}</strong></div>
-                    <div class="title-en"><strong>{{$item->title_en}}</strong></div>
-                    <div class="runtime"><strong>Duration:</strong> {{$item->runtime}} phút</div>
+                    <div class="runtime"><strong>Duration:</strong> {{$item->runtime}} Minutes</div>
                     <div class="year"><strong>Public date:</strong> {{$item->date}}</div>
                     <div class="des">{{str_limit(strip_tags($item->storyline), 600)}}</div>
                 </div>
