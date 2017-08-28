@@ -10,9 +10,11 @@ namespace JavCrawl.Dal.Context
     public interface IDbRepository
     {
         Task<int> CrawlJavHiHiMovies(JavHiHiMovies javHiHiMovies);
+
         Task<bool> SaveJavHiHiMovie(JavHiHiMovie movie);
 
         Task<bool> SaveSchedule(JobListCrawl job);
+
         IList<JobListCrawl> GetSchedule();
 
         Task<bool> RunJobCrawl();
@@ -28,7 +30,9 @@ namespace JavCrawl.Dal.Context
         Task<bool> UpdateEpisodeWithNewLink(int id, string link);
 
         IList<Episodes> GetEpisodesRemoted();
+
         IList<Episodes> GetEpisodesRemoting();
+
         IList<Episodes> GetEpisodesRemoteError();
 
         IList<Films> GetFilmsToGenerateBigSlide();
@@ -36,6 +40,7 @@ namespace JavCrawl.Dal.Context
         Task<bool> NewSlide(IList<int> filmIds);
 
         IList<YoutubeComment> GetYoutubeComment(IList<string> videoId);
+
         Task<bool> AddNewYoutubeComment(IList<YoutubeComment> youtube);
 
         Task<bool> GenerateMemberVideo();
@@ -47,11 +52,15 @@ namespace JavCrawl.Dal.Context
         Task<bool> AddGoogleApi(GoogleApi api);
 
         IList<GoogleApi> GetGoogleApi();
+
         GoogleApi GetGoogleApi(int id);
 
         Task<bool> GoogleAuthorized(int apiId);
+
         Task<bool> UpdateGoogleApiLastUsed(int? apiId);
 
         GoogleApi GetGoogleApiToUse();
+
+        Task<bool> JobUpdateSlideAndFilmMember();
     }
 }
