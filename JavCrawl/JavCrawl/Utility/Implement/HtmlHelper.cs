@@ -46,7 +46,10 @@ namespace JavCrawl.Utility.Implement
 
             if (sourceNodes == null || sourceNodes.Count() == 0)
             {
-                var aNodes = htmlDoc.DocumentNode.Descendants("a").Where(x => x.Attributes.Contains("href") && x.Attributes["href"].Value.Contains(".googlevideo.com"));
+                var aNodes = htmlDoc.DocumentNode.Descendants("a")
+                    .Where(
+                        x => 
+                            x.Attributes.Contains("href") && (x.Attributes["href"].Value.Contains(".googlevideo.com") || x.Attributes["href"].Value.Contains("stream.javhihi.com")));
 
                 if (aNodes == null) return null;
                 var resulta = new List<VideoApi>();
@@ -56,15 +59,22 @@ namespace JavCrawl.Utility.Implement
 
                     var file = a.Attributes["href"].Value;
 
-                    file = file.Substring(file.IndexOf(".googlevideo.com"));
+                    var defaultSource = true;
 
-                    file = file.Substring(0, file.IndexOf("&title="));
+                    if (file.Contains(".googlevideo.com"))
+                    {
+                        file = file.Substring(file.IndexOf(".googlevideo.com"));
 
-                    file = "https://redirector" + file;
+                        file = file.Substring(0, file.IndexOf("&title="));
+
+                        file = "https://redirector" + file;
+
+                        defaultSource = label.Contains("720");
+                    }
 
                     resulta.Add(new VideoApi
                     {
-                        Default = label.Contains("720").ToString(),
+                        Default = defaultSource.ToString(),
                         File = file,
                         Src = file,
                         Label = label,
@@ -81,19 +91,26 @@ namespace JavCrawl.Utility.Implement
 
             var result = new List<VideoApi>();
 
-            foreach(var nodeLink in sourceLinks)
+            foreach (var nodeLink in sourceLinks)
             {
                 var label = nodeLink.Attributes.Contains("data-res") ? nodeLink.Attributes["data-res"].Value : "HD";
 
                 var file = nodeLink.Attributes["src"].Value;
 
-                file = file.Substring(file.IndexOf(".googlevideo.com"));
+                var defaultSource = true;
 
-                file = "https://redirector" + file;
+                if (file.Contains(".googlevideo.com"))
+                {
+                    file = file.Substring(file.IndexOf(".googlevideo.com"));
+
+                    file = "https://redirector" + file;
+
+                    defaultSource = label.Contains("720");
+                }
 
                 result.Add(new VideoApi
                 {
-                    Default = label.Contains("720").ToString(),
+                    Default = defaultSource.ToString(),
                     File = file,
                     Src = file,
                     Label = label,
@@ -313,7 +330,7 @@ namespace JavCrawl.Utility.Implement
             {
                 foreach (var serverNode in serverNodes)
                 {
-                    if (serverNode.InnerText.Contains("Server YT") && serverNode.ChildNodes != null && serverNode.ChildNodes.Count > 1)
+                    if ((serverNode.InnerText.Contains("Server YT") || serverNode.InnerText.Contains("Server HD")) && serverNode.ChildNodes != null && serverNode.ChildNodes.Count > 1)
                     {
                         results.LinkEps.Add(serverNode.ChildNodes["a"].Attributes["href"].Value);
                     }

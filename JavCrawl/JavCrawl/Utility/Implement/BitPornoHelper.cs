@@ -16,36 +16,59 @@ namespace JavCrawl.Utility.Implement
     {
         private readonly BitPornoSettings _bitPornoSettings;
         private readonly IDbRepository _dbRepository;
+        private readonly IBitPornoRepository _bitpornoRepository;
+        private readonly IHtmlHelper _htmlHelper;
 
-        public BitPornoHelper(IOptions<BitPornoSettings> bitPornoSettings, IDbRepository dbRepository)
+        public BitPornoHelper(IOptions<BitPornoSettings> bitPornoSettings, IDbRepository dbRepository, IBitPornoRepository bitpornoRepository, IHtmlHelper htmlHelper)
         {
             _bitPornoSettings = bitPornoSettings.Value;
             _dbRepository = dbRepository;
+            _bitpornoRepository = bitpornoRepository;
+            _htmlHelper = htmlHelper;
         }
         public async Task<bool> JobRemoteFile()
         {
-            var epsNeedToCheckStatus = _dbRepository.GetEpisodeToCheckStatusRemote(HostingLink.BitPorno);
 
-            if (epsNeedToCheckStatus != null)
+            var filmNeedToCheckStatus = _bitpornoRepository.GetFilmsRemoting();
+            foreach(var film in filmNeedToCheckStatus)
             {
-                var fileId = await RemoteFileStatus(epsNeedToCheckStatus.CustomerId.Value);
+                var objectCode = await RemoteFileStatus(film.CustomerId.Value);
 
-                if (!string.IsNullOrWhiteSpace(fileId))
+                if (!string.IsNullOrWhiteSpace(objectCode))
                 {
-                    var newLink = string.Format("https://www.bitporno.com/embed/{0}", fileId);
-
-                    await _dbRepository.UpdateEpisodeWithNewLink(epsNeedToCheckStatus.Id, newLink);
+                    await _bitpornoRepository.UpdateBitpornoEps(film.Id, objectCode);
                 }
             }
 
-            var epsNeedToRemote = _dbRepository.GetEpisodeToTranferOpenload(HostingLink.BitPorno);
+            var filmNeedToRemoting = _bitpornoRepository.GetFilmNeedRemote();
 
-            if (epsNeedToRemote != null)
+            if (filmNeedToRemoting != null)
             {
-                var idRemote = await RemoteFile(epsNeedToRemote.FileName);
-
-                await _dbRepository.UpdateEpisodeRemoteId(epsNeedToRemote.Id, idRemote);
+                
             }
+
+            //var epsNeedToCheckStatus = _dbRepository.GetEpisodeToCheckStatusRemote(HostingLink.BitPorno);
+
+            //if (epsNeedToCheckStatus != null)
+            //{
+            //    var fileId = await RemoteFileStatus(epsNeedToCheckStatus.CustomerId.Value);
+
+            //    if (!string.IsNullOrWhiteSpace(fileId))
+            //    {
+            //        var newLink = string.Format("https://www.bitporno.com/embed/{0}", fileId);
+
+            //        await _dbRepository.UpdateEpisodeWithNewLink(epsNeedToCheckStatus.Id, newLink);
+            //    }
+            //}
+
+            //var epsNeedToRemote = _dbRepository.GetEpisodeToTranferOpenload(HostingLink.BitPorno);
+
+            //if (epsNeedToRemote != null)
+            //{
+            //    var idRemote = await RemoteFile(epsNeedToRemote.FileName);
+
+            //    await _dbRepository.UpdateEpisodeRemoteId(epsNeedToRemote.Id, idRemote);
+            //}
 
             return true;
         }
