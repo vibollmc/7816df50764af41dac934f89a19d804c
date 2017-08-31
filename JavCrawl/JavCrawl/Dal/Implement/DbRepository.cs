@@ -31,6 +31,45 @@ namespace JavCrawl.Dal.Implement
             _htmlHelper = htmlHelper;
         }
 
+        public async Task<bool> JobUpdateSlideAndFilmMember()
+        {
+            try
+            {
+                var result = _dbContext.Films
+                    .Where(x => x.ThumbName != x.CoverName && x.Online == 1 && x.DeletedAt == null)
+                    .Select(x => x.Id)
+                    .ToList();
+
+                var idRandoms = new List<int>();
+                var idFilms = new List<int>();
+
+                for (var i = 1; i < 13; i++)
+                {
+                    var random = new Random();
+                    var next = random.Next(0, result.Count - 1);
+
+                    while (idRandoms.Contains(next))
+                    {
+                        next = random.Next(0, result.Count - 1);
+                    }
+
+                    idRandoms.Add(next);
+
+                    idFilms.Add(result[next]);
+                }
+
+                await NewSlide(idFilms);
+
+                await GenerateMemberVideo();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task<bool> AddGoogleApi(GoogleApi api)
         {
             var googleApi = _dbContext.GoogleApi.FirstOrDefault(x => x.ApiKey == api.ApiKey);

@@ -7,53 +7,60 @@ using System.Threading.Tasks;
 
 namespace JavCrawl.Dal.Context
 {
-    public interface IDbRepository
-    {
-        Task<int> CrawlJavHiHiMovies(JavHiHiMovies javHiHiMovies);
-        Task<bool> SaveJavHiHiMovie(JavHiHiMovie movie);
+	public interface IDbRepository
+	{
+		Task<int> CrawlJavHiHiMovies(JavHiHiMovies javHiHiMovies);
 
-        Task<bool> SaveSchedule(JobListCrawl job);
-        IList<JobListCrawl> GetSchedule();
+		Task<bool> SaveJavHiHiMovie(JavHiHiMovie movie);
 
-        Task<bool> RunJobCrawl();
+		Task<bool> SaveSchedule(JobListCrawl job);
 
-        Task<bool> UpdateImage();
+		IList<JobListCrawl> GetSchedule();
 
-        Episodes GetEpisodeToTranferOpenload(HostingLink hosting);
+		Task<bool> RunJobCrawl();
 
-        Task<bool> UpdateEpisodeRemoteId(int id, int remoteid);
+		Task<bool> UpdateImage();
 
-        Episodes GetEpisodeToCheckStatusRemote(HostingLink hosting);
+		Episodes GetEpisodeToTranferOpenload(HostingLink hosting);
 
-        Task<bool> UpdateEpisodeWithNewLink(int id, string link);
+		Task<bool> UpdateEpisodeRemoteId(int id, int remoteid);
 
-        IList<Episodes> GetEpisodesRemoted();
-        IList<Episodes> GetEpisodesRemoting();
-        IList<Episodes> GetEpisodesRemoteError();
+		Episodes GetEpisodeToCheckStatusRemote(HostingLink hosting);
 
-        IList<Films> GetFilmsToGenerateBigSlide();
+		Task<bool> UpdateEpisodeWithNewLink(int id, string link);
 
-        Task<bool> NewSlide(IList<int> filmIds);
+		IList<Episodes> GetEpisodesRemoted();
 
-        IList<YoutubeComment> GetYoutubeComment(IList<string> videoId);
-        Task<bool> AddNewYoutubeComment(IList<YoutubeComment> youtube);
+		IList<Episodes> GetEpisodesRemoting();
 
-        Task<bool> GenerateMemberVideo();
+		IList<Episodes> GetEpisodesRemoteError();
 
-        Task<Stars> GetStar();
+		IList<Films> GetFilmsToGenerateBigSlide();
 
-        Task<bool> UpdateCrossImage();
+		Task<bool> NewSlide(IList<int> filmIds);
 
-        Task<bool> AddGoogleApi(GoogleApi api);
+		IList<YoutubeComment> GetYoutubeComment(IList<string> videoId);
 
-        IList<GoogleApi> GetGoogleApi();
-        GoogleApi GetGoogleApi(int id);
+		Task<bool> AddNewYoutubeComment(IList<YoutubeComment> youtube);
 
-        Task<bool> GoogleAuthorized(int apiId);
-        Task<bool> UpdateGoogleApiLastUsed(int? apiId);
+		Task<bool> GenerateMemberVideo();
 
-        GoogleApi GetGoogleApiToUse();
+		Task<Stars> GetStar();
 
-        Task<bool> ReupdateSeoField();
-    }
+		Task<bool> UpdateCrossImage();
+
+		Task<bool> AddGoogleApi(GoogleApi api);
+
+		IList<GoogleApi> GetGoogleApi();
+
+		GoogleApi GetGoogleApi(int id);
+
+		Task<bool> GoogleAuthorized(int apiId);
+		Task<bool> UpdateGoogleApiLastUsed(int? apiId);
+
+		GoogleApi GetGoogleApiToUse();
+
+		Task<bool> ReupdateSeoField();
+		Task<bool> JobUpdateSlideAndFilmMember();
+	}
 }

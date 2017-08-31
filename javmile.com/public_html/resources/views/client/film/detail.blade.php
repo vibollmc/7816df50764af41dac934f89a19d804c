@@ -28,7 +28,7 @@
                             <div class="block-title-style">
                                 <img src="{{asset('themes/client/img/logo-javmile.png')}}" style="margin-top:20px" class="img-responsive">
                             </div>
-                            <strong>Server 1</strong>
+                            <strong>Servers:</strong>
                             <div class="block-note hidden-xs">Click to change service if cannot play</div>
                         </h2>
                     </div>
