@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -47,14 +44,20 @@ namespace JavCrawl
             services.Configure<OpenloadSettings>(Configuration.GetSection("OpenloadSettings"));
             services.Configure<YoutubeSettings>(Configuration.GetSection("YoutubeSettings"));
             services.Configure<BitPornoSettings>(Configuration.GetSection("BitPornoSettings"));
+            services.Configure<StreamCherrySettings>(Configuration.GetSection("StreamCherrySettings"));
 
             services.AddTransient<IHtmlHelper, HtmlHelper>();
             services.AddTransient<IFtpHelper, FtpHelper>();
+
             services.AddTransient<IDbRepository, DbRepository>();
+            services.AddTransient<IFilmsUploadRepository, FilmsUploadRepository>();
+
             services.AddTransient<JobAuto, JobAuto>();
+
             services.AddTransient<IOpenloadHelper, OpenloadHelper>();
             services.AddTransient<IYoutubeHelper, YoutubeHelper>();
             services.AddTransient<IBitPornoHelper, BitPornoHelper>();
+            services.AddTransient<IStreamCherryHelper, StreamCherryHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -89,6 +92,8 @@ namespace JavCrawl
             
             var timerSetting = Configuration.GetSection("TimerSettings").Get<TimerSettings>();
 
+            var intervalMinute = timerSetting.Interval * 60000;
+
             if (timerSetting != null && timerSetting.Enabled)
             {
                 Console.WriteLine("JobAuto is running...");
@@ -101,26 +106,21 @@ namespace JavCrawl
                     if (isProcessing) return;
                     isProcessing = true;
                     
-                    var crawler = serviceProvider.GetService<JobAuto>();
+                    var jobAuto = serviceProvider.GetService<JobAuto>();
 
                     if (timerSetting.EnabledCrawler)
                     {
-                        crawler.ExecuteCrawl();
+                        jobAuto.ExecuteCrawl();
                     }
 
-                    if (timerSetting.EnabledOpenload)
+                    if (timerSetting.EnabledRemoteUpload)
                     {
-                        crawler.ExecuteOpenloadRemote();
-                    }
-
-                    if (timerSetting.EnabledBitPorno)
-                    {
-                        crawler.ExecuteBitPornoRemote();
+                        jobAuto.ExecuteRemoteUpload();
                     }
 
                     isProcessing = false;
 
-                }, _autoEvent, 1000, timerSetting.Interval);
+                }, _autoEvent, 1000, intervalMinute);
 
             }
 

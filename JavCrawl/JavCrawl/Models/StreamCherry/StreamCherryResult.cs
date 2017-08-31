@@ -1,6 +1,6 @@
-﻿namespace JavCrawl.Models.Openload
+﻿namespace JavCrawl.Models.StreamCherry
 {
-    public class OpenloadResult<T>
+    public class StreamCherryResult<T>
     {
         public ResultStatus status { get; set; }
         public string msg { get; set; }

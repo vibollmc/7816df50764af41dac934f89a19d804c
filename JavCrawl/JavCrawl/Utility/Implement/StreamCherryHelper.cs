@@ -1,5 +1,5 @@
 ﻿using JavCrawl.Models;
-using JavCrawl.Models.Openload;
+using JavCrawl.Models.StreamCherry;
 using JavCrawl.Utility.Context;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace JavCrawl.Utility.Implement
 {
-    public class OpenloadHelper : IOpenloadHelper
+    public class StreamCherryHelper : IStreamCherryHelper
     {
-        private readonly OpenloadSettings _openloadSettings;
+        private readonly StreamCherrySettings _streamCherrySettings;
 
-        public OpenloadHelper(IOptions<OpenloadSettings> openloadSettings)
+        public StreamCherryHelper(IOptions<StreamCherrySettings> streamCherrySettings)
         {
-            _openloadSettings = openloadSettings.Value;
+            _streamCherrySettings = streamCherrySettings.Value;
         }
 
         public async Task<string> RemoteFile(string fileUrl)
         {
-            var url = string.Format(_openloadSettings.ApiLinkRemoteFile, fileUrl);
+            var url = string.Format(_streamCherrySettings.ApiLinkRemoteFile, fileUrl);
 
             var httpClient = new HttpClient();
 
@@ -27,7 +27,7 @@ namespace JavCrawl.Utility.Implement
 
             if (json == null) return null;
 
-            var result = JsonConvert.DeserializeObject<OpenloadResult<RemoteResult>>(json);
+            var result = JsonConvert.DeserializeObject<StreamCherryResult<RemoteResult>>(json);
 
             if (result == null || 
                 result.status != ResultStatus.Success || 
@@ -47,12 +47,12 @@ namespace JavCrawl.Utility.Implement
 
             await RenameFile(fileId, fileName);
 
-            return string.Format(_openloadSettings.LinkEmbed, fileId, fileName);
+            return string.Format(_streamCherrySettings.LinkEmbed, fileId, fileName);
         }
 
         private async Task<string> CheckStatusRemote(string idRemote)
         {
-            var url = string.Format(_openloadSettings.ApiLinkRemoteStatus, idRemote);
+            var url = string.Format(_streamCherrySettings.ApiLinkRemoteStatus, idRemote);
 
             var httpClient = new HttpClient();
 
@@ -60,7 +60,7 @@ namespace JavCrawl.Utility.Implement
 
             if (json == null) return null;
 
-            var result = JsonConvert.DeserializeObject<OpenloadResult<dynamic>>(json);
+            var result = JsonConvert.DeserializeObject<StreamCherryResult<dynamic>>(json);
 
             if (result == null ||
                 result.status != ResultStatus.Success || result.result == null) return null;
@@ -87,7 +87,7 @@ namespace JavCrawl.Utility.Implement
 
         private async Task<bool> RenameFile(string fileId, string newName)
         {
-            var url = string.Format(_openloadSettings.ApiLinkRenameFile, fileId, newName);
+            var url = string.Format(_streamCherrySettings.ApiLinkRenameFile, fileId, newName);
 
             var httpClient = new HttpClient();
 
@@ -95,7 +95,7 @@ namespace JavCrawl.Utility.Implement
 
             if (json == null) return false;
 
-            var result = JsonConvert.DeserializeObject<OpenloadResult<bool>>(json);
+            var result = JsonConvert.DeserializeObject<StreamCherryResult<bool>>(json);
 
             if (result == null ||
                 result.status != ResultStatus.Success) return false;

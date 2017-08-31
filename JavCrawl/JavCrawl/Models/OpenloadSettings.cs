@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace JavCrawl.Models
+﻿namespace JavCrawl.Models
 {
     public class OpenloadSettings
     {
@@ -12,5 +7,6 @@ namespace JavCrawl.Models
         public string ApiLinkRemoteFile { get; set; }
         public string ApiLinkRemoteStatus { get; set; }
         public string ApiLinkRenameFile { get; set; }
+        public string LinkEmbed { get; set; }
     }
 }

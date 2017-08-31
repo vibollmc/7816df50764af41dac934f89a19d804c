@@ -1,4 +1,4 @@
-﻿namespace JavCrawl.Models.Openload
+﻿namespace JavCrawl.Models.StreamCherry
 {
     public class RemoteStatusResult
     {

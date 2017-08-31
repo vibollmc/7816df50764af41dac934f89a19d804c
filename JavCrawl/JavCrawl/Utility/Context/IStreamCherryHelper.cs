@@ -2,9 +2,9 @@
 
 namespace JavCrawl.Utility.Context
 {
-    public interface IBitPornoHelper
+    public interface IStreamCherryHelper
     {
         Task<string> RemoteFile(string fileUrl);
-        Task<string> RemoteFileStatus(string idRemote);
+        Task<string> RemoteFileStatus(string idRemote, int filmId);
     }
 }

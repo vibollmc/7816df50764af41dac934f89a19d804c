@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace JavCrawl.Models.BitPorno
+﻿namespace JavCrawl.Models.BitPorno
 {
     public class BitPornoResult<T>
     {

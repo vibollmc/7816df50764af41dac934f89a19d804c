@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 using JavCrawl.Models.DbEntity;
 
 namespace JavCrawl.Dal
@@ -42,6 +40,7 @@ namespace JavCrawl.Dal
         public virtual DbSet<JobListCrawl> JobListCrawl { get; set; }
         public virtual DbSet<YoutubeComment> YoutubeComment { get; set; }
         public virtual DbSet<GoogleApi> GoogleApi { get; set; }
+        public virtual DbSet<FilmsUpload> FilmsUpload { get; set; }
 
         public MySqlContext(DbContextOptions options) : base(options)
         {
@@ -1601,6 +1600,39 @@ namespace JavCrawl.Dal
                 entity.Property(e => e.LastUsed)
                     .HasColumnName("last_used")
                     .HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<FilmsUpload>(entity =>
+            {
+                entity.ToTable("films_upload");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.FilmId)
+                    .HasColumnName("film_id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Server)
+                    .HasColumnName("server")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnName("updated_at")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.RemoteId)
+                    .HasColumnName("remote_id")
+                    .HasColumnType("varchar(512)");
             });
         }
     }

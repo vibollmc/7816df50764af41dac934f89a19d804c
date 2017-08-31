@@ -10,8 +10,6 @@ using JavCrawl.Utility.Context;
 using JavCrawl.Models.DbEntity;
 using JavCrawl.Dal;
 using Microsoft.Extensions.Options;
-using System.Text.RegularExpressions;
-using System.Globalization;
 
 namespace JavCrawl.Utility.Implement
 {

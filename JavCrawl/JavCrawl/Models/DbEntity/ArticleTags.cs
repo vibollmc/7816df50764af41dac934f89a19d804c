@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace JavCrawl.Models.DbEntity
+﻿namespace JavCrawl.Models.DbEntity
 {
     public partial class ArticleTags
     {
