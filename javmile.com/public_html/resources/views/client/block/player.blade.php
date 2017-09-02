@@ -26,8 +26,3 @@
     </div>
     @endif
 </div>
-<div class="social player-bottom text-center" style="height:50px">
-    <div class="pull-right hidden-xs">
-        <strong>{{isset($episode)? number_format($episode->viewed): number_format($result->viewed)}}</strong>
-    </div>
-</div>

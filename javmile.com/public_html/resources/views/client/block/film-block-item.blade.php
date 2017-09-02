@@ -19,7 +19,6 @@
         <div class="block-item-caption pull-right">
             <a href="{{route('film_detail', ['category' => $item->category->slug, 'slug' => $item->slug])}}" title="{{$item->title}}">
                 <div class="caption-line title">{{$item->title}}</div>
-                <div class="caption-line title-en">{{$item->title_en}}</div>
                 <div class="caption-line viewed">views: <span class="text-success">{{number_format($item->viewed)}}</span></div>
             </a>
         </div>

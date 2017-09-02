@@ -13,7 +13,7 @@ class MenuComposer {
         }
         $categories = Cache::get('categories');
         if(!Cache::has('menu_genres')){
-            $menu_genres = Genre::where('menu', 1)->get();
+            $menu_genres = Genre::where('menu', 1)->orderBy('title')->get();
             Cache::put('menu_genres', $menu_genres, 10);
         }
         $menu_genres = Cache::get('menu_genres');

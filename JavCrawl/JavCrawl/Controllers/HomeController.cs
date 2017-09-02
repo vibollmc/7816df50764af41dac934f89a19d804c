@@ -50,13 +50,15 @@ namespace JavCrawl.Controllers
 
             //await _dbRepository.UpdateImage();
 
-            //var movies = await _htmlHelper.GetJavHiHiMovies("http://javbuz.com/movie?sort=published&page=39&ajax=1");
+            //var movies = await _htmlHelper.GetJavHiHiMovies("http://javbuz.com/movie?sort=published&page=1&ajax=1");
 
             //var complete = await _dbRepository.CrawlJavHiHiMovies(movies);
 
-            var x = await _dbRepository.ReupdateSeoField();
+            //var x = await _dbRepository.ReupdateSeoField();
 
             //var x = await _dbRepository.UpdateCrossImage();
+
+            await _dbRepository.MixGenre();
 
             return Json(new { OK = results });
         }

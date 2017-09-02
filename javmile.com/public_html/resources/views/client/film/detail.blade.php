@@ -243,7 +243,7 @@
                 <div class="film-info">
                     <div class="">
                         <div class="title-line">
-                            <label>{{$result->title}}<?php echo is_null($result->title_en)? '': ': '.$result->title_en; ?></label>
+                            <label>{{$result->title}}</label>
                         </div>
                         <div class="film-info-line">
                             <span class="sub">Public date:</span><label>{{$result->date}}</label>
@@ -316,17 +316,6 @@ $(document).ready(function(){
     }
 
     $('.info-group').height($('.detail-movie-thumbail').height() - 13);
-    $('body').on('click', '.btn-expant', function(){
-        if($('.info-group').hasClass('expant-sort')){
-            $('.info-group').removeClass('expant-sort');
-            $('.info-group').css('height', 'auto');
-            $('.btn-expant').text('< thu gọn');
-        }else{
-            $('.info-group').addClass('expant-sort');
-            $('.info-group').height($('.detail-movie-thumbail').height() - 13);
-            $('.btn-expant').text('xem thêm >');
-        }
-    });
     $('.server-chosen-action').find('a').click(function(){
         if ($(this).attr('data') == 'all') {
             $('.episode-type-group').removeClass('hide');

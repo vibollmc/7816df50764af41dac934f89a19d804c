@@ -93,8 +93,8 @@
                             <div class="title">
                                 <h2><a href="{{route('film_detail', ['category' => $item->category->slug, 'slug' => $item->slug])}}">
                                     <?php
-                                        if(strlen($item->title) > 25 and strpos($item->title, ' ', 25) > 0){
-                                            $title_vi =  substr($item->title, 0, strpos($item->title, ' ', 25)) . '..';
+                                        if(strlen($item->title) > 72 and strpos($item->title, ' ', 72) > 0){
+                                            $title_vi =  substr($item->title, 0, strpos($item->title, ' ', 72)) . '..';
                                         }else{
                                             $title_vi =  $item->title;
                                         }
@@ -103,7 +103,7 @@
                                         }else{
                                             $title_en = $item->title_en;
                                         }
-                                        echo '<span class="caption-line title">'.$title_vi.'</span><br/><span class="caption-line title-en">'.$title_en.'</span>';
+                                        echo '<span class="caption-line title">'.$title_vi.'</span>';
                                     ?>
                                 </a></h2>
                             </div>

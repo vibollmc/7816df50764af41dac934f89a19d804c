@@ -118,6 +118,11 @@ namespace JavCrawl
                         jobAuto.ExecuteRemoteUpload();
                     }
 
+                    if (timerSetting.EnabledGenarateSlideAndFilmMember)
+                    {
+                        jobAuto.ExecuteGenarateSlideAndFilmMember();
+                    }
+
                     isProcessing = false;
 
                 }, _autoEvent, 1000, intervalMinute);

@@ -259,7 +259,7 @@ namespace JavCrawl.Utility.Implement
 
                 item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
 
-                if (_timerSettings.EnablebReloadEpisodesLink && _dbContext.Films.Any(x => x.Slug == item.url))
+                if (!_timerSettings.EnabledReloadEpisodesLink && _dbContext.Films.Any(x => x.Slug == item.url))
                 {
                     item.url = string.Empty; //Marked Remove;
                 }
@@ -277,11 +277,9 @@ namespace JavCrawl.Utility.Implement
                         {
                             item.descriptions = string.IsNullOrWhiteSpace(linkEpsAndDecs.Description) ? item.name : linkEpsAndDecs.Description;
                         }
-
-                        if (linkEpsAndDecs.LinkEps.Any(x => x.Contains("bitporno")))
-                            item.linkepisode = linkEpsAndDecs.LinkEps;
-                        else
-                            item.url = string.Empty;
+                        
+                        item.linkepisode = linkEpsAndDecs.LinkEps;
+                        
                     }
                     catch
                     {

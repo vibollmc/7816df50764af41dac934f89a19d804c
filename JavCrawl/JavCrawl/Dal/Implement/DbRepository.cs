@@ -35,6 +35,10 @@ namespace JavCrawl.Dal.Implement
         {
             try
             {
+                var schedule = _dbContext.Settings.FirstOrDefault(x => x.Title == "genarate_slide_and_filmmember" && x.UpdatedAt < DateTime.Now);
+
+                if (schedule == null) return false;
+
                 var result = _dbContext.Films
                     .Where(x => x.ThumbName != x.CoverName && x.Online == 1 && x.DeletedAt == null)
                     .Select(x => x.Id)
@@ -61,6 +65,10 @@ namespace JavCrawl.Dal.Implement
                 await NewSlide(idFilms);
 
                 await GenerateMemberVideo();
+
+                schedule.UpdatedAt = DateTime.Now.AddDays(1);
+
+                await _dbContext.SaveChangesAsync();
 
                 return true;
             }
@@ -570,10 +578,80 @@ namespace JavCrawl.Dal.Implement
             return dir.Id;
         }
 
+        public async Task MixGenre()
+        {
+            var genres = _dbContext.Genres.Where(x => x.DeletedAt == null);
+
+            foreach(var genre in genres)
+            {
+                var tempName = StandardGenre(genre.Title);
+
+                if (tempName == genre.Title) continue;
+
+                var joingenre = _dbContext.Genres.FirstOrDefault(x => x.Title == tempName && x.DeletedAt == null);
+
+                if (joingenre == null)
+                {
+                    genre.Title = tempName;
+                    genre.Slug = tempName.ToLower().Replace(" ", "-");
+
+                    await _dbContext.SaveChangesAsync();
+
+                    continue;
+                }
+
+                using(var dbTransaction = await _dbContext.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        genre.DeletedAt = DateTime.Now;
+                        genre.Menu = 0;
+
+                        await _dbContext.SaveChangesAsync();
+
+                        var filmGenres = _dbContext.FilmGenres.Where(x => x.GenreId == genre.Id);
+
+                        foreach (var filmGenre in filmGenres)
+                        {
+                            filmGenre.GenreId = joingenre.Id;
+
+                            await _dbContext.SaveChangesAsync();
+                        }
+
+                        dbTransaction.Commit();
+                    }
+                    catch
+                    {
+                        dbTransaction.Rollback();
+                    }
+                }
+                
+            }
+        }
+
+        private string StandardGenre(string name)
+        {
+            if (name.StartsWith("Jav ")) name = name.Replace("Jav ", "");
+            if (name.StartsWith("Asian ")) name = name.Replace("Asian ", "");
+            if (name.StartsWith("Japanese ")) name = name.Replace("Japanese ", "");
+            if (name == "Bigtits") name = "Big Tits";
+            if (name == "Milf Housewife") name = "Milf";
+            if (name == "Gangbang") name = "Gang Bang";
+            if (name == "Outdoor Fucking") name = "Outdoor";
+            if (name == "Squirt") name = "Squirting";
+            if (name == "Young") name = "Teen";
+            if (name == "Wife") name = "Wifehouse";
+            if (name == "Handjob") name = "Hand Job";
+
+            return name;
+        }
+
         private async Task<int> GetGenre(string name)
         {
             name = name.Replace("-", " ").ToTitleCase();
 
+            name = StandardGenre(name);
+            
             var genre = _dbContext.Genres.FirstOrDefault(x => x.Title.ToLower() == name.ToLower().Trim());
             if (genre != null) return genre.Id;
 

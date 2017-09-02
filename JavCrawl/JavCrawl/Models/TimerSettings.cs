@@ -6,6 +6,7 @@
         public bool Enabled { get; set; }
         public bool EnabledRemoteUpload { get; set; }
         public bool EnabledCrawler { get; set; }
-        public bool EnablebReloadEpisodesLink { get; set; }
+        public bool EnabledReloadEpisodesLink { get; set; }
+        public bool EnabledGenarateSlideAndFilmMember { get; set; }
     }
 }

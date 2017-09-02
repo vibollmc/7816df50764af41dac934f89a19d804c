@@ -49,6 +49,18 @@ namespace JavCrawl.Utility
             }
         }
 
+        public void ExecuteGenarateSlideAndFilmMember()
+        {
+            try
+            {
+                AsyncHelper.RunSync(() => _dbRepository.JobUpdateSlideAndFilmMember());
+            }
+            catch
+            {
+
+            }
+        }
+
 
         private async Task RemoteUpload()
         {
@@ -88,7 +100,7 @@ namespace JavCrawl.Utility
                     if (string.IsNullOrWhiteSpace(directLink)) return;
 
                     //BitPorno
-                    var remoteId = await _bitPornoHelper.RemoteFile(directLink);
+                     var remoteId = await _bitPornoHelper.RemoteFile(directLink);
                     if (string.IsNullOrWhiteSpace(remoteId)) await _filmuploadRepository.UpdateUploadError(needUpload.Id, Models.DbEntity.ServerUpload.BitPorno);
                     else await _filmuploadRepository.UpdateUploading(needUpload.Id, Models.DbEntity.ServerUpload.BitPorno, remoteId);
 

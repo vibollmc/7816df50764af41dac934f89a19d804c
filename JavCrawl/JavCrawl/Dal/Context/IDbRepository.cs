@@ -60,5 +60,8 @@ namespace JavCrawl.Dal.Context
 
 		Task<bool> ReupdateSeoField();
 		Task<bool> JobUpdateSlideAndFilmMember();
-	}
+
+        Task MixGenre();
+
+    }
 }
