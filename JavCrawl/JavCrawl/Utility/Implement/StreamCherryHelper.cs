@@ -47,7 +47,7 @@ namespace JavCrawl.Utility.Implement
 
             await RenameFile(fileId, fileName);
 
-            return string.Format(_streamCherrySettings.LinkEmbed, fileId, fileName);
+            return string.Format(_streamCherrySettings.LinkEmbed, fileId, fileName.Replace(".", "_"));
         }
 
         private async Task<string> CheckStatusRemote(string idRemote)
