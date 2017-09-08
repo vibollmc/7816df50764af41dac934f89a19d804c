@@ -29,6 +29,8 @@ namespace JavCrawl.Utility.Implement
 
             if (!Directory.Exists(dirUploads)) Directory.CreateDirectory(dirUploads);
 
+            if (fileUrl.StartsWith("//")) fileUrl = "http:" + fileUrl;
+
             var uri = new Uri(fileUrl);
             
             //if (!uri.IsFile) return new FtpResults { IsSuccessful = false };

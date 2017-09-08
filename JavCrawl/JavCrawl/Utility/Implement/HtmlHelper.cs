@@ -59,7 +59,7 @@ namespace JavCrawl.Utility.Implement
 
                     var file = a.Attributes["href"].Value;
 
-                    var defaultSource = true;
+                    var defaultSource = label.Contains("720");
 
                     if (file.Contains(".googlevideo.com"))
                     {
@@ -68,8 +68,6 @@ namespace JavCrawl.Utility.Implement
                         file = file.Substring(0, file.IndexOf("&title="));
 
                         file = "https://redirector" + file;
-
-                        defaultSource = label.Contains("720");
                     }
 
                     resulta.Add(new VideoApi
@@ -96,8 +94,8 @@ namespace JavCrawl.Utility.Implement
                 var label = nodeLink.Attributes.Contains("data-res") ? nodeLink.Attributes["data-res"].Value : "HD";
 
                 var file = nodeLink.Attributes["src"].Value;
-
-                var defaultSource = true;
+                
+                var defaultSource = label.Contains("720");
 
                 if (file.Contains(".googlevideo.com"))
                 {
@@ -105,7 +103,6 @@ namespace JavCrawl.Utility.Implement
 
                     file = "https://redirector" + file;
 
-                    defaultSource = label.Contains("720");
                 }
 
                 result.Add(new VideoApi
@@ -117,6 +114,8 @@ namespace JavCrawl.Utility.Implement
                     Type = nodeLink.Attributes["type"].Value
                 });
             }
+
+            if (result.Count == 1) result[0].Default = "true";
 
             return result;
         }
@@ -230,66 +229,74 @@ namespace JavCrawl.Utility.Implement
 
         public async Task<JavHiHiMovies> GetJavHiHiMovies(string url)
         {
-            var httpClient = new HttpClient();
-
-            var json = await httpClient.GetStringAsync(url);
-
-            if (json == null) return null;
-            
-            var from789 = url.Contains("jav789.com");
-
-            var frombuz = url.Contains("javbuz.com");
-
-            var results = JsonConvert.DeserializeObject<JavHiHiMovies>(json);
-
-            foreach (var item in results.movies)
+            try
             {
-                var urlPage = string.Format("http://javhihi.com/{0}", item.url);
-                item.fromsite = "hihi";
-                if (from789)
-                {
-                    urlPage = string.Format("http://jav789.com/{0}", item.url);
-                    item.fromsite = "789";
-                }
-                else if (frombuz)
-                {
-                    urlPage = string.Format("http://javbuz.com/{0}", item.url);
-                    item.fromsite = "buz";
-                }
+                var httpClient = new HttpClient();
 
-                item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
+                var json = await httpClient.GetStringAsync(url);
 
-                if (!_timerSettings.EnabledReloadEpisodesLink && _dbContext.Films.Any(x => x.Slug == item.url))
+                if (json == null) return null;
+
+                var from789 = url.Contains("jav789.com");
+
+                var frombuz = url.Contains("javbuz.com");
+
+                var results = JsonConvert.DeserializeObject<JavHiHiMovies>(json);
+
+                foreach (var item in results.movies)
                 {
-                    item.url = string.Empty; //Marked Remove;
-                }
-                else
-                {
-                    try
+                    var urlPage = string.Format("http://javhihi.com/{0}", item.url);
+                    item.fromsite = "hihi";
+                    if (from789)
                     {
-                        var linkEpsAndDecs = await GetJavHiHiMoviesLinkEpisode(urlPage);
-
-                        if (from789)
-                        {
-                            item.descriptions = item.name;
-                        }
-                        else
-                        {
-                            item.descriptions = string.IsNullOrWhiteSpace(linkEpsAndDecs.Description) ? item.name : linkEpsAndDecs.Description;
-                        }
-                        
-                        item.linkepisode = linkEpsAndDecs.LinkEps;
-                        
+                        urlPage = string.Format("http://jav789.com/{0}", item.url);
+                        item.fromsite = "789";
                     }
-                    catch
+                    else if (frombuz)
                     {
-                        item.url = string.Empty;
+                        urlPage = string.Format("http://javbuz.com/{0}", item.url);
+                        item.fromsite = "buz";
                     }
-                    
+
+                    item.url = item.url.Substring(item.url.IndexOf('/') + 1, item.url.IndexOf('.') - item.url.IndexOf('/') - 1);
+
+                    if (!_timerSettings.EnabledReloadEpisodesLink && _dbContext.Films.Any(x => x.Slug == item.url))
+                    {
+                        item.url = string.Empty; //Marked Remove;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var linkEpsAndDecs = await GetJavHiHiMoviesLinkEpisode(urlPage);
+
+                            if (from789)
+                            {
+                                item.descriptions = item.name;
+                            }
+                            else
+                            {
+                                item.descriptions = string.IsNullOrWhiteSpace(linkEpsAndDecs.Description) ? item.name : linkEpsAndDecs.Description;
+                            }
+
+                            item.linkepisode = linkEpsAndDecs.LinkEps;
+
+                        }
+                        catch
+                        {
+                            item.url = string.Empty;
+                        }
+
+                    }
                 }
+                results.movies = results.movies.Where(x => x.url != string.Empty).ToList();
+                return results;
             }
-            results.movies = results.movies.Where(x => x.url != string.Empty).ToList();
-            return results;
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         private async Task<string> GetLinkHiddenEps(string url)
@@ -351,7 +358,11 @@ namespace JavCrawl.Utility.Implement
                 {
                     if ((serverNode.InnerText.Contains("Server YT") || serverNode.InnerText.Contains("Server HD")) && serverNode.ChildNodes != null && serverNode.ChildNodes.Count > 1)
                     {
-                        results.LinkEps.Add(serverNode.ChildNodes["a"].Attributes["href"].Value);
+                        var epsLink = serverNode.ChildNodes["a"].Attributes["href"].Value;
+
+                        if (epsLink.StartsWith("//")) epsLink = "http:" + epsLink;
+
+                        results.LinkEps.Add(epsLink);
                     }
                     else
                     {
@@ -368,10 +379,15 @@ namespace JavCrawl.Utility.Implement
                         else if (serverNode.ChildNodes != null && serverNode.ChildNodes.Count > 1)
                         {
                             var urlEps = serverNode.ChildNodes["a"].Attributes["href"].Value;
+
+                            if (urlEps.StartsWith("//")) urlEps = "http:" + urlEps;
+
                             var linkEps = await GetLinkHiddenEps(urlEps);
 
                             if (linkEps != null)
                             {
+                                if (linkEps.StartsWith("//")) linkEps = "http:" + linkEps;
+
                                 results.LinkEps.Add(linkEps);
                             }
                         }
