@@ -155,7 +155,10 @@ class FilmController extends Controller {
         }
         $breadcrumb[] = ['link' => route('category', $cat_slug), 'title' => $result->category->title];
         $breadcrumb[] = ['link' => route('film_detail', ['cat' => $cat_slug, 'slug' => $result->slug]), 'title' => $result->title];
-        $breadcrumb[] = ['link' => 'javascript:void(0)', 'title' => 'Eps '.$episode->title];
+        $breadcrumb[] = ['link' => 'javascript:void(0)', 'title' => $episode->title];
+
+        MetaTag::set('canonical', route('film_detail', ['cat' => $cat_slug, 'slug' => $result->slug]));
+
         $link = NULL;
         if (strlen($episode->sub_vi) > 0) {
             $sub = $episode->sub_vi;
