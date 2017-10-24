@@ -15,3 +15,11 @@
 /javmile.com/public_html/storage/logs
 /javmile.com/public_html/app/Policies/*.gitkeep
 /crawler.javmile.com
+/YTCommenter/.vs
+/YTCommenter/packages
+/YTCommenter/YTCommenter/bin
+/YTCommenter/YTCommenter/obj
+/SshChecker/packages
+/SshChecker/.vs
+/SshChecker/SshChecker/obj
+/SshChecker/SshChecker/bin
