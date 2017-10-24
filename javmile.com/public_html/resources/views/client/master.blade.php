@@ -17,7 +17,11 @@
         <meta property="og:title" content="{{ MetaTag::get('title') }}" />
         <meta property="og:description" content="{{ MetaTag::get('description') }}" />
         <meta property="og:image" content="{{ MetaTag::get('image_src') }}" />
+        @if(is_null(MetaTag::get('canonical')))
         <meta property="og:url" content="{{ \URL::current() }}" />
+        @else
+        <meta property="og:url" content="{{ MetaTag::get('canonical') }}" />
+        @endif
         <meta property="og:type" content="{{ MetaTag::get('og_type') }}" />
         <meta property="og:site_name" content="{{ MetaTag::get('title') }}" />
         <meta property="fb:app_id" content="{{ env('SOCIAL_FB_ID') }}" />
@@ -25,8 +29,14 @@
         
         <link rel="shortcut icon" href="{{asset('favicon.ico')}}">
         <link rel="image_src" type="{{ MetaTag::get('image_type') }}" href="{{ MetaTag::get('image_src') }}"/>
+        
+        @if(is_null(MetaTag::get('canonical')))
         <link rel="canonical" href="{{ \URL::current() }}" />
         <link rel="shortlink" href="{{ \URL::current() }}" />
+        @else
+        <link rel="canonical" href="{{ MetaTag::get('canonical') }}" />
+        <link rel="shortlink" href="{{ MetaTag::get('canonical') }}" />
+        @endif
 
         <!-- Stylesheets -->
         <!-- Bootstrap is included in its original form, unaltered -->
