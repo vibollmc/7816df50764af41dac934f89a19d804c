@@ -155,7 +155,10 @@ class FilmController extends Controller {
         }
         $breadcrumb[] = ['link' => route('category', $cat_slug), 'title' => $result->category->title];
         $breadcrumb[] = ['link' => route('film_detail', ['cat' => $cat_slug, 'slug' => $result->slug]), 'title' => $result->title];
-        $breadcrumb[] = ['link' => 'javascript:void(0)', 'title' => 'Eps '.$episode->title];
+        $breadcrumb[] = ['link' => 'javascript:void(0)', 'title' => $episode->title];
+
+        MetaTag::set('canonical', route('film_detail', ['cat' => $cat_slug, 'slug' => $result->slug]));
+
         $link = NULL;
         if (strlen($episode->sub_vi) > 0) {
             $sub = $episode->sub_vi;
@@ -176,7 +179,7 @@ class FilmController extends Controller {
         $link_embed = null;
 
         if (!is_null($episode)) {
-            if (strpos($episode->file_name, 'javhihi.com') or strpos($episode->file_name, 'jav789.com') or strpos($episode->file_name, 'javbuz.com')) {
+            if (strpos($episode->file_name, 'javhihi.in') or strpos($episode->file_name, 'javhihi.com') or strpos($episode->file_name, 'jav789.com') or strpos($episode->file_name, 'javbuz.com')) {
                 $link = $this->javhihi($episode->file_name);
                 if(!is_null($link)){
                     if ($episode->status == 2) {
