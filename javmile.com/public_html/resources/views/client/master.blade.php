@@ -25,7 +25,7 @@
         <meta property="og:type" content="{{ MetaTag::get('og_type') }}" />
         <meta property="og:site_name" content="{{ MetaTag::get('title') }}" />
         <meta property="fb:app_id" content="{{ env('SOCIAL_FB_ID') }}" />
-        <meta name="ero_verify" content="9518e91e20da175f29c54f6fde507ba0" />
+        <meta name="ero_verify" content="87e14c5d50c98603450c46a2d5d41ad7" />
         
         <link rel="shortcut icon" href="{{asset('favicon.ico')}}">
         <link rel="image_src" type="{{ MetaTag::get('image_type') }}" href="{{ MetaTag::get('image_src') }}"/>
@@ -86,21 +86,10 @@
                                         @include('client.block.slider')
                                     </div>
                                     <div class="facebook-box hidden-xs">
-                                        <script type="text/javascript">
-                                        var ad_idzone = "2673506",
-                                            ad_width = "300",
-                                            ad_height = "250";
-                                        </script>
-                                        <script type="text/javascript" src="https://ads.exoclick.com/ads.js"></script>
-                                        <noscript><a href="https://main.exoclick.com/img-click.php?idzone=2673506" target="_blank"><img src="https://syndication.exoclick.com/ads-iframe-display.php?idzone=2673506&output=img&type=300x250"></a></noscript>
-
-                                        <script type="text/javascript">
-                                        var ad_idzone = "2674092",
-                                            ad_width = "300",
-                                            ad_height = "250";
-                                        </script>
-                                        <script type="text/javascript" src="https://ads.exoclick.com/ads.js"></script>
-                                        <noscript><a href="https://main.exoclick.com/img-click.php?idzone=2674092" target="_blank"><img src="https://syndication.exoclick.com/ads-iframe-display.php?idzone=2674092&output=img&type=300x250"></a></noscript>
+<!-- BEGIN EroAdvertising ADSPACE CODE -->
+<script type="text/javascript" language="javascript" charset="utf-8" src="//adspaces.ero-advertising.com/adspace/3553950.js"></script>
+<script type="text/javascript" language="javascript" charset="utf-8" src="//adspaces.ero-advertising.com/adspace/3553952.js"></script>
+<!-- END EroAdvertising ADSPACE CODE -->
                                     </div>
                                 </div>
                                 @include('client.block.slide-bottom')
