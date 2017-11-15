@@ -8,7 +8,7 @@
         <div class="block-item-thumb">
             <div class="thumbnail film-tooltip" style="width: 100%;" data-tooltip-content="#{{$tooltip_id}}">
                 <a href="{{route('film_detail', ['category' => $item->category->slug, 'slug' => $item->slug])}}">
-                    <img src="{{strlen($item->cover_name)>0? $image_prefix.$item->cover_name: asset('themes/client/img/film-cover.png')}}" class="cover img-reponsive">
+                    <img src="{{strlen($item->cover_name)>0? $image_prefix.$item->cover_name: asset('themes/client/img/film-cover.png')}}" alt="{{$item->title}}" class="cover img-reponsive">
                 </a>
                 <div class="overlay">
                     <a href="{{route('film_detail', ['category' => $item->category->slug, 'slug' => $item->slug])}}" title="">

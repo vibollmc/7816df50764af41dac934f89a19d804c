@@ -12,14 +12,14 @@
             <div class="col-md-6 thumbnail-item">
                 <div class="thumbnail film-tooltip" style="width: 100%;" data-tooltip-content="#{{$tooltip_id}}">
                     <a href="{{route('star_show', $item->slug)}}">
-                        <img src="{{$image_prefix.$item->thumb_name}}" alt="{{$item->slug}}" class="cover img-reponsive">
+                        <img src="{{$image_prefix.$item->thumb_name}}" alt="{{$item->title}}" class="cover img-reponsive">
                     </a>
                     <div class="caption">
                         <div class="title">
                             <h2><a href="{{route('star_show', $item->slug)}}">
                                 <?php
-                                    if(strlen($item->title) > 25 and strpos($item->title, ' ', 25) > 0){
-                                        $title =  substr($item->title, 0, strpos($item->title, ' ', 25)) . '..';
+                                    if(strlen($item->title) > 72 and strpos($item->title, ' ', 72) > 0){
+                                        $title =  substr($item->title, 0, strpos($item->title, ' ', 72)) . '..';
                                     }else{
                                         $title =  $item->title;
                                     }

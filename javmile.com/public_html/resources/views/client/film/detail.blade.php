@@ -13,6 +13,10 @@
 
 <div class="main-content">
     <div class="">
+		<div class="clearfix"></div>
+		<center>
+		</center>
+		<div class="clearfix"></div>
         <div class="header-section player-group" style="padding:0;">
             @include('client.block.player')
         </div>
@@ -185,6 +189,10 @@
                     @endif
                 @endif
                 <div class="clearfix"></div>
+				<center>
+					
+				</center>
+				<div class="clearfix"></div>
             </div>
             <div class="col-md-6">
                 <div class="film-calendar-group">

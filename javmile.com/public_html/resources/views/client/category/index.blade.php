@@ -7,6 +7,10 @@
             <h4 class="sub-header">
                 <strong>{{$result['title']}}</strong>
             </h4>
+			<div class="clearfix"></div>
+			<center>
+			</center>
+			<div class="clearfix"></div>
             <div class="thumbnail-list">
                 <div class="clearfix"></div>
                 @foreach($result['result'] as $key => $item)

@@ -47,7 +47,7 @@
             </div>
         </div>
         <div class="overlay">
-            <a href="{{route('film_detail', ['category' => $item->category->slug, 'slug' => $item->slug])}}" title="">
+            <a href="{{route('film_detail', ['category' => $item->category->slug, 'slug' => $item->slug])}}" alt="{{$item->title}}">
                 <img src="{{asset('themes/client/img/play.png')}}">
             </a>
         </div>
