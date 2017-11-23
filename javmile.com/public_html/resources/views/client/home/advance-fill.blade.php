@@ -10,7 +10,9 @@
             <div class="thumbnail-list">
 				<div class="clearfix"></div>
 				<center>
-					
+<!-- BEGIN EroAdvertising ADSPACE CODE -->
+<script type="text/javascript" language="javascript" charset="utf-8" src="//adspaces.ero-advertising.com/adspace/3558982.js"></script>
+<!-- END EroAdvertising ADSPACE CODE -->
 				</center>
 				<div class="clearfix"></div>
                 @foreach($result as $key => $item)

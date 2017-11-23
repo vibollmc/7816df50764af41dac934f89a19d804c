@@ -7,6 +7,13 @@
             <h4 class="sub-header">
                 Porn star <strong>{{$result->title}}</strong>
             </h4>
+			<div class="clearfix"></div>
+			<center>
+<!-- BEGIN EroAdvertising ADSPACE CODE -->
+<script type="text/javascript" language="javascript" charset="utf-8" src="//adspaces.ero-advertising.com/adspace/3558982.js"></script>
+<!-- END EroAdvertising ADSPACE CODE -->
+			</center>
+			<div class="clearfix"></div>
             <div class="movie-detail-info">
                 <div class="detail-info">
                     <div class="col-md-3">

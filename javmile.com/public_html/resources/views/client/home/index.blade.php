@@ -17,6 +17,12 @@
                 @endforeach
             </div>
             <div class="clearfix"></div>
+				<center>
+<!-- BEGIN EroAdvertising ADSPACE CODE -->
+<script type="text/javascript" language="javascript" charset="utf-8" src="//adspaces.ero-advertising.com/adspace/3558982.js"></script>
+<!-- END EroAdvertising ADSPACE CODE -->
+				</center>
+			<div class="clearfix"></div>
             <h4 class="sub-header">
                  <a href="{{route('category', $recent_movie->first()->category->slug)}}">
                     <strong>Video</strong>

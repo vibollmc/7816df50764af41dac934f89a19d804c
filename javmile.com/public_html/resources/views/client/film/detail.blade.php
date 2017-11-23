@@ -15,6 +15,9 @@
     <div class="">
 		<div class="clearfix"></div>
 		<center>
+<!-- BEGIN EroAdvertising ADSPACE CODE -->
+<script type="text/javascript" language="javascript" charset="utf-8" src="//adspaces.ero-advertising.com/adspace/3558982.js"></script>
+<!-- END EroAdvertising ADSPACE CODE -->
 		</center>
 		<div class="clearfix"></div>
         <div class="header-section player-group" style="padding:0;">
@@ -189,8 +192,10 @@
                     @endif
                 @endif
                 <div class="clearfix"></div>
-				<center>
-					
+				<center>	
+<!-- BEGIN EroAdvertising ADSPACE CODE -->
+<script type="text/javascript" language="javascript" charset="utf-8" src="//adspaces.ero-advertising.com/adspace/3553950.js"></script>
+<!-- END EroAdvertising ADSPACE CODE -->
 				</center>
 				<div class="clearfix"></div>
             </div>

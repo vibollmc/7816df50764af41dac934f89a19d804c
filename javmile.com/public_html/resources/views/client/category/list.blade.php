@@ -6,6 +6,13 @@
             <h4 class="sub-header">
                 <strong>{{$breadcrumb[0]['title']}}</strong>
             </h4>
+			<div class="clearfix"></div>
+			<center>
+<!-- BEGIN EroAdvertising ADSPACE CODE -->
+<script type="text/javascript" language="javascript" charset="utf-8" src="//adspaces.ero-advertising.com/adspace/3558982.js"></script>
+<!-- END EroAdvertising ADSPACE CODE -->
+			</center>
+			<div class="clearfix"></div>
             <div class="thumbnail-list">
                 @if($result->count() > 0)
                     @foreach($result as $key => $item)
@@ -14,7 +21,7 @@
                         </div>
                     @endforeach
                 @else
-                    <p><h3>Chưa có dữ liệu.</h3></p>
+                    <p><h3>No data.</h3></p>
                 @endif
             </div>
         </div>
