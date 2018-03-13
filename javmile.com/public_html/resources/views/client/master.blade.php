@@ -26,6 +26,7 @@
         <meta property="og:site_name" content="{{ MetaTag::get('title') }}" />
         <meta property="fb:app_id" content="{{ env('SOCIAL_FB_ID') }}" />
         <meta name="ero_verify" content="87e14c5d50c98603450c46a2d5d41ad7" />
+		<meta name="clckd" content="ecfef9bb103ada7bf4f0d45e7a2b313e" />
         
         <link rel="shortcut icon" href="{{asset('favicon.ico')}}">
         <link rel="image_src" type="{{ MetaTag::get('image_type') }}" href="{{ MetaTag::get('image_src') }}"/>

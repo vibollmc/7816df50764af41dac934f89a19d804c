@@ -16,7 +16,7 @@ namespace SshChecker
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FrmSshChecker());
+            Application.Run(new SshChecker());
         }
     }
 }

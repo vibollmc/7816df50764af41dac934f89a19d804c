@@ -14,10 +14,6 @@
     <EmbeddedResource Remove="Uploads\**" />
     <None Remove="Uploads\**" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="wwwroot\client_secrets.json" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentFTP" Version="17.4.2" />
     <PackageReference Include="Google.Apis" Version="1.27.1" />
@@ -46,11 +42,6 @@
     <Folder Include="Views\ViewFilm\" />
     <Folder Include="Views\Openload\" />
     <Folder Include="wwwroot\Uploads\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Update="wwwroot/client_secrets.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>
