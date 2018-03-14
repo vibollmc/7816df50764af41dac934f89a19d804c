@@ -23,7 +23,8 @@ namespace HighLights.Web.Migrations
 
             modelBuilder.Entity("HighLights.Web.Entities.Category", b =>
                 {
-                    b.Property<decimal?>("Id");
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime?>("CreatedAt");
 
@@ -48,7 +49,8 @@ namespace HighLights.Web.Migrations
 
             modelBuilder.Entity("HighLights.Web.Entities.Clip", b =>
                 {
-                    b.Property<decimal?>("Id");
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int?>("ClipType");
 
@@ -58,7 +60,7 @@ namespace HighLights.Web.Migrations
 
                     b.Property<int?>("LinkType");
 
-                    b.Property<decimal?>("MatchId");
+                    b.Property<int?>("MatchId");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -77,15 +79,44 @@ namespace HighLights.Web.Migrations
                     b.ToTable("Clips");
                 });
 
-            modelBuilder.Entity("HighLights.Web.Entities.Formation", b =>
+            modelBuilder.Entity("HighLights.Web.Entities.CrawlLink", b =>
                 {
-                    b.Property<decimal?>("Id");
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("BaseLink");
 
                     b.Property<DateTime?>("CreatedAt");
 
                     b.Property<DateTime?>("DeletedAt");
 
-                    b.Property<decimal?>("MatchId");
+                    b.Property<int?>("Finished");
+
+                    b.Property<int?>("FromPage");
+
+                    b.Property<bool>("IsCircle");
+
+                    b.Property<bool>("IsFinished");
+
+                    b.Property<int?>("ToPage");
+
+                    b.Property<DateTime?>("UpdatedAt");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CrawlLinks");
+                });
+
+            modelBuilder.Entity("HighLights.Web.Entities.Formation", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime?>("CreatedAt");
+
+                    b.Property<DateTime?>("DeletedAt");
+
+                    b.Property<int?>("MatchId");
 
                     b.Property<string>("Name");
 
@@ -100,15 +131,62 @@ namespace HighLights.Web.Migrations
                     b.ToTable("Formations");
                 });
 
-            modelBuilder.Entity("HighLights.Web.Entities.Match", b =>
+            modelBuilder.Entity("HighLights.Web.Entities.ImageServer", b =>
                 {
-                    b.Property<decimal?>("Id");
-
-                    b.Property<decimal?>("CategoryId");
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime?>("CreatedAt");
 
                     b.Property<DateTime?>("DeletedAt");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("Patch")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<int>("Port");
+
+                    b.Property<string>("ServerFtp")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("ServerName")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("ServerUrl")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<DateTime?>("UpdatedAt");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ImageServers");
+                });
+
+            modelBuilder.Entity("HighLights.Web.Entities.Match", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("CategoryId");
+
+                    b.Property<DateTime?>("CreatedAt");
+
+                    b.Property<DateTime?>("DeletedAt");
+
+                    b.Property<string>("ImageName");
+
+                    b.Property<int?>("ImageServerId");
 
                     b.Property<DateTime?>("MatchDate")
                         .IsRequired();
@@ -127,18 +205,21 @@ namespace HighLights.Web.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("ImageServerId");
+
                     b.ToTable("Matchs");
                 });
 
             modelBuilder.Entity("HighLights.Web.Entities.Substitution", b =>
                 {
-                    b.Property<decimal?>("Id");
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime?>("CreatedAt");
 
                     b.Property<DateTime?>("DeletedAt");
 
-                    b.Property<decimal?>("FormationId");
+                    b.Property<int?>("FormationId");
 
                     b.Property<int?>("Minutes");
 
@@ -158,7 +239,8 @@ namespace HighLights.Web.Migrations
 
             modelBuilder.Entity("HighLights.Web.Entities.Tag", b =>
                 {
-                    b.Property<decimal?>("Id");
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime?>("CreatedAt");
 
@@ -181,9 +263,9 @@ namespace HighLights.Web.Migrations
 
             modelBuilder.Entity("HighLights.Web.Entities.TagAssignment", b =>
                 {
-                    b.Property<decimal>("MatchId");
+                    b.Property<int>("MatchId");
 
-                    b.Property<decimal>("TagId");
+                    b.Property<int>("TagId");
 
                     b.HasKey("MatchId", "TagId");
 
@@ -211,6 +293,10 @@ namespace HighLights.Web.Migrations
                     b.HasOne("HighLights.Web.Entities.Category", "Category")
                         .WithMany("Matches")
                         .HasForeignKey("CategoryId");
+
+                    b.HasOne("HighLights.Web.Entities.ImageServer", "ImageServer")
+                        .WithMany("Matches")
+                        .HasForeignKey("ImageServerId");
                 });
 
             modelBuilder.Entity("HighLights.Web.Entities.Substitution", b =>

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,7 +13,8 @@ namespace HighLights.Web.Entities
         {
             CreatedAt = DateTime.UtcNow;
         }
-        public decimal? Id { get; set; }
+        [Key]
+        public int? Id { get; set; }
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

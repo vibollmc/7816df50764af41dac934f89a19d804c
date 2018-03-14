@@ -14,8 +14,12 @@ namespace HighLights.Web.Entities
         public string Slug { get; set; }
         [Required]
         public DateTime? MatchDate { get; set; }
-        
-        public decimal? CategoryId { get; set; }
+
+        public string ImageName { get; set; }
+        public int? ImageServerId { get; set; }
+        public ImageServer ImageServer { get; set; }
+
+        public int? CategoryId { get; set; }
         public Category Category { get; set; }
 
         public ICollection<Clip> Clips { get; set; }

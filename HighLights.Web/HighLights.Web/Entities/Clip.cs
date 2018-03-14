@@ -9,7 +9,7 @@ namespace HighLights.Web.Entities
 {
     public class Clip : Base
     {
-        public decimal? MatchId { get; set; }
+        public int? MatchId { get; set; }
         [Required, MaxLength(50)]
         public string Name { get; set; }
         [Required, MaxLength(1000)]

@@ -16,6 +16,8 @@ namespace HighLights.Web.Dal
         public DbSet<Substitution> Substitutions { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<TagAssignment> TagAssignments { get; set; }
+        public DbSet<CrawlLink> CrawlLinks { get; set; }
+        public DbSet<ImageServer> ImageServers { get; set; }
 
         public HighLightsContext(DbContextOptions<HighLightsContext> options) : base(options)
         {

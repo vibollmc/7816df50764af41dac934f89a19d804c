@@ -7,7 +7,7 @@ namespace HighLights.Web.Entities
 {
     public class Formation: Base
     {
-        public decimal? MatchId { get; set; }
+        public int? MatchId { get; set; }
         public int? Number { get; set; }
         public string Name { get; set; }
 
