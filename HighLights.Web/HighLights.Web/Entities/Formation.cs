@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HighLights.Web.Entities.Enum;
 
 namespace HighLights.Web.Entities
 {
@@ -10,6 +11,8 @@ namespace HighLights.Web.Entities
         public int? MatchId { get; set; }
         public int? Number { get; set; }
         public string Name { get; set; }
+        public FormationType Type { get; set; }
+        public bool IsSubstitution { get; set; }
 
         public Substitution Substitution { get; set; }
     }

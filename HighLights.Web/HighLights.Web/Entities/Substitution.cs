@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HighLights.Web.Entities.Enum;
 
 namespace HighLights.Web.Entities
 {
@@ -11,6 +12,7 @@ namespace HighLights.Web.Entities
         public string Name { get; set; }
         public int? Minutes { get; set; }
         public int? FormationId { get; set; }
+        public FormationType Type { get; set; }
         public Formation Formation { get; set; }
     }
 }

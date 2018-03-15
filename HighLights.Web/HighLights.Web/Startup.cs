@@ -31,12 +31,15 @@ namespace HighLights.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<HighLightsContext>(options => options.UseMySql(Configuration.GetConnectionString("MySqlConnection")));
+
+            services.AddMemoryCache();
             services.AddMvc();
-
-            services.AddTransient<ICrawler, Crawler>();
-
+            
             services.AddTransient<IImageServerRepository, ImageServerRepository>();
             services.AddTransient<ICrawlLinkRepository, CrawlLinkRepository>();
+            services.AddTransient<IMatchRepository, MatchRepository>();
+
+            services.AddTransient<ICrawler, Crawler>();
 
             services.AddTransient<IFtpHelper, FtpHelper>();
         }
@@ -74,7 +77,7 @@ namespace HighLights.Web
 
                 crawler.Run();
 
-            }, _autoEvent, 1000, 120000);
+            }, _autoEvent, 1000, 10000000);
         }
     }
 }
