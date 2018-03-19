@@ -50,16 +50,25 @@ namespace HighLights.Web.Utilities.Implement
                 }
 
 
-                var matchLinks = await GetMatchLinks(url);
+                //var matchLinks = await GetMatchLinks(url);
 
-                if (matchLinks == null) return;
+                //if (matchLinks == null) return;
 
-                foreach (var matchLink in matchLinks)
+                //foreach (var matchLink in matchLinks)
+                //{
+                //    var exsits = await _matchRepository.CheckExsits(matchLink.Slug);
+
+                //    if (!exsits) await SaveMatch(matchLink);
+                //}
+
+                await SaveMatch(new MatchLink
                 {
-                    var exsits = await _matchRepository.CheckExsits(matchLink.Slug);
+                    Link = "http://www.fullmatchesandshows.com/2018/03/14/paris-saint-germain-vs-angers-highlights-full-match-video/",
+                    Name = "Paris Saint Germain vs Angers – Highlights & Full Match",
+                    ImageLink = "https://i1.wp.com/www.fullmatchesandshows.com/wp-content/uploads/2018/03/Paris-Saint-Germain-vs-Angers.jpg?w=600",
+                    Date = "Mar 14, 2018"
+                });
 
-                    if (!exsits) await SaveMatch(matchLink);
-                }
 
                 //await _crawlLinkRepository.UpdateFinished(crawlLink.Id);
             }
@@ -77,6 +86,10 @@ namespace HighLights.Web.Utilities.Implement
             var htmlDoc = await htmlWeb.LoadFromWebAsync(matchLink.Link);
 
             var articleNode = htmlDoc.DocumentNode.Descendants("article").FirstOrDefault();
+
+            var iframeNode = articleNode?.Descendants("iframe");
+
+            var ulNodes = articleNode?.Descendants("ul");
 
             var divNodes = articleNode?.Descendants("div");
 
@@ -118,74 +131,102 @@ namespace HighLights.Web.Utilities.Implement
             var divHeaderTeam2 = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "headerteam2");
             if (divHeaderTeam2 != null)
             {
-                match.Home = divHeaderTeam2.ChildNodes[0].InnerText;
+                match.Away = divHeaderTeam2.ChildNodes[0].InnerText;
             }
 
             var divScore = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "score");
             if (divScore != null)
             {
-                match.Score = $"{divScore.ChildNodes[0].InnerText}\" : \"{divScore.ChildNodes[2].InnerText}";
+                match.Score = $"{divScore.ChildNodes[0].InnerText} : {divScore.ChildNodes[2].InnerText}";
             }
 
-            var divTeam1roster = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team1roster");
+            var divTeam1Roster = ulNodes?.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team1roster");
             var formations = new List<Formation>();
-            if (divTeam1roster != null)
+            if (divTeam1Roster != null)
             {
-                match.HomeManager = divTeam1roster.ChildNodes[1].InnerText;
-                foreach (var liNode in divTeam1roster.Descendants("li"))
-                {
-                    formations.Add(new Formation
+                match.HomeManager = divTeam1Roster.ChildNodes[1].InnerText;
+                formations.AddRange(divTeam1Roster.Descendants("li")
+                    .Select(liNode => new Formation
                     {
                         Type = FormationType.Home,
                         Number = liNode.ChildNodes[0].InnerText.ToInt(),
                         Name = liNode.ChildNodes[1].InnerText,
                         IsSubstitution = liNode.Attributes.Contains("class") && liNode.Attributes["class"].Value == "issub"
-                    });
-                }
+                    }));
             }
-            var divTeam2roster = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team2roster");
-            if (divTeam2roster != null)
+            var divTeam2Roster = ulNodes?.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team2roster");
+            if (divTeam2Roster != null)
             {
-                match.HomeManager = divTeam2roster.ChildNodes[1].InnerText;
-
-                foreach (var liNode in divTeam2roster.Descendants("li"))
-                {
-                    formations.Add(new Formation
+                match.HomeManager = divTeam2Roster.ChildNodes[1].InnerText;
+                formations.AddRange(divTeam2Roster.Descendants("li")
+                    .Select(liNode => new Formation
                     {
                         Type = FormationType.Home,
                         Number = liNode.ChildNodes[0].InnerText.ToInt(),
                         Name = liNode.ChildNodes[1].InnerText,
                         IsSubstitution = liNode.Attributes.Contains("class") && liNode.Attributes["class"].Value == "issub"
-                    });
-                }
+                    }));
             }
 
             var substitutions = new List<Substitution>();
-            var divTeam1subs = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team1subs");
-            if (divTeam1subs != null)
+            var divTeam1Subs = ulNodes?.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team1subs");
+            if (divTeam1Subs != null)
             {
-                foreach (var liNode in divTeam1subs.Descendants("li"))
-                {
-                    substitutions.Add(new Substitution
+                substitutions.AddRange(divTeam1Subs.Descendants("li")
+                    .Select(liNode => new Substitution
                     {
                         Type = FormationType.Home,
                         Number = liNode.ChildNodes[0].InnerText.ToInt(),
                         Name = liNode.ChildNodes[1].InnerText
-                    });
-                }
+                    }));
             }
-            var divTeam2subs = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team2subs");
-            if (divTeam2subs != null)
+            var divTeam2Subs = ulNodes?.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team2subs");
+            if (divTeam2Subs != null)
             {
-                foreach (var liNode in divTeam1subs.Descendants("li"))
-                {
-                    substitutions.Add(new Substitution
+                substitutions.AddRange(divTeam2Subs.Descendants("li")
+                    .Select(liNode => new Substitution
                     {
                         Type = FormationType.Home,
                         Number = liNode.ChildNodes[0].InnerText.ToInt(),
                         Name = liNode.ChildNodes[1].InnerText
-                    });
-                }
+                    }));
+            }
+
+            var actionSubstitutions = new List<ActionSubstitution>();
+
+            var divteam1Actualsubs = ulNodes?.FirstOrDefault(x =>
+                x.Attributes.Contains("class") && x.Attributes["class"].Value == "team1actualsubs");
+            if (divteam1Actualsubs != null)
+            {
+                actionSubstitutions.AddRange(divteam1Actualsubs.Descendants("li")
+                    .Select(x => new ActionSubstitution
+                        {
+                            Min = x.ChildNodes[0].InnerText,
+                            In = x.ChildNodes[1].ChildNodes[0].InnerText,
+                            Out = x.ChildNodes[1].ChildNodes[2].InnerText,
+                            Type = FormationType.Home
+                    }));
+            }
+
+            var divteam2Actualsubs = ulNodes?.FirstOrDefault(x =>
+                x.Attributes.Contains("class") && x.Attributes["class"].Value == "team2actualsubs");
+            if (divteam2Actualsubs != null)
+            {
+                actionSubstitutions.AddRange(divteam2Actualsubs.Descendants("li")
+                    .Select(x => new ActionSubstitution
+                    {
+                        Min = x.ChildNodes[0].InnerText,
+                        In = x.ChildNodes[1].ChildNodes[0].InnerText,
+                        Out = x.ChildNodes[1].ChildNodes[2].InnerText,
+                        Type = FormationType.Away
+                    }));
+            }
+
+            var clips = new List<Clip>();
+
+            foreach (var node in iframeNode)
+            {
+                
             }
 
             return true;
@@ -229,7 +270,7 @@ namespace HighLights.Web.Utilities.Implement
                         }
                         else
                         {
-                            matchLink.Name = aNode.InnerHtml.Replace("&#8211;", "-");
+                            matchLink.Name = aNode.InnerHtml.Replace("&#8211;", "–");
                             matchLink.Link = aNode.Attributes["href"].Value;
                         }
                     }
