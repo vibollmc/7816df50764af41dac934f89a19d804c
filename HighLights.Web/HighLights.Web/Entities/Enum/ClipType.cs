@@ -7,7 +7,7 @@ namespace HighLights.Web.Entities.Enum
 {
     public enum ClipType
     {
-        HighLights = 1,
+        HighLight = 1,
         FullMatch = 2
     }
 }

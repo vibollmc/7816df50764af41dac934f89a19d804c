@@ -29,7 +29,7 @@ namespace HighLights.Web.Utilities.Model
         public string ImageLink { get; set; }
 
         public string Slug =>
-            $"{RDateTime:yyyy-MM-dd}-{Name.Replace(" - ", "-").Replace(" &amp; ", "-").Replace(" & ", "-").Replace(" ", "-")}"
+            $"{RDateTime:yyyy-MM-dd}-{Name.Replace(" – ", "-").Replace(" &amp; ", "-").Replace(" & ", "-").Replace(" ", "-")}"
                 .ToLower();
     }
 }

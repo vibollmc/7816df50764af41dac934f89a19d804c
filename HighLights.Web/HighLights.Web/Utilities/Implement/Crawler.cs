@@ -50,27 +50,28 @@ namespace HighLights.Web.Utilities.Implement
                 }
 
 
-                //var matchLinks = await GetMatchLinks(url);
+                var matchLinks = await GetMatchLinks(url);
 
-                //if (matchLinks == null) return;
+                if (matchLinks == null) return;
 
-                //foreach (var matchLink in matchLinks)
-                //{
-                //    var exsits = await _matchRepository.CheckExsits(matchLink.Slug);
-
-                //    if (!exsits) await SaveMatch(matchLink);
-                //}
-
-                await SaveMatch(new MatchLink
+                foreach (var matchLink in matchLinks)
                 {
-                    Link = "http://www.fullmatchesandshows.com/2018/03/14/paris-saint-germain-vs-angers-highlights-full-match-video/",
-                    Name = "Paris Saint Germain vs Angers – Highlights & Full Match",
-                    ImageLink = "https://i1.wp.com/www.fullmatchesandshows.com/wp-content/uploads/2018/03/Paris-Saint-Germain-vs-Angers.jpg?w=600",
-                    Date = "Mar 14, 2018"
-                });
+                    var exsits = await _matchRepository.CheckExsits(matchLink.Slug);
+
+                    if (!exsits) await SaveMatch(matchLink);
+                }
+
+                //for test
+                //await SaveMatch(new MatchLink
+                //{
+                //    Link = "http://www.fullmatchesandshows.com/2018/03/14/paris-saint-germain-vs-angers-highlights-full-match-video/",
+                //    Name = "Paris Saint Germain vs Angers – Highlights & Full Match",
+                //    ImageLink = "https://i1.wp.com/www.fullmatchesandshows.com/wp-content/uploads/2018/03/Paris-Saint-Germain-vs-Angers.jpg?w=600",
+                //    Date = "Mar 14, 2018"
+                //});
 
 
-                //await _crawlLinkRepository.UpdateFinished(crawlLink.Id);
+                await _crawlLinkRepository.UpdateFinished(crawlLink.Id);
             }
             catch (Exception ex)
             {
@@ -99,11 +100,30 @@ namespace HighLights.Web.Utilities.Implement
             var divWpbWrapper =
                 divVcRow?.Descendants("div")?.LastOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "wpb_wrapper");
 
-            if (divWpbWrapper == null) return false;
+            if (divWpbWrapper == null || !iframeNode.Any()) return false;
+
+            var clips = new List<Clip>();
+            clips.AddRange(iframeNode.Where(x => x.Attributes.Contains("data-lazy-src")).Select((x, i) => new Clip
+            {
+                Url = x.Attributes["data-lazy-src"].Value,
+                ClipType = ClipType.HighLight,
+                LinkType = LinkType.Embed,
+                Name = "Server " + (i + 1)
+            }));
+
+            if (!clips.Any()) return false;
 
             var match = new Match();
             match.Slug = matchLink.Slug;
             match.Title = matchLink.Name;
+
+            var ftpResult = await _ftpHelper.RemoteFiles(matchLink.ImageLink, match.Slug);
+
+            if (ftpResult != null)
+            {
+                match.ImageName = ftpResult.FileName;
+                match.ImageServerId = ftpResult.ServerId;
+            }
 
             foreach (var childNode in divWpbWrapper.ChildNodes)
             {
@@ -126,12 +146,27 @@ namespace HighLights.Web.Utilities.Implement
             if (divHeaderTeam1 != null)
             {
                 match.Home = divHeaderTeam1.ChildNodes[0].InnerText;
+                if (divHeaderTeam1.ChildNodes.Count > 1)
+                {
+                    foreach (var node in divHeaderTeam1.Descendants("div"))
+                    {
+                        match.HomePersonScored = string.IsNullOrWhiteSpace(match.HomePersonScored) ? node.InnerText : ("|" + node.InnerText);
+                    }
+                }
             }
 
             var divHeaderTeam2 = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "headerteam2");
             if (divHeaderTeam2 != null)
             {
                 match.Away = divHeaderTeam2.ChildNodes[0].InnerText;
+
+                if (divHeaderTeam2.ChildNodes.Count > 1)
+                {
+                    foreach (var node in divHeaderTeam2.Descendants("div"))
+                    {
+                        match.AwayPersonScored = string.IsNullOrWhiteSpace(match.AwayPersonScored) ? node.InnerText : ("|" + node.InnerText);
+                    }
+                }
             }
 
             var divScore = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "score");
@@ -222,12 +257,8 @@ namespace HighLights.Web.Utilities.Implement
                     }));
             }
 
-            var clips = new List<Clip>();
 
-            foreach (var node in iframeNode)
-            {
-                
-            }
+            await _matchRepository.Add(match, clips, formations, substitutions, actionSubstitutions);
 
             return true;
         }

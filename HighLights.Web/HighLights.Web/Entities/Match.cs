@@ -30,7 +30,11 @@ namespace HighLights.Web.Entities
         public string Competition { get; set; }
         [MaxLength(100)]
         public string Stadium { get; set; }
-
+        [MaxLength(300)]
+        public string HomePersonScored { get; set; }
+        [MaxLength(300)]
+        public string AwayPersonScored { get; set; }
+        [MaxLength(300)]
         public string ImageName { get; set; }
         public int? ImageServerId { get; set; }
         public ImageServer ImageServer { get; set; }
@@ -41,5 +45,6 @@ namespace HighLights.Web.Entities
         public ICollection<Clip> Clips { get; set; }
         public ICollection<Formation> Formations { get; set; }
         public ICollection<TagAssignment> TagAssignments { get; set; }
+        public ICollection<Substitution> Substitutions { get; set; }
     }
 }

@@ -116,11 +116,15 @@ namespace HighLights.Web.Migrations
 
                     b.Property<DateTime?>("DeletedAt");
 
+                    b.Property<bool>("IsSubstitution");
+
                     b.Property<int?>("MatchId");
 
                     b.Property<string>("Name");
 
                     b.Property<int?>("Number");
+
+                    b.Property<int>("Type");
 
                     b.Property<DateTime?>("UpdatedAt");
 
@@ -184,6 +188,9 @@ namespace HighLights.Web.Migrations
                     b.Property<string>("AwayManager")
                         .HasMaxLength(100);
 
+                    b.Property<string>("AwayPersonScored")
+                        .HasMaxLength(300);
+
                     b.Property<int?>("CategoryId");
 
                     b.Property<string>("Competition")
@@ -199,7 +206,11 @@ namespace HighLights.Web.Migrations
                     b.Property<string>("HomeManager")
                         .HasMaxLength(100);
 
-                    b.Property<string>("ImageName");
+                    b.Property<string>("HomePersonScored")
+                        .HasMaxLength(300);
+
+                    b.Property<string>("ImageName")
+                        .HasMaxLength(300);
 
                     b.Property<int?>("ImageServerId");
 
@@ -250,6 +261,8 @@ namespace HighLights.Web.Migrations
                     b.Property<string>("Name");
 
                     b.Property<int?>("Number");
+
+                    b.Property<int>("Type");
 
                     b.Property<DateTime?>("UpdatedAt");
 
