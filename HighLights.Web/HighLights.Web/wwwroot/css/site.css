@@ -26,10 +26,19 @@ body {
     margin: 15px;
 }
 
+.thumbnail-item {
+    min-height: 235px;
+}
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {
     /* Hide captions */
     .carousel-caption {
         display: none;
+    }
+}
+
+@media screen and (max-width: 411px) {
+    .thumbnail-item {
+        min-height: 200px;
     }
 }

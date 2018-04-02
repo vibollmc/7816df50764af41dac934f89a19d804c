@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using SQLitePCL;
 
 namespace HighLights.Web.Utilities.Model
 {
@@ -21,7 +16,7 @@ namespace HighLights.Web.Utilities.Model
             {
                 _date = value;
 
-                RDateTime = _date.ToDateTime("MMM dd, yyyy");
+                RDateTime = _date.ToDateTime("MMM d, yyyy");
             }
         }
 

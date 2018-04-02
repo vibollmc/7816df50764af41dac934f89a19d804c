@@ -1,0 +1,52 @@
+{
+  "name": "vanilla-lazyload",
+  "homepage": "http://verlok.github.io/lazyload/",
+  "authors": [
+    "Andrea Verlicchi <andrea.verlicchi@gmail.com>"
+  ],
+  "description": "A fast, lightweight script to load images as they enter the viewport. Supporting responsive images (both srcset + sizes and picture).",
+  "main": "dist/lazyload.min.js",
+  "keywords": [
+    "lazy",
+    "load",
+    "responsive",
+    "images",
+    "picture",
+    "srcset",
+    "sizes",
+    "progressive",
+    "SEO",
+    "JPEG",
+    "performance",
+    "perfmatters",
+    "no-jquery",
+    "vanilla"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "src",
+    "img",
+    "demos",
+    "Gruntfile.js",
+    "README.md",
+    "todo.md",
+    "favicon.ico",
+    "index.html",
+    "package.json"
+  ],
+  "version": "10.5.2",
+  "_release": "10.5.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "10.5.2",
+    "commit": "69a488cf16c3c5b2773d8881deb317339c4d55db"
+  },
+  "_source": "https://github.com/verlok/lazyload.git",
+  "_target": "10.5.2",
+  "_originalSource": "vanilla-lazyload"
+}

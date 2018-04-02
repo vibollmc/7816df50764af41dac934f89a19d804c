@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using HighLights.Web.Dal.Context;
 using HighLights.Web.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +16,7 @@ namespace HighLights.Web.Dal.Implement
 
         public async Task<ImageServer> GetActiveImageServer()
         {
-            return await _dbContext.ImageServers.FirstOrDefaultAsync(x => x.DeletedAt == null);
+            return await _dbContext.ImageServers.FirstOrDefaultAsync(x => !x.DeletedAt.HasValue);
         }
     }
 }

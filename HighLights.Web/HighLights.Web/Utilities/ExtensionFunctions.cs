@@ -2,12 +2,37 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace HighLights.Web.Utilities
 {
     public static class ExtensionFunctions
     {
+        /// <summary>
+        /// Paging
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        public static IQueryable<TSource> Page<TSource>(this IQueryable<TSource> source, int page, int pageSize)
+        {
+            return source.Skip((page - 1) * pageSize).Take(pageSize);
+        }
+
+        /// <summary>
+        /// Paging
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        public static IEnumerable<TSource> Page<TSource>(this IEnumerable<TSource> source, int page, int pageSize)
+        {
+            return source.Skip((page - 1) * pageSize).Take(pageSize);
+        }
+
         /// <summary>
         /// Convert string to datetime?
         /// </summary>
@@ -27,7 +52,7 @@ namespace HighLights.Web.Utilities
         /// <returns>datetime value</returns>
         public static DateTime? ToDate(this string input)
         {
-            return input.ToDateTime("dd MMMM yyyy");
+            return input.ToDateTime("d MMMM yyyy");
         }
 
         /// <summary>

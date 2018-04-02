@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using HighLights.Web.Dal.Context;
 using HighLights.Web.Entities;
@@ -30,8 +28,8 @@ namespace HighLights.Web.Dal.Implement
             if (crawlLink.Finished.HasValue) crawlLink.Finished++;
             else crawlLink.Finished = 1;
 
-            crawlLink.IsFinished = (crawlLink.FromPage < crawlLink.ToPage && crawlLink.Finished == crawlLink.FromPage) || 
-                (crawlLink.FromPage > crawlLink.ToPage && crawlLink.Finished == crawlLink.ToPage);
+            crawlLink.IsFinished = (crawlLink.FromPage < crawlLink.ToPage && crawlLink.Finished >= crawlLink.ToPage) || 
+                (crawlLink.FromPage > crawlLink.ToPage && crawlLink.Finished >= crawlLink.FromPage);
 
             crawlLink.UpdatedAt = DateTime.UtcNow;
 

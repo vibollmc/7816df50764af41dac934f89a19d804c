@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using HighLights.Web.Dal.Context;
 using HighLights.Web.Entities;
@@ -39,14 +36,11 @@ namespace HighLights.Web.Utilities.Implement
 
                 if (crawlLink.FromPage.HasValue && crawlLink.ToPage.HasValue)
                 {
-
-                    if (crawlLink.Finished == null)
-                        crawlLink.Finished = crawlLink.FromPage > crawlLink.ToPage
+                    var page = crawlLink.FromPage > crawlLink.ToPage
                             ? crawlLink.FromPage
                             : crawlLink.ToPage;
-                    else crawlLink.Finished--;
-
-                    url = string.Format(url, crawlLink.Finished);
+                    if (crawlLink.Finished.HasValue) page = page - crawlLink.Finished;
+                    url = string.Format(url, page);
                 }
 
 
@@ -142,23 +136,48 @@ namespace HighLights.Web.Utilities.Implement
                     match.Referee = childNode.InnerText;
             }
 
+            if (match.MatchDate == null) match.MatchDate = matchLink.RDateTime;
+
             var divHeaderTeam1 = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "headerteam1");
             if (divHeaderTeam1 != null)
             {
-                match.Home = divHeaderTeam1.ChildNodes[0].InnerText;
-                if (divHeaderTeam1.ChildNodes.Count > 1)
+                match.Home = string.Empty;
+                foreach (var h2 in divHeaderTeam1.Descendants("h2"))
                 {
-                    foreach (var node in divHeaderTeam1.Descendants("div"))
-                    {
-                        match.HomePersonScored = string.IsNullOrWhiteSpace(match.HomePersonScored) ? node.InnerText : ("|" + node.InnerText);
-                    }
+                    match.Home += " " + h2.InnerText;
+                }
+                match.Home = match.Home.Trim();
+
+                foreach (var node in divHeaderTeam1.Descendants("div"))
+                {
+                    match.HomePersonScored = string.IsNullOrWhiteSpace(match.HomePersonScored)
+                        ? node.InnerText
+                        : ("|" + node.InnerText);
+                }
+            }
+            else
+            {
+                //td-tags td-post-small-box clearfix
+                var tagNode = ulNodes?.FirstOrDefault(x =>
+                    x.Attributes.Contains("class") && 
+                    x.Attributes["class"].Value.Contains("td-tags") &&
+                    x.Attributes["class"].Value.Contains("td-post-small-box"));
+
+                if (tagNode != null)
+                {
+                    match.Home = tagNode.ChildNodes[1].ChildNodes[0].InnerText;
                 }
             }
 
             var divHeaderTeam2 = divNodes.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "headerteam2");
             if (divHeaderTeam2 != null)
             {
-                match.Away = divHeaderTeam2.ChildNodes[0].InnerText;
+                match.Away = string.Empty;
+                foreach (var h2 in divHeaderTeam2.Descendants("h2"))
+                {
+                    match.Away += " " + h2.InnerText;
+                }
+                match.Away = match.Away.Trim();
 
                 if (divHeaderTeam2.ChildNodes.Count > 1)
                 {
@@ -166,6 +185,19 @@ namespace HighLights.Web.Utilities.Implement
                     {
                         match.AwayPersonScored = string.IsNullOrWhiteSpace(match.AwayPersonScored) ? node.InnerText : ("|" + node.InnerText);
                     }
+                }
+            }
+            else
+            {
+                //td-tags td-post-small-box clearfix
+                var tagNode = ulNodes?.FirstOrDefault(x =>
+                    x.Attributes.Contains("class") &&
+                    x.Attributes["class"].Value.Contains("td-tags") &&
+                    x.Attributes["class"].Value.Contains("td-post-small-box"));
+
+                if (tagNode != null)
+                {
+                    match.Away = tagNode.ChildNodes[2].ChildNodes[0].InnerText;
                 }
             }
 
@@ -301,7 +333,7 @@ namespace HighLights.Web.Utilities.Implement
                         }
                         else
                         {
-                            matchLink.Name = aNode.InnerHtml.Replace("&#8211;", "–");
+                            matchLink.Name = aNode.InnerHtml.Replace("&#8211;", "–").Replace("&#038;","&");
                             matchLink.Link = aNode.Attributes["href"].Value;
                         }
                     }

@@ -6,18 +6,22 @@ using HighLights.Web.Dal.Context;
 using HighLights.Web.Entities;
 using HighLights.Web.Utilities;
 using HighLights.Web.Utilities.Model;
-using Microsoft.CodeAnalysis.CSharp;
+using HighLights.Web.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Match = HighLights.Web.Entities.Match;
 
 namespace HighLights.Web.Dal.Implement
 {
     public class MatchRepository : IMatchRepository
     {
         private readonly HighLightsContext _dbContext;
+        private readonly SiteSetttings _siteSetttings;
 
-        public MatchRepository(HighLightsContext dbContext)
+        public MatchRepository(HighLightsContext dbContext, IOptions<SiteSetttings> siteSetttings)
         {
             _dbContext = dbContext;
+            _siteSetttings = siteSetttings.Value;
         }
 
         public async Task<bool> CheckExsits(string slug)
@@ -27,7 +31,7 @@ namespace HighLights.Web.Dal.Implement
 
         public async Task<bool> Add(Match match, IList<Clip> clips, IList<Formation> formations, IList<Substitution> substitutions, IList<ActionSubstitution> actionSubstitutions)
         {
-            if (match == null || clips == null) return false;
+            if (match == null || clips == null || string.IsNullOrWhiteSpace(match.Competition)) return false;
 
             using (var dbTransaction = _dbContext.Database.BeginTransaction())
             {
@@ -74,7 +78,8 @@ namespace HighLights.Web.Dal.Implement
                             Number = x.Number,
                             MatchId = match.Id,
                             IsSubstitution = actionSubstitutions?.Any(y=>y.Out.Equals(x.Name, StringComparison.OrdinalIgnoreCase)) ?? false
-                        });
+                        }).ToList();
+
                         await _dbContext.Formations.AddRangeAsync(formationsAdded);
                         await _dbContext.SaveChangesAsync();
 
@@ -101,47 +106,48 @@ namespace HighLights.Web.Dal.Implement
                         }
                     }
 
-                    //Save tag 1
-                    var tag = await _dbContext.Tags.FirstOrDefaultAsync(x =>
-                        x.Name.Equals(match.Home, StringComparison.OrdinalIgnoreCase));
-                    if (tag == null)
+                    if (!string.IsNullOrWhiteSpace(match.Home) && !string.IsNullOrWhiteSpace(match.Away))
                     {
-                        tag = new Tag
+                        //Save tag 1
+                        var tag1 = await _dbContext.Tags.FirstOrDefaultAsync(x =>
+                            x.Name.Equals(match.Home, StringComparison.OrdinalIgnoreCase));
+                        var tag2 = await _dbContext.Tags.FirstOrDefaultAsync(x =>
+                            x.Name.Equals(match.Away, StringComparison.OrdinalIgnoreCase));
+                        if (tag1 == null)
                         {
-                            Name = match.Home,
-                            Slug = match.Home.Replace(" ", "").ToLower()
-                        };
-                        await _dbContext.Tags.AddAsync(tag);
+                            tag1 = new Tag
+                            {
+                                Name = match.Home,
+                                Slug = match.Home.Replace(" ", "-").ToLower()
+                            };
+                            await _dbContext.Tags.AddAsync(tag1);
+                        }
+                        if (tag2 == null)
+                        {
+                            tag2 = new Tag
+                            {
+                                Name = match.Away,
+                                Slug = match.Away.Replace(" ", "-").ToLower()
+                            };
+                            await _dbContext.Tags.AddAsync(tag2);
+                        }
+
+                        await _dbContext.SaveChangesAsync();
+
+                        await _dbContext.TagAssignments.AddAsync(new TagAssignment
+                        {
+                            TagId = tag1.Id.Value,
+                            MatchId = match.Id.Value
+                        });
+
+                        await _dbContext.TagAssignments.AddAsync(new TagAssignment
+                        {
+                            TagId = tag2.Id.Value,
+                            MatchId = match.Id.Value
+                        });
+
                         await _dbContext.SaveChangesAsync();
                     }
-
-                    await _dbContext.TagAssignments.AddAsync(new TagAssignment
-                    {
-                        TagId = tag.Id.Value,
-                        MatchId = match.Id.Value
-                    });
-                    await _dbContext.SaveChangesAsync();
-
-                    //Save tag 2
-                    tag = await _dbContext.Tags.FirstOrDefaultAsync(x =>
-                        x.Name.Equals(match.Away, StringComparison.OrdinalIgnoreCase));
-                    if (tag == null)
-                    {
-                        tag = new Tag
-                        {
-                            Name = match.Away,
-                            Slug = match.Away.Replace(" ", "").ToLower()
-                        };
-                        await _dbContext.Tags.AddAsync(tag);
-                        await _dbContext.SaveChangesAsync();
-                    }
-
-                    await _dbContext.TagAssignments.AddAsync(new TagAssignment
-                    {
-                        TagId = tag.Id.Value,
-                        MatchId = match.Id.Value
-                    });
-                    await _dbContext.SaveChangesAsync();
 
                     dbTransaction.Commit();
                 }
@@ -154,6 +160,32 @@ namespace HighLights.Web.Dal.Implement
             }
 
             return true;
+        }
+
+        public async Task<IEnumerable<ViewModels.Match>> GetMatchs(int page)
+        {
+            var result = await _dbContext.Matchs
+                .Where(x => !x.DeletedAt.HasValue)
+                .OrderByDescending(x => x.MatchDate)
+                .ThenByDescending(x => x.CreatedAt)
+                .Page(page, _siteSetttings.PageSize)
+                .Select(x => new ViewModels.Match
+                {
+                    MatchDate = x.MatchDate,
+                    Slug = x.Slug,
+                    Title = x.Title,
+                    ImageUrl = $"{x.ImageServer.ServerUrl}/{x.ImageServer.Patch}{x.ImageName}"
+                }).ToListAsync();
+
+            return result;
+        }
+
+        public async Task<int> GetTotalPage()
+        {
+            var countMatch = await _dbContext.Matchs.CountAsync(x => !x.DeletedAt.HasValue);
+            var totalPage = ((double) countMatch / _siteSetttings.PageSize) + 0.49;
+
+            return (int)Math.Round(totalPage, 0, MidpointRounding.ToEven);
         }
     }
 }

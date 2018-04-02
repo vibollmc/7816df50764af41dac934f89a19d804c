@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +9,8 @@ using HighLights.Web.Dal.Context;
 using HighLights.Web.Dal.Implement;
 using HighLights.Web.Utilities.Context;
 using HighLights.Web.Utilities.Implement;
+using HighLights.Web.ViewModels;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace HighLights.Web
@@ -33,7 +32,13 @@ namespace HighLights.Web
             services.AddDbContext<HighLightsContext>(options => options.UseMySql(Configuration.GetConnectionString("MySqlConnection")));
 
             services.AddMemoryCache();
-            services.AddMvc();
+            services.AddMvc()
+                .AddRazorPagesOptions(options =>
+                {
+                    options.Conventions.Add(new GlobalTemplatePageRouteModelConvention());
+                });
+
+            services.Configure<SiteSetttings>(Configuration.GetSection("SiteSettings"));
             
             services.AddTransient<IImageServerRepository, ImageServerRepository>();
             services.AddTransient<ICrawlLinkRepository, CrawlLinkRepository>();
@@ -59,12 +64,14 @@ namespace HighLights.Web
 
             app.UseStaticFiles();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
-            });
+            //app.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller}/{action=Index}/{id?}");
+            //});
+
+            app.UseMvc();
 
             var isProcessing = false;
             _autoEvent = new AutoResetEvent(false);
@@ -77,7 +84,31 @@ namespace HighLights.Web
 
                 crawler.Run();
 
-            }, _autoEvent, 1000, 10000000);
+                isProcessing = false;
+            }, _autoEvent, 1000, 240000);
+        }
+    }
+
+    public class GlobalTemplatePageRouteModelConvention
+        : IPageRouteModelConvention
+    {
+        public void Apply(PageRouteModel model)
+        {
+            var selectorCount = model.Selectors.Count;
+            for (var i = 0; i < selectorCount; i++)
+            {
+                var selector = model.Selectors[i];
+                model.Selectors.Add(new SelectorModel
+                {
+                    AttributeRouteModel = new AttributeRouteModel
+                    {
+                        Order = -1,
+                        Template = AttributeRouteModel.CombineTemplates(
+                            selector.AttributeRouteModel.Template,
+                            "{globalTemplate?}"),
+                    }
+                });
+            }
         }
     }
 }
