@@ -12,9 +12,10 @@ using System;
 namespace HighLights.Web.Migrations
 {
     [DbContext(typeof(HighLightsContext))]
-    partial class HighLightsContextModelSnapshot : ModelSnapshot
+    [Migration("20180403100412_MakeIndex")]
+    partial class MakeIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

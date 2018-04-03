@@ -3,6 +3,15 @@ body {
     padding-bottom: 20px;
 }
 
+.view-videos a, .view-videos a:visited {
+    color: #333333 !important;
+}
+
+    .view-videos a:hover, .view-videos a:active {
+        color: #242729 !important;
+        text-decoration: none !important;
+    }
+
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
@@ -26,19 +35,10 @@ body {
     margin: 15px;
 }
 
-.thumbnail-item {
-    min-height: 235px;
-}
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {
     /* Hide captions */
     .carousel-caption {
         display: none;
-    }
-}
-
-@media screen and (max-width: 411px) {
-    .thumbnail-item {
-        min-height: 200px;
     }
 }

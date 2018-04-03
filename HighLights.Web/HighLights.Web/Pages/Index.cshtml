@@ -1,7 +1,9 @@
 ﻿@page "{currentPage:int?}"
-@model IndexModel
+@model HighLights.Web.Pages.IndexModel
 @{
     ViewData["Title"] = "Home page";
+
+    var idx = 0;
 }
 
 <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
@@ -67,14 +69,31 @@
     </a>*@
 </div>
 
-<div class="row">
+<div class="row view-videos">
     @foreach (var match in Model.Matches)
     {
+        idx++;
         <div class="col-md-3 col-sm-4 col-xs-6 thumbnail-item">
-            <img class="img-responsive" src="data:image/gif;base64,R0lGODdhAQABAPAAAP///wAAACwAAAAAAQABAEACAkQBADs=" data-src="@match.ImageUrl" alt="@match.Title"/>
-            <h4>@match.Title</h4>
-            <h5>@string.Format("{0:dd-MM-yyyy}", match.MatchDate)</h5>
+            <a asp-page="./Match" asp-route-slug="@match.Slug" title="@match.Title">
+                <img class="img-responsive" src="data:image/gif;base64,R0lGODdhAQABAPAAAP///wAAACwAAAAAAQABAEACAkQBADs=" data-src="@match.ImageUrl" alt="@match.Title" />
+            </a>
+            <a asp-page="./Match" asp-route-slug="@match.Slug" title="@match.Title">
+                <h5>@match.Title</h5>
+            </a>
+            <h6>@string.Format("{0:dd-MM-yyyy}", match.MatchDate)</h6>
         </div>
+        if (idx % 4 == 0)
+        {
+            <div class="clearfix-md"></div>
+        }
+        if (idx % 3 == 0)
+        {
+            <div class="clearfix-sm"></div>
+        }
+        if (idx % 2 == 0)
+        {
+            <div class="clearfix-xs"></div>
+        }
     }
 </div>
 <div class="row">
@@ -99,6 +118,30 @@
 @section Scripts
 {
     <script>
+        function resizeMain() {
+            var winWidth =  $(window).width();
+            if(winWidth < 751 ){
+                $('.clearfix-md').removeClass('clearfix');
+                $('.clearfix-sm').removeClass('clearfix');
+                $('.clearfix-xs').addClass('clearfix');
+            }
+            else if( winWidth <= 974){
+                $('.clearfix-md').removeClass('clearfix');
+                $('.clearfix-xs').removeClass('clearfix');
+                $('.clearfix-sm').addClass('clearfix');
+            }
+            else {
+                $('.clearfix-xs').removeClass('clearfix');
+                $('.clearfix-sm').removeClass('clearfix');
+                $('.clearfix-md').addClass('clearfix');
+            }
+        }
+
+        $(window).on('resize',function(){
+            resizeMain();
+        });
+
+        resizeMain();
         var myLazyLoad = new LazyLoad();
     </script>
 }

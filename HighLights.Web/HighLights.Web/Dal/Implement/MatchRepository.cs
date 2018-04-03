@@ -6,19 +6,17 @@ using HighLights.Web.Dal.Context;
 using HighLights.Web.Entities;
 using HighLights.Web.Utilities;
 using HighLights.Web.Utilities.Model;
-using HighLights.Web.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Match = HighLights.Web.Entities.Match;
 
 namespace HighLights.Web.Dal.Implement
 {
     public class MatchRepository : IMatchRepository
     {
         private readonly HighLightsContext _dbContext;
-        private readonly SiteSetttings _siteSetttings;
+        private readonly ViewModels.SiteSetttings _siteSetttings;
 
-        public MatchRepository(HighLightsContext dbContext, IOptions<SiteSetttings> siteSetttings)
+        public MatchRepository(HighLightsContext dbContext, IOptions<ViewModels.SiteSetttings> siteSetttings)
         {
             _dbContext = dbContext;
             _siteSetttings = siteSetttings.Value;
@@ -186,6 +184,49 @@ namespace HighLights.Web.Dal.Implement
             var totalPage = ((double) countMatch / _siteSetttings.PageSize) + 0.49;
 
             return (int)Math.Round(totalPage, 0, MidpointRounding.ToEven);
+        }
+
+        public async Task<ViewModels.MatchDetail> GetMatchDetail(string slug)
+        {
+            var match = await _dbContext.Matchs
+                .Where(x => x.Slug == slug)
+                .Select(x => new ViewModels.MatchDetail
+                {
+                    Home = x.Home,
+                    Slug = x.Slug,
+                    Away = x.Away,
+                    Title = x.Title,
+                    Competition = x.Competition,
+                    MatchDate = x.MatchDate,
+                    AwayManager = x.AwayManager,
+                    AwayPersonScored = x.AwayPersonScored,
+                    HomeManager = x.HomeManager,
+                    HomePersonScored = x.HomePersonScored,
+                    Referee = x.Referee,
+                    Score = x.Score,
+                    Stadium = x.Stadium,
+                    Category = x.Category.Name,
+                    CategorySlug = x.Category.Slug,
+                    ImageUrl = $"{x.ImageServer.ServerUrl}/{x.ImageServer.Patch}{x.ImageName}",
+                    Tags = x.TagAssignments.Select(t => new ViewModels.Tag {Slug = t.Tag.Slug, Name = t.Tag.Name}),
+                    Clips = x.Clips.Select(c =>
+                        new ViewModels.Clip {Name = c.Name, ClipType = c.ClipType, LinkType = c.LinkType, Url = c.Url}),
+                    Formations = x.Formations.Select(f => new ViewModels.Formation
+                    {
+                        Name = f.Name,
+                        Number = f.Number,
+                        Type = f.Type,
+                        IsSubstitution = f.IsSubstitution,
+                        SubsName = f.Substitution == null ? null : f.Substitution.Name,
+                        SubsNumber = f.Substitution == null ? null : f.Substitution.Number,
+                        SubsMinutes = f.Substitution == null ? null : f.Substitution.Minutes
+                    }),
+                    Substitutions = x.Substitutions.Select(s =>
+                        new ViewModels.Substitution {Name = s.Name, Number = s.Number, Type = s.Type})
+                })
+                .FirstOrDefaultAsync();
+
+            return match;
         }
     }
 }

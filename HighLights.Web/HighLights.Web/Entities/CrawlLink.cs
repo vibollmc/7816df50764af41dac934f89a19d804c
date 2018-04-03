@@ -1,7 +1,10 @@
-﻿namespace HighLights.Web.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HighLights.Web.Entities
 {
     public class CrawlLink : Base
     {
+        [Required, MaxLength(500)]
         public string BaseLink { get; set; }
         public int? FromPage { get; set; }
         public int? ToPage { get; set; }

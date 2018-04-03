@@ -22,6 +22,18 @@ namespace HighLights.Web.Dal
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => c.Slug)
+                .IsUnique();
+
+            modelBuilder.Entity<Match>()
+                .HasIndex(c => c.Slug)
+                .IsUnique();
+
+            modelBuilder.Entity<Tag>()
+                .HasIndex(c => c.Slug)
+                .IsUnique();
+
             modelBuilder.Entity<TagAssignment>()
                 .HasKey(c => new { c.MatchId, c.TagId });
         }
