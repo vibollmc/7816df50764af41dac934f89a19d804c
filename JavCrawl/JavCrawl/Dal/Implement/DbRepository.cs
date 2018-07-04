@@ -458,7 +458,7 @@ namespace JavCrawl.Dal.Implement
         {
             var jobs = _dbContext.JobListCrawl
                         .OrderBy(x => x.ScheduleAt)
-                        .FirstOrDefault(x => (x.Status == 0 && x.ScheduleAt <= DateTime.Now) || (x.Always == true && x.ScheduleAt <= DateTime.Now));
+                        .FirstOrDefault(x => (x.Status == 0 && x.ScheduleAt <= DateTime.Now) || (x.Always == 1 && x.ScheduleAt <= DateTime.Now));
 
             if (jobs == null) return true;
 
@@ -477,7 +477,7 @@ namespace JavCrawl.Dal.Implement
                     jobs.FinishAt = DateTime.Now;
                     jobs.Status = 2;
 
-                    if (jobs.Always)
+                    if (jobs.Always == 1)
                     {
                         jobs.ScheduleAt = DateTime.Now.AddDays(1);
                     }
@@ -497,7 +497,7 @@ namespace JavCrawl.Dal.Implement
                 jobs.UnComplete += total - complete;
                 jobs.Status = 2;
 
-                if (jobs.Always)
+                if (jobs.Always == 1)
                 {
                     jobs.ScheduleAt = DateTime.Now.AddDays(1);
                 }

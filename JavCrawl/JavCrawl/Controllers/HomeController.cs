@@ -118,7 +118,7 @@ namespace JavCrawl.Controllers
                 {
                     Link = link,
                     ScheduleAt = schedule,
-                    Always = always
+                    Always = (sbyte)(always ? 1 : 0)
                 };
 
                 var results = await _dbRepository.SaveSchedule(newSchedule);

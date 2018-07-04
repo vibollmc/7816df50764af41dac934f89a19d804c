@@ -52,7 +52,7 @@ namespace JavCrawl
             services.AddTransient<IDbRepository, DbRepository>();
             services.AddTransient<IFilmsUploadRepository, FilmsUploadRepository>();
 
-            services.AddTransient<JobAuto, JobAuto>();
+            services.AddSingleton<JobAuto, JobAuto>();
 
             services.AddTransient<IOpenloadHelper, OpenloadHelper>();
             services.AddTransient<IYoutubeHelper, YoutubeHelper>();
@@ -61,7 +61,7 @@ namespace JavCrawl
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -103,10 +103,10 @@ namespace JavCrawl
 
                 Timer = new Timer((o) =>
                 {
-                    if (isProcessing) return;
+                   if (isProcessing) return;
                     isProcessing = true;
                     
-                    var jobAuto = serviceProvider.GetService<JobAuto>();
+                    var jobAuto = app.ApplicationServices.GetService<JobAuto>();
 
                     if (timerSetting.EnabledCrawler)
                     {

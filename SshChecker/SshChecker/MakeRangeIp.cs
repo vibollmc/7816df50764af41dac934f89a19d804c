@@ -495,7 +495,7 @@ namespace SshChecker
 
                 if (string.IsNullOrWhiteSpace(ip) || string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(pass)) continue;
 
-                if (_sshs.Any(x => x.Ip == ip && x.User == user && x.Password == pass)) continue;
+                //if (_sshs.Any(x => x.Ip == ip && x.User == user && x.Password == pass)) continue;
 
                 _sshs.Add(new SSH
                 {
@@ -504,8 +504,37 @@ namespace SshChecker
                     Ip = ip
                 });
 
-                _sshDistinct.AppendLine(line);
+                //_sshDistinct.AppendLine(line);
             }
+
+            if (!_sshs.Any()) return;
+
+            var distincts = _sshs.Select(x => $"{x.Ip}|{x.User}|{x.Password}").Distinct().ToArray();
+
+            _sshDistinct.Append(string.Join(Environment.NewLine, distincts));
+
+            //Invoke(new MethodInvoker(() =>
+            //{
+            //    progressBar1.Maximum = distincts.Count();
+
+            //    progressBar1.Value = 0;
+
+            //    lblStatus.Text = $"{progressBar1.Value}/{progressBar1.Maximum}";
+
+            //}));
+
+            //foreach (var item in distincts)
+            //{
+            //    Invoke(new MethodInvoker(() =>
+            //    {
+            //        progressBar1.Value++;
+
+            //        lblStatus.Text = $"{progressBar1.Value}/{progressBar1.Maximum}";
+
+            //    }));
+
+            //    _sshDistinct.AppendLine();
+            //}
         }
 
         private void btnFilter_Click_1(object sender, EventArgs e)
@@ -616,6 +645,33 @@ namespace SshChecker
                 cboCountry.DataSource = countries;
 
             }));
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var result = new StringBuilder();
+
+            var date1 = txtDate.Value;
+            var date2 = txtDate2.Value;
+
+            while (date1 <= date2)
+            {
+                for (var i = 0; i < 24; i++)
+                {
+                    result.AppendLine(
+                        $"http://103.99.2.128:6252/SSH_Mini_Tuan_{date1:dd-MM-yyyy} {i:00}.txt");
+                }
+
+                date1 = date1.AddDays(1);
+            }
+            
+
+            txtIP.Text = result.ToString();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(txtIP.Text);
         }
     }
 }
