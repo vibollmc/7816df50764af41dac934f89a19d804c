@@ -279,22 +279,22 @@ namespace JavCrawl.Utility.Implement
                                 item.descriptions = string.IsNullOrWhiteSpace(linkEpsAndDecs.Description) ? item.name : linkEpsAndDecs.Description;
                             }
 
-                            linkEpsAndDecs.LinkEps.ForEach(x =>
+                            for(var i = 0; i < linkEpsAndDecs.LinkEps.Count; i ++)
                             {
-                                if (!x.StartsWith("http"))
+                                if (!linkEpsAndDecs.LinkEps[i].StartsWith("http"))
                                 {
-                                    x = string.Format("http://javhihi.com/{0}", x);
+                                    linkEpsAndDecs.LinkEps[i] = string.Format("http://javhihi.com/{0}", linkEpsAndDecs.LinkEps[i]);
 
                                     if (from789)
                                     {
-                                        x = string.Format("http://jav789.com/{0}", x);
+                                        linkEpsAndDecs.LinkEps[i] = string.Format("http://jav789.com/{0}", linkEpsAndDecs.LinkEps[i]);
                                     }
                                     else if (frombuz)
                                     {
-                                        x = string.Format("http://javbuz.com/{0}", x);
+                                        linkEpsAndDecs.LinkEps[i] = string.Format("http://javbuz.com/{0}", linkEpsAndDecs.LinkEps[i]);
                                     }
                                 }
-                            });
+                            }
 
                             item.linkepisode = linkEpsAndDecs.LinkEps;
 

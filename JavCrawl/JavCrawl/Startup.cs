@@ -41,6 +41,7 @@ namespace JavCrawl
             services.AddDbContext<MySqlContext>(options =>
             options.UseMySql(Configuration.GetConnectionString("MySqlConnection")));
 
+            services.Configure<TimerSettings>(Configuration.GetSection("TimerSettings"));
             services.Configure<OpenloadSettings>(Configuration.GetSection("OpenloadSettings"));
             services.Configure<YoutubeSettings>(Configuration.GetSection("YoutubeSettings"));
             services.Configure<BitPornoSettings>(Configuration.GetSection("BitPornoSettings"));
