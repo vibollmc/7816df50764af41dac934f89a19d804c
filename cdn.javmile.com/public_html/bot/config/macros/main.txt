@@ -1,0 +1,94 @@
+while(IsLoading())
+{
+    Delay(1000);
+}
+
+Delay (1000);
+ranNum = Random(0, 100);
+
+ClickByCoordinates (76,50,500,500);
+
+if (ranNum < 30)
+{
+    ClickByCoordinates (76, 46, 558, 507);
+}
+
+Delay(5000);
+ScrollTo(0, 500); 
+ranNum = Random(0, 100);
+
+if (ranNum < 70)
+{
+    ClickByCoordinates (76, 46, 544, 199);
+}
+Delay (4000);
+ScrollTo(0, 800); 
+ranNum = Random(0, 100);
+
+if (ranNum < 60)
+{
+    ClickByCoordinates (76,50,200,300);
+}
+
+Delay (3000);
+ScrollTo(0, 500); 
+ranNum = Random(0, 100);
+
+if (ranNum < 50)
+{
+    ClickByCoordinates (76,50,500,500);
+}
+
+Delay (5000);
+ScrollTo(0, 800); 
+ranNum = Random(0, 100);
+
+if (ranNum < 40)
+{
+    ClickByCoordinates (76,50,500,500);
+}
+
+Delay (5000);
+ScrollTo(0, 800); 
+ranNum = Random(0, 100);
+
+if (ranNum < 30)
+{
+    ClickByCoordinates (76,50,500,500);
+}
+
+Delay (5000);
+ScrollTo(0, 800); 
+ranNum = Random(0, 100);
+
+if (ranNum < 30)
+{
+    ClickByCoordinates (76,50,500,500);
+}
+
+Delay (5000);
+ScrollTo(0, 800); 
+ranNum = Random(0, 100);
+
+if (ranNum < 30)
+{
+    ClickByCoordinates (76,50,500,500);
+}
+
+Delay (5000);
+ScrollTo(0, 800); 
+ranNum = Random(0, 100);
+
+if (ranNum < 30)
+{
+    ClickByCoordinates (76,50,500,500);
+}
+
+Delay (5000);
+ScrollTo(0, 800); 
+ranNum = Random(0, 100);
+
+if (ranNum < 30)
+{
+    ClickByCoordinates (76,50,500,500);
+}

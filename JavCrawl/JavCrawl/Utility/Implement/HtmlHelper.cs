@@ -22,7 +22,7 @@ namespace JavCrawl.Utility.Implement
                 LinkEps = new List<string>();
             }
             public string Description { get; set; }
-            public IList<string> LinkEps { get; set; }
+            public List<string> LinkEps { get; set; }
         }
 
         private readonly MySqlContext _dbContext;
@@ -278,6 +278,23 @@ namespace JavCrawl.Utility.Implement
                             {
                                 item.descriptions = string.IsNullOrWhiteSpace(linkEpsAndDecs.Description) ? item.name : linkEpsAndDecs.Description;
                             }
+
+                            linkEpsAndDecs.LinkEps.ForEach(x =>
+                            {
+                                if (!x.StartsWith("http"))
+                                {
+                                    x = string.Format("http://javhihi.com/{0}", x);
+
+                                    if (from789)
+                                    {
+                                        x = string.Format("http://jav789.com/{0}", x);
+                                    }
+                                    else if (frombuz)
+                                    {
+                                        x = string.Format("http://javbuz.com/{0}", x);
+                                    }
+                                }
+                            });
 
                             item.linkepisode = linkEpsAndDecs.LinkEps;
 

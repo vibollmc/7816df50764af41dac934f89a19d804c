@@ -943,7 +943,7 @@ namespace JavCrawl.Dal.Implement
                         {
                             episodes.Add(new Episodes
                             {
-                                Title = eps.Contains("bitporno") ? "Server BP" : (eps.Contains("openload") ? "Server OL" : "Server HD"),
+                                Title = eps.Contains("bitporno") ? "Server BP" : (eps.Contains("openload") ? "Server OL" : (eps.Contains("rapidvideo") ? "Server RP" : "Server HD")),
                                 FilmId = newFilm.Id,
                                 FileName = eps,
                                 Type = "Full",
@@ -978,30 +978,30 @@ namespace JavCrawl.Dal.Implement
                 foreach (var eps in epsLinks)
                 {
 
-                    if (eps.Contains("onecloud.media")) continue;
+                    //if (eps.Contains("onecloud.media")) continue;
 
-                    if (eps.Contains("javhihi.com")) {
-                        if (_dbContext.Episodes.Any(x => x.FilmId == filmId &&
-                            x.FileName.Contains("javhihi.com"))) continue;
-                    }
+                    //if (eps.Contains("javhihi.com")) {
+                    //    if (_dbContext.Episodes.Any(x => x.FilmId == filmId &&
+                    //        x.FileName.Contains("javhihi.com"))) continue;
+                    //}
 
-                    if (eps.Contains("javbuz.com"))
-                    {
-                        if (_dbContext.Episodes.Any(x => x.FilmId == filmId &&
-                            x.FileName.Contains("javbuz.com"))) continue;
-                    }
+                    //if (eps.Contains("javbuz.com"))
+                    //{
+                    //    if (_dbContext.Episodes.Any(x => x.FilmId == filmId &&
+                    //        x.FileName.Contains("javbuz.com"))) continue;
+                    //}
 
-                    if (eps.Contains("jav789.com"))
-                    {
-                        if (_dbContext.Episodes.Any(x => x.FilmId == filmId &&
-                            x.FileName.Contains("jav789.com"))) continue;
-                    }
+                    //if (eps.Contains("jav789.com"))
+                    //{
+                    //    if (_dbContext.Episodes.Any(x => x.FilmId == filmId &&
+                    //        x.FileName.Contains("jav789.com"))) continue;
+                    //}
 
-                    if (eps.Contains("openload"))
-                    {
-                        if (_dbContext.Episodes.Any(x => x.FilmId == filmId &&
-                            x.FileName.Contains("openload") && x.FileName.Contains("javmile.com"))) continue;
-                    }
+                    //if (eps.Contains("openload"))
+                    //{
+                    //    if (_dbContext.Episodes.Any(x => x.FilmId == filmId &&
+                    //        x.FileName.Contains("openload") && x.FileName.Contains("javmile.com"))) continue;
+                    //}
 
 
                     var exsits = _dbContext.Episodes.Any(
@@ -1011,7 +1011,7 @@ namespace JavCrawl.Dal.Implement
                     {
                         episodes.Add(new Episodes
                         {
-                            Title = eps.Contains("bitporno") ? "Server BP" : (eps.Contains("openload") ? "Server OL" : "Server HD"),
+                            Title = eps.Contains("bitporno") ? "Server BP" : (eps.Contains("openload") ? "Server OL" : (eps.Contains("rapidvideo") ? "Server RP" : "Server HD")),
                             FilmId = filmId,
                             FileName = eps,
                             Type = "Full",
