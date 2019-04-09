@@ -6,9 +6,9 @@ namespace HighLights.Web.Entities
 {
     public class Match : Base
     {
-        [Required, MaxLength(500)]
+        [Required, MaxLength(100)]
         public string Title { get; set; }
-        [Required, MaxLength(500)]
+        [Required, MaxLength(100)]
         public string Slug { get; set; }
         [Required]
         public DateTime? MatchDate { get; set; }
@@ -35,14 +35,14 @@ namespace HighLights.Web.Entities
         [MaxLength(300)]
         public string ImageName { get; set; }
         public int? ImageServerId { get; set; }
-        public ImageServer ImageServer { get; set; }
+        public virtual ImageServer ImageServer { get; set; }
 
         public int? CategoryId { get; set; }
-        public Category Category { get; set; }
+        public virtual Category Category { get; set; }
 
-        public ICollection<Clip> Clips { get; set; }
-        public ICollection<Formation> Formations { get; set; }
-        public ICollection<TagAssignment> TagAssignments { get; set; }
-        public ICollection<Substitution> Substitutions { get; set; }
+        public virtual ICollection<Clip> Clips { get; set; }
+        public virtual ICollection<Formation> Formations { get; set; }
+        public virtual ICollection<TagAssignment> TagAssignments { get; set; }
+        public virtual ICollection<Substitution> Substitutions { get; set; }
     }
 }

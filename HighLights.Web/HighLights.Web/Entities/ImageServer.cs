@@ -19,7 +19,7 @@ namespace HighLights.Web.Entities
         public int Port { get; set; }
         [Required, MaxLength(50)]
         public string ServerName { get; set; }
-        
-        public ICollection<Match> Matches { get; set; }
+
+        public virtual ICollection<Match> Matches { get; set; }
     }
 }

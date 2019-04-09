@@ -5,15 +5,15 @@ namespace HighLights.Web.Dal
 {
     public class HighLightsContext: DbContext
     {
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Clip> Clips { get; set; }
-        public DbSet<Formation> Formations { get; set; }
-        public DbSet<Match> Matchs { get; set; }
-        public DbSet<Substitution> Substitutions { get; set; }
-        public DbSet<Tag> Tags { get; set; }
-        public DbSet<TagAssignment> TagAssignments { get; set; }
-        public DbSet<CrawlLink> CrawlLinks { get; set; }
-        public DbSet<ImageServer> ImageServers { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
+        public virtual DbSet<Clip> Clips { get; set; }
+        public virtual DbSet<Formation> Formations { get; set; }
+        public virtual DbSet<Match> Matchs { get; set; }
+        public virtual DbSet<Substitution> Substitutions { get; set; }
+        public virtual DbSet<Tag> Tags { get; set; }
+        public virtual DbSet<TagAssignment> TagAssignments { get; set; }
+        public virtual DbSet<CrawlLink> CrawlLinks { get; set; }
+        public virtual DbSet<ImageServer> ImageServers { get; set; }
 
         public HighLightsContext(DbContextOptions<HighLightsContext> options) : base(options)
         {

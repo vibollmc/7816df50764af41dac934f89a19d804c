@@ -10,6 +10,6 @@ namespace HighLights.Web.Entities
         [Required, MaxLength(50)]
         public string Slug { get; set; }
 
-        public ICollection<TagAssignment> TagAssignments { get; set; }
+        public virtual ICollection<TagAssignment> TagAssignments { get; set; }
     }
 }

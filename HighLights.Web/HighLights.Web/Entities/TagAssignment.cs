@@ -5,7 +5,7 @@
         public int TagId { get; set; }
         public int MatchId { get; set; }
 
-        public Tag Tag { get; set; }
-        public Match Match { get; set; }
+        public virtual Tag Tag { get; set; }
+        public virtual Match Match { get; set; }
     }
 }

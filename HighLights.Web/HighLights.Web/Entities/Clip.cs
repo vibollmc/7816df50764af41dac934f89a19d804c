@@ -13,6 +13,6 @@ namespace HighLights.Web.Entities
         public LinkType? LinkType { get; set; }
         public ClipType? ClipType { get; set; }
 
-        public Match Match { get; set; }
+        public virtual Match Match { get; set; }
     }
 }

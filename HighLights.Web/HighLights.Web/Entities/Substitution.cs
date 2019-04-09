@@ -12,7 +12,7 @@ namespace HighLights.Web.Entities
         public int? FormationId { get; set; }
         public int? MatchId { get; set; }
         public FormationType Type { get; set; }
-        public Formation Formation { get; set; }
-        public Match Match { get; set; }
+        public virtual Formation Formation { get; set; }
+        public virtual Match Match { get; set; }
     }
 }

@@ -12,6 +12,6 @@ namespace HighLights.Web.Entities
         public FormationType Type { get; set; }
         public bool IsSubstitution { get; set; }
 
-        public Substitution Substitution { get; set; }
+        public virtual Substitution Substitution { get; set; }
     }
 }
