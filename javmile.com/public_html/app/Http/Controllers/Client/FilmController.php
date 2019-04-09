@@ -179,7 +179,7 @@ class FilmController extends Controller {
         $link_embed = null;
 
         if (!is_null($episode)) {
-            if (strpos($episode->file_name, 'javhihi.in') or strpos($episode->file_name, 'javhihi.com') or strpos($episode->file_name, 'jav789.com') or strpos($episode->file_name, 'javbuz.com')) {
+            if (!strpos($episode->file_name, 'embed_hydrax') and (strpos($episode->file_name, 'javhihi.in') or strpos($episode->file_name, 'javhihi.com') or strpos($episode->file_name, 'jav789.com') or strpos($episode->file_name, 'javbuz.com'))) {
                 $link = $this->javhihi($episode->file_name);
                 if(!is_null($link)){
                     if ($episode->status == 2) {

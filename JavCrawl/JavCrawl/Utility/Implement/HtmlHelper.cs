@@ -283,16 +283,18 @@ namespace JavCrawl.Utility.Implement
                             {
                                 if (!linkEpsAndDecs.LinkEps[i].StartsWith("http"))
                                 {
-                                    linkEpsAndDecs.LinkEps[i] = string.Format("http://javhihi.com/{0}", linkEpsAndDecs.LinkEps[i]);
-
                                     if (from789)
                                     {
                                         linkEpsAndDecs.LinkEps[i] = string.Format("http://jav789.com/{0}", linkEpsAndDecs.LinkEps[i]);
+                                        continue;
                                     }
                                     else if (frombuz)
                                     {
                                         linkEpsAndDecs.LinkEps[i] = string.Format("http://javbuz.com/{0}", linkEpsAndDecs.LinkEps[i]);
+                                        continue;
                                     }
+
+                                    linkEpsAndDecs.LinkEps[i] = string.Format("http://javhihi.com/{0}", linkEpsAndDecs.LinkEps[i]);
                                 }
                             }
 

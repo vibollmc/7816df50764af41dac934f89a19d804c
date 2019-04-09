@@ -168,10 +168,6 @@ eaCtrl.add({"display":"ea_3553952_node","sid":3553952,"plugin":"banner","traffic
         </div>
         <!-- END Page Container -->
 		
-		<!-- JuicyAds PopUnders v3 Start -->
-		<!-- <script type="text/javascript" src="https://js.juicyads.com/jp.php?c=3474z2w2s274u4q2q29403b444&u={{ \URL::current() }}"></script> -->
-		<!-- JuicyAds PopUnders v3 End -->
-		
         @include('client.layouts.js')
         <!-- Scroll to top link, initialized in - scrollToTop() -->
         <a href="#" id="to-top"><i class="fa fa-angle-up"></i></a>
