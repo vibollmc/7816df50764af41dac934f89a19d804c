@@ -92,7 +92,7 @@ namespace Football.Show
                 }
 
                 _isProcessing = false;
-            }, _autoEvent, 1000, 240000);
+            }, _autoEvent, 1000, 2400000);
         }
     }
 }

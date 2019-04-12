@@ -89,7 +89,10 @@ namespace Football.Show.Utilities.Implement
             var divNodes = articleNode?.Descendants("div");
 
             var divVcRow = divNodes?.FirstOrDefault(x =>
-                x.Attributes.Contains("class") && x.Attributes["class"].Value == "vc_row wpb_row td-pb-row");
+                x.Attributes.Contains("class") && 
+                x.Attributes["class"].Value.Contains("vc_row") && 
+                x.Attributes["class"].Value.Contains("wpb_row") &&
+                x.Attributes["class"].Value.Contains("td-pb-row"));
 
             var divWpbWrapper =
                 divVcRow?.Descendants("div")?.LastOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "wpb_wrapper");
@@ -97,7 +100,10 @@ namespace Football.Show.Utilities.Implement
             if (divWpbWrapper == null || !iframeNode.Any()) return false;
 
             var clips = new List<Clip>();
-            clips.AddRange(iframeNode.Where(x => x.Attributes.Contains("data-lazy-src")).Select((x, i) => new Clip
+            clips.AddRange(iframeNode.Where(x => 
+                x.Attributes.Contains("data-lazy-src") && 
+                !x.Attributes["data-lazy-src"].Value.Contains("facebook.com"))
+            .Select((x, i) => new Clip
             {
                 Url = x.Attributes["data-lazy-src"].Value,
                 ClipType = ClipType.HighLight,
