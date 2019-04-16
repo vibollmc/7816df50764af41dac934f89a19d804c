@@ -234,7 +234,7 @@ namespace Football.Show.Utilities.Implement
                 formations.AddRange(divTeam2Roster.Descendants("li")
                     .Select(liNode => new Formation
                     {
-                        Type = FormationType.Home,
+                        Type = FormationType.Away,
                         Number = liNode.ChildNodes[0].InnerText.ToInt(),
                         Name = liNode.ChildNodes[1].InnerText,
                         IsSubstitution = liNode.Attributes.Contains("class") && liNode.Attributes["class"].Value == "issub"
@@ -259,7 +259,7 @@ namespace Football.Show.Utilities.Implement
                 substitutions.AddRange(divTeam2Subs.Descendants("li")
                     .Select(liNode => new Substitution
                     {
-                        Type = FormationType.Home,
+                        Type = FormationType.Away,
                         Number = liNode.ChildNodes[0].InnerText.ToInt(),
                         Name = liNode.ChildNodes[1].InnerText
                     }));
