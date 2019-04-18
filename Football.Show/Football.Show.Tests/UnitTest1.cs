@@ -1,34 +1,26 @@
-﻿using System;
+using Football.Show.Entities;
+using Football.Show.Entities.Enum;
+using Football.Show.Utilities;
+using Football.Show.Utilities.Model;
+using HtmlAgilityPack;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using Football.Show.Dal.Context;
-using Football.Show.Entities;
-using Football.Show.Entities.Enum;
-using Football.Show.Utilities.Context;
-using Football.Show.Utilities.Model;
-using HtmlAgilityPack;
 
-namespace Football.Show.Utilities.Implement
+namespace Football.Show.Tests
 {
-    public class Crawler : ICrawler
+    [TestClass]
+    public class UnitTest1
     {
-        private readonly ICrawlLinkRepository _crawlLinkRepository;
-        private readonly IMatchRepository _matchRepository;
-        private readonly IFtpHelper _ftpHelper;
+        private CookieCollection _cookies;
+        private HtmlWeb _htmlWeb;
 
-        private readonly CookieCollection _cookies;
-        private readonly HtmlWeb _htmlWeb;
-
-        public Crawler(ICrawlLinkRepository crawlLinkRepository, IMatchRepository matchRepository, IFtpHelper ftpHelper)
+        [TestInitialize]
+        public void Init()
         {
-            _crawlLinkRepository = crawlLinkRepository;
-            _matchRepository = matchRepository;
-            _ftpHelper = ftpHelper;
-
             _cookies = new CookieCollection();
             _htmlWeb = new HtmlWeb();
 
@@ -43,7 +35,7 @@ namespace Football.Show.Utilities.Implement
             {
                 if (request.Method == "POST")
                 {
-                    string payload = request.Address.Query;
+                    string payload = request.Address.Query.Substring(1);
                     byte[] buff = Encoding.UTF8.GetBytes(payload.ToCharArray());
                     request.ContentLength = buff.Length;
                     request.ContentType = "application/x-www-form-urlencoded";
@@ -66,57 +58,6 @@ namespace Football.Show.Utilities.Implement
 
         }
 
-        private async Task CrawlData()
-        {
-            try
-            {
-                var crawlLink = await _crawlLinkRepository.GetActive();
-
-                if (crawlLink == null) return;
-
-                var url = crawlLink.BaseLink;
-
-                if (crawlLink.FromPage.HasValue && crawlLink.ToPage.HasValue)
-                {
-                    var page = crawlLink.FromPage > crawlLink.ToPage
-                            ? crawlLink.FromPage
-                            : crawlLink.ToPage;
-                    if (crawlLink.Finished.HasValue) page = page - crawlLink.Finished;
-                    url = string.Format(url, page);
-                }
-
-
-                var matchLinks = await GetMatchLinks(url);
-
-                if (matchLinks == null) return;
-
-                foreach (var matchLink in matchLinks)
-                {
-                    var exsits = await _matchRepository.CheckExsits(matchLink.Slug);
-
-                    if (!exsits) await SaveMatch(matchLink);
-                }
-
-                //for test
-                //await SaveMatch(new MatchLink
-                //{
-                //    Link = "http://www.fullmatchesandshows.com/2018/03/14/paris-saint-germain-vs-angers-highlights-full-match-video/",
-                //    Name = "Paris Saint Germain vs Angers – Highlights & Full Match",
-                //    ImageLink = "https://i1.wp.com/www.fullmatchesandshows.com/wp-content/uploads/2018/03/Paris-Saint-Germain-vs-Angers.jpg?w=600",
-                //    Date = "Mar 14, 2018"
-                //});
-
-
-                await _crawlLinkRepository.UpdateFinished(crawlLink.Id);
-            }
-            catch (Exception ex)
-            {
-                
-            }
-
-            return;
-        }
-
         private IList<Clip> GetMatchClip(string acpPost, string acpShortcode)
         {
             if (string.IsNullOrWhiteSpace(acpPost) || string.IsNullOrWhiteSpace(acpShortcode)) return null;
@@ -133,7 +74,7 @@ namespace Football.Show.Utilities.Implement
 
                 if (iframeNodes == null) continue;
 
-                var link = iframeNodes.FirstOrDefault(x => x.Attributes.Contains("src") &&
+                var link = iframeNodes.FirstOrDefault(x => x.Attributes.Contains("src") && 
                     !string.IsNullOrWhiteSpace(x.Attributes["src"].Value))?.Attributes["src"].Value;
 
                 if (string.IsNullOrWhiteSpace(link)) continue;
@@ -157,7 +98,7 @@ namespace Football.Show.Utilities.Implement
             return clips;
         }
 
-        private async Task<bool> SaveMatch(MatchLink matchLink)
+        private bool SaveMatch(MatchLink matchLink)
         {
             var htmlDoc = _htmlWeb.Load(matchLink.Link);
 
@@ -172,8 +113,8 @@ namespace Football.Show.Utilities.Implement
             var inputNodes = articleNode?.Descendants("input");
 
             var divVcRow = divNodes?.FirstOrDefault(x =>
-                x.Attributes.Contains("class") && 
-                x.Attributes["class"].Value.Contains("vc_row") && 
+                x.Attributes.Contains("class") &&
+                x.Attributes["class"].Value.Contains("vc_row") &&
                 x.Attributes["class"].Value.Contains("wpb_row") &&
                 x.Attributes["class"].Value.Contains("td-pb-row"));
 
@@ -212,13 +153,13 @@ namespace Football.Show.Utilities.Implement
             match.Slug = matchLink.Slug;
             match.Title = matchLink.Name;
 
-            var ftpResult = await _ftpHelper.RemoteFiles(matchLink.ImageLink, match.Slug);
+            //var ftpResult = await _ftpHelper.RemoteFiles(matchLink.ImageLink, match.Slug);
 
-            if (ftpResult != null)
-            {
-                match.ImageName = ftpResult.FileName;
-                match.ImageServerId = ftpResult.ServerId;
-            }
+            //if (ftpResult != null)
+            //{
+            //    match.ImageName = ftpResult.FileName;
+            //    match.ImageServerId = ftpResult.ServerId;
+            //}
 
             foreach (var childNode in divWpbWrapper.ChildNodes)
             {
@@ -260,7 +201,7 @@ namespace Football.Show.Utilities.Implement
             {
                 //td-tags td-post-small-box clearfix
                 var tagNode = ulNodes?.FirstOrDefault(x =>
-                    x.Attributes.Contains("class") && 
+                    x.Attributes.Contains("class") &&
                     x.Attributes["class"].Value.Contains("td-tags") &&
                     x.Attributes["class"].Value.Contains("td-post-small-box"));
 
@@ -368,11 +309,11 @@ namespace Football.Show.Utilities.Implement
             {
                 actionSubstitutions.AddRange(divteam1Actualsubs.Descendants("li")
                     .Select(x => new ActionSubstitution
-                        {
-                            Min = x.ChildNodes[0].InnerText,
-                            In = x.ChildNodes[1].ChildNodes[0].InnerText,
-                            Out = x.ChildNodes[1].ChildNodes[2].InnerText,
-                            Type = FormationType.Home
+                    {
+                        Min = x.ChildNodes[0].InnerText,
+                        In = x.ChildNodes[1].ChildNodes[0].InnerText,
+                        Out = x.ChildNodes[1].ChildNodes[2].InnerText,
+                        Type = FormationType.Home
                     }));
             }
 
@@ -391,64 +332,23 @@ namespace Football.Show.Utilities.Implement
             }
 
 
-            await _matchRepository.Add(match, clips, formations, substitutions, actionSubstitutions);
+            //await _matchRepository.Add(match, clips, formations, substitutions, actionSubstitutions);
 
             return true;
         }
 
-        private async Task<IEnumerable<MatchLink>> GetMatchLinks(string url)
+        [TestMethod]
+        public void TestMethod1()
         {
-            var htmlWeb = new HtmlWeb();
-            var htmlDoc = await htmlWeb.LoadFromWebAsync(url);
-
-            var divNodes = htmlDoc.DocumentNode.Descendants("div");
-
-            if (divNodes == null || !divNodes.Any()) return null;
-
-            var divMainContent = divNodes.FirstOrDefault(x =>
-                x.Attributes.Contains("class") && x.Attributes["class"].Value == "td-ss-main-content");
-
-            if (divMainContent == null) return null;
-
-            var results = new List<MatchLink>();
-
-            foreach (var nodeBlock in divMainContent.ChildNodes)
+            var result = SaveMatch(new MatchLink
             {
-                if (!(nodeBlock.Attributes.Contains("class") && nodeBlock.Attributes["class"].Value == "td-block-row")) continue;
+                Date = "Apr 17, 2019",
+                Link = "https://www.fullmatchesandshows.com/2019/04/17/uefa-champions-league-highlights-17-apr-2019/",
+                ImageLink = "https://www.fullmatchesandshows.com/wp-content/uploads/2019/04/Manchester-City-vs-Tottenham-Hotspur.jpg",
+                Name = "Manchester City vs Tottenham Hotspur � Highlights & Full Match"
+            });
 
-                foreach (var node in nodeBlock.ChildNodes)
-                {
-                    var timeNode = node.Descendants("time");
-
-                    var matchLink = new MatchLink();
-
-                    if (timeNode.Any()) matchLink.Date = timeNode.First().InnerHtml;
-
-                    var aNodes = node.Descendants("a");
-
-                    foreach (var aNode in aNodes)
-                    {
-                        if (aNode.Descendants("img").Any())
-                        {
-                            matchLink.ImageLink = aNode.ChildNodes[0].Attributes["data-img-url"].Value;
-                        }
-                        else
-                        {
-                            matchLink.Name = aNode.InnerHtml.Replace("&#8211;", "–").Replace("&#038;","&");
-                            matchLink.Link = aNode.Attributes["href"].Value;
-                        }
-                    }
-
-                    results.Add(matchLink);
-                }
-            }
-
-            return results;
-        }
-
-        public async Task Run()
-        {
-            await CrawlData();
+            Assert.IsTrue(result);
         }
     }
 }

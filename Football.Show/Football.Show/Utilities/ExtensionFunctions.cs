@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Football.Show.Entities.Enum;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -65,6 +66,29 @@ namespace Football.Show.Utilities
             if (int.TryParse(input, out var oint)) return oint;
 
             return null;
+        }
+
+        public static string ToTitle(this ClipType clipType)
+        {
+            switch(clipType)
+            {
+                case ClipType.ExtraTimeOrPen:
+                    return "Extra Time/Pens if any";
+                case ClipType.FirstHalf:
+                    return "1st Half";
+                case ClipType.HalfTime:
+                    return "Half Time";
+                case ClipType.Highlights:
+                    return "Hightlights";
+                case ClipType.PostMatch:
+                    return "Post match";
+                case ClipType.PreMatch:
+                    return "Pre-match";
+                case ClipType.SecondHalf:
+                    return "2nd Half";
+                default:
+                    return null;
+            }
         }
     }
 }

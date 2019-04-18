@@ -83,7 +83,7 @@ namespace Football.Show.Utilities.Implement
 
             results.IsSuccessful = true;
             results.FileName = saveAsName + fileExtension;
-            results.FullPath = $"{imageServer.ServerUrl}/{imageServer.Patch}{saveAsName}{fileExtension}";
+            results.FullPath = $"{imageServer.ServerUrl}/{saveAsName}{fileExtension}";
             if (imageServer.Id != null) results.ServerId = imageServer.Id.Value;
 
             ftpClient.Disconnect();
