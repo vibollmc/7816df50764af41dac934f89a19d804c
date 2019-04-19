@@ -266,7 +266,7 @@ namespace Football.Show.Tests
             var divTeam2Roster = ulNodes?.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team2roster");
             if (divTeam2Roster != null)
             {
-                match.HomeManager = divTeam2Roster.ChildNodes[1].InnerText;
+                match.AwayManager = divTeam2Roster.ChildNodes[1].InnerText;
                 formations.AddRange(divTeam2Roster.Descendants("li")
                     .Select(liNode => new Formation
                     {

@@ -4,6 +4,6 @@ namespace Football.Show.Utilities.Context
 {
     public interface ICrawler
     {
-        Task Run();
+        void Run();
     }
 }

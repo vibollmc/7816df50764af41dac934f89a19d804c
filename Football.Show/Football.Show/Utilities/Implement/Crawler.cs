@@ -325,7 +325,7 @@ namespace Football.Show.Utilities.Implement
             var divTeam2Roster = ulNodes?.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team2roster");
             if (divTeam2Roster != null)
             {
-                match.HomeManager = divTeam2Roster.ChildNodes[1].InnerText;
+                match.AwayManager = divTeam2Roster.ChildNodes[1].InnerText;
                 formations.AddRange(divTeam2Roster.Descendants("li")
                     .Select(liNode => new Formation
                     {
@@ -446,9 +446,19 @@ namespace Football.Show.Utilities.Implement
             return results;
         }
 
-        public async Task Run()
+        public void Run()
         {
-            await CrawlData();
+            AsyncHelper.RunSync(async () =>
+            {
+                try
+                {
+                    await CrawlData();
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            });
         }
     }
 }

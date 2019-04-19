@@ -51,6 +51,7 @@ namespace Football.Show
             services.AddDbContext<MainDbContext>(options => options.UseMySql(Configuration.GetConnectionString("MySqlConnection")));
 
             services.Configure<SiteSetttings>(Configuration.GetSection("SiteSettings"));
+            services.Configure<TimerSettings>(Configuration.GetSection("TimerSettings"));
 
             services.AddTransient<IImageServerRepository, ImageServerRepository>();
             services.AddTransient<ICrawlLinkRepository, CrawlLinkRepository>();
@@ -58,8 +59,6 @@ namespace Football.Show
             services.AddTransient<IFtpHelper, FtpHelper>();
             services.AddTransient<ICrawler, Crawler>();
             services.AddTransient<LoadDbContext, LoadDbContext>();
-
-            services.AddSingleton<AutoJob, AutoJob>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -79,20 +78,27 @@ namespace Football.Show
 
             app.UseMvc();
 
-            _autoEvent = new AutoResetEvent(false);
-            _timer = new Timer(o =>
+            var timerSetting = Configuration.GetSection("TimerSettings").Get<TimerSettings>();
+            if (timerSetting != null && timerSetting.Enabled)
             {
-                if (_isProcessing) return;
-                _isProcessing = true;
-                using (var serviceScope = app.ApplicationServices.CreateScope())
-                {
-                    var autoJob = serviceScope.ServiceProvider.GetService<ICrawler>();// services.GetService<AutoJob>();
-                    autoJob.Run();
-                    //autoJob.ExecuteCrawlContent();
-                }
+                Console.WriteLine("Crawler is running...");
 
-                _isProcessing = false;
-            }, _autoEvent, 1000, 2400000);
+                var minuteInterval = timerSetting.MinuteInterval * 60000;
+                _autoEvent = new AutoResetEvent(false);
+                _timer = new Timer(o =>
+                {
+                    if (_isProcessing) return;
+                    _isProcessing = true;
+                    using (var serviceScope = app.ApplicationServices.CreateScope())
+                    {
+                        var autoJob = serviceScope.ServiceProvider.GetService<ICrawler>();
+                        
+                        autoJob.Run();
+                    }
+
+                    _isProcessing = false;
+                }, _autoEvent, 1000, minuteInterval);
+            }
         }
     }
 }

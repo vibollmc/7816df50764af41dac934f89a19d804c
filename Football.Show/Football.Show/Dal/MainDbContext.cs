@@ -23,16 +23,13 @@ namespace Football.Show.Dal
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Category>()
-                .HasIndex(c => c.Slug)
-                .IsUnique();
+                .HasIndex(c => c.Slug);
 
             modelBuilder.Entity<Match>()
-                .HasIndex(c => c.Slug)
-                .IsUnique();
+                .HasIndex(c => c.Slug);
 
             modelBuilder.Entity<Tag>()
-                .HasIndex(c => c.Slug)
-                .IsUnique();
+                .HasIndex(c => c.Slug);
 
             modelBuilder.Entity<TagAssignment>()
                 .HasKey(c => new { c.MatchId, c.TagId });
