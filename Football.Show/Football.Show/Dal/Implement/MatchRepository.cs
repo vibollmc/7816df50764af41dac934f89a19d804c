@@ -160,30 +160,89 @@ namespace Football.Show.Dal.Implement
             return true;
         }
 
-        public async Task<IEnumerable<ViewModels.Match>> GetMatchs(int page)
+        public async Task<ViewModels.PagingResult> GetMatchs(int currentPage)
         {
-            var result = await _dbContext.Matchs
+            var result = new ViewModels.PagingResult();
+
+            var matches = await _dbContext.Matchs
                 .Where(x => !x.DeletedAt.HasValue)
+                //.Include(x => x.ImageServer)
                 .OrderByDescending(x => x.MatchDate)
-                .ThenByDescending(x => x.CreatedAt)
-                .Page(page, _siteSetttings.PageSize)
-                .Select(x => new ViewModels.Match
-                {
-                    MatchDate = x.MatchDate,
-                    Slug = x.Slug,
-                    Title = x.Title,
-                    ImageUrl = $"{x.ImageServer.ServerUrl}/{x.ImageServer.Patch}{x.ImageName}"
-                }).ToListAsync();
+                .ThenBy(x => x.CreatedAt)
+                .Page(currentPage, _siteSetttings.PageSize)
+                .Select(x => x.ToViewModel()).ToListAsync();
+
+            var countMatch = await _dbContext.Matchs.CountAsync(x => !x.DeletedAt.HasValue);
+            var totalPage = ((double)countMatch / _siteSetttings.PageSize) + 0.49;
+
+            result.Matches = matches;
+            result.TotalPage = (int)Math.Round(totalPage, 0, MidpointRounding.ToEven);
+            result.CurrentPage = currentPage;
 
             return result;
         }
 
-        public async Task<int> GetTotalPage()
+        public async Task<ViewModels.PagingResult> GetMatchsByCategory(string categorySlug, int currentPage)
         {
-            var countMatch = await _dbContext.Matchs.CountAsync(x => !x.DeletedAt.HasValue);
-            var totalPage = ((double) countMatch / _siteSetttings.PageSize) + 0.49;
+            var result = new ViewModels.PagingResult();
+            
+            var matches = await _dbContext.Matchs
+                //.Include(x => x.Category)
+                .Where(
+                    x => 
+                        !x.DeletedAt.HasValue && 
+                        x.Category.Slug.Equals(categorySlug, StringComparison.OrdinalIgnoreCase) &&
+                        !x.Category.DeletedAt.HasValue)
+                //.Include(x => x.ImageServer)
+                .OrderByDescending(x => x.MatchDate)
+                .ThenBy(x => x.CreatedAt)
+                .Page(currentPage, _siteSetttings.PageSize)
+                .Select(x => x.ToViewModel()).ToListAsync();
 
-            return (int)Math.Round(totalPage, 0, MidpointRounding.ToEven);
+            var countMatch = await _dbContext.Matchs
+                .Include(x => x.Category)
+                .CountAsync(x => 
+                    !x.DeletedAt.HasValue &&
+                    x.Category.Slug.Equals(categorySlug, StringComparison.OrdinalIgnoreCase) &&
+                    !x.Category.DeletedAt.HasValue);
+
+            var totalPage = ((double)countMatch / _siteSetttings.PageSize) + 0.49;
+
+            result.Matches = matches;
+            result.TotalPage = (int)Math.Round(totalPage, 0, MidpointRounding.ToEven);
+            result.CurrentPage = currentPage;
+
+            return result;
+        }
+
+        public async Task<ViewModels.PagingResult> GetMatchsByTag(string tagSlug, int currentPage)
+        {
+            var result = new ViewModels.PagingResult();
+            var matches = await _dbContext.Matchs
+                .Where(
+                    x =>
+                        !x.DeletedAt.HasValue &&
+                        x.TagAssignments.Any(t => !t.Tag.DeletedAt.HasValue && t.Tag.Slug.Equals(tagSlug, StringComparison.OrdinalIgnoreCase)) &&
+                        !x.Category.DeletedAt.HasValue)
+                .OrderByDescending(x => x.MatchDate)
+                .ThenBy(x => x.CreatedAt)
+                .Page(currentPage, _siteSetttings.PageSize)
+                .Select(x => x.ToViewModel()).ToListAsync();
+
+            var countMatch = await _dbContext.Matchs
+                .Include(x => x.Category)
+                .CountAsync(x =>
+                    !x.DeletedAt.HasValue &&
+                    x.TagAssignments.Any(t => !t.Tag.DeletedAt.HasValue && t.Tag.Slug.Equals(tagSlug, StringComparison.OrdinalIgnoreCase)) &&
+                    !x.Category.DeletedAt.HasValue);
+
+            var totalPage = ((double)countMatch / _siteSetttings.PageSize) + 0.49;
+
+            result.Matches = matches;
+            result.TotalPage = (int)Math.Round(totalPage, 0, MidpointRounding.ToEven);
+            result.CurrentPage = currentPage;
+
+            return result;
         }
 
         public async Task<ViewModels.MatchDetail> GetMatchDetail(string slug)
@@ -207,7 +266,7 @@ namespace Football.Show.Dal.Implement
                     Stadium = x.Stadium,
                     Category = x.Category.Name,
                     CategorySlug = x.Category.Slug,
-                    ImageUrl = $"{x.ImageServer.ServerUrl}/{x.ImageServer.Patch}{x.ImageName}",
+                    ImageUrl = $"{x.ImageServer.ServerUrl}/{x.ImageName}",
                     Tags = x.TagAssignments.Select(t => new ViewModels.Tag {Slug = t.Tag.Slug, Name = t.Tag.Name}),
                     Clips = x.Clips.Select(c =>
                         new ViewModels.Clip {Name = c.Name, ClipType = c.ClipType, LinkType = c.LinkType, Url = c.Url}),

@@ -90,5 +90,18 @@ namespace Football.Show.Utilities
                     return null;
             }
         }
+
+        public static ViewModels.Match ToViewModel(this Entities.Match match)
+        {
+            if (match == null) return null;
+
+            return new ViewModels.Match
+            {
+                MatchDate = match.MatchDate,
+                Slug = match.Slug,
+                Title = match.Title,
+                ImageUrl = $"{match.ImageServer.ServerUrl}/{match.ImageName}"
+            };
+        }
     }
 }

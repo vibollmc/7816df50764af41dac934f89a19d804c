@@ -11,9 +11,9 @@ namespace Football.Show.Dal.Context
 
         Task<bool> Add(Match match, IList<Clip> clips, IList<Formation> formations, IList<Substitution> substitutions, IList<ActionSubstitution> actionSubstitutions);
 
-        Task<IEnumerable<ViewModels.Match>> GetMatchs(int page);
-
-        Task<int> GetTotalPage();
+        Task<ViewModels.PagingResult> GetMatchs(int currentPage);
+        Task<ViewModels.PagingResult> GetMatchsByCategory(string categorySlug, int currentPage);
+        Task<ViewModels.PagingResult> GetMatchsByTag(string tagSlug, int currentPage);
 
         Task<ViewModels.MatchDetail> GetMatchDetail(string slug);
     }
