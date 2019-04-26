@@ -5,11 +5,23 @@ body {
     padding-bottom: 20px;
 }
 
+a, a:active {
+    color: #111;
+    text-decoration:none;
+}
+
+    a:hover {
+        color: #d61b1b;
+        text-decoration: none;
+    }
+
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    margin-bottom: 30px;
+    margin-top: 30px;
 }
 
 /* Carousel */
@@ -35,3 +47,22 @@ body {
         display: none;
     }
 }
+
+.match a {
+    color: #111;
+    text-decoration: none;
+}
+    .match:hover a {
+        color: #d61b1b;
+        text-decoration: none;
+    }
+
+.item-title-block {
+    padding-bottom: 35px
+}
+
+    .item-title-block > .title {
+        max-width: 334px;
+        margin-left: auto;
+        margin-right: auto
+    }
