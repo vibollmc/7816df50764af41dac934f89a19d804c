@@ -166,7 +166,7 @@ namespace Football.Show.Dal.Implement
 
             var matches = await _dbContext.Matchs
                 .Where(x => !x.DeletedAt.HasValue)
-                //.Include(x => x.ImageServer)
+                .Include(x => x.ImageServer)
                 .OrderByDescending(x => x.MatchDate)
                 .ThenBy(x => x.CreatedAt)
                 .Page(currentPage, _siteSetttings.PageSize)
@@ -187,20 +187,18 @@ namespace Football.Show.Dal.Implement
             var result = new ViewModels.PagingResult();
             
             var matches = await _dbContext.Matchs
-                //.Include(x => x.Category)
                 .Where(
                     x => 
                         !x.DeletedAt.HasValue && 
                         x.Category.Slug.Equals(categorySlug, StringComparison.OrdinalIgnoreCase) &&
                         !x.Category.DeletedAt.HasValue)
-                //.Include(x => x.ImageServer)
+                .Include(x => x.ImageServer)
                 .OrderByDescending(x => x.MatchDate)
                 .ThenBy(x => x.CreatedAt)
                 .Page(currentPage, _siteSetttings.PageSize)
                 .Select(x => x.ToViewModel()).ToListAsync();
 
             var countMatch = await _dbContext.Matchs
-                .Include(x => x.Category)
                 .CountAsync(x => 
                     !x.DeletedAt.HasValue &&
                     x.Category.Slug.Equals(categorySlug, StringComparison.OrdinalIgnoreCase) &&
@@ -222,19 +220,17 @@ namespace Football.Show.Dal.Implement
                 .Where(
                     x =>
                         !x.DeletedAt.HasValue &&
-                        x.TagAssignments.Any(t => !t.Tag.DeletedAt.HasValue && t.Tag.Slug.Equals(tagSlug, StringComparison.OrdinalIgnoreCase)) &&
-                        !x.Category.DeletedAt.HasValue)
+                        x.TagAssignments.Any(t => !t.Tag.DeletedAt.HasValue && t.Tag.Slug.Equals(tagSlug, StringComparison.OrdinalIgnoreCase)))
+                .Include(x => x.ImageServer)
                 .OrderByDescending(x => x.MatchDate)
                 .ThenBy(x => x.CreatedAt)
                 .Page(currentPage, _siteSetttings.PageSize)
                 .Select(x => x.ToViewModel()).ToListAsync();
 
             var countMatch = await _dbContext.Matchs
-                .Include(x => x.Category)
                 .CountAsync(x =>
                     !x.DeletedAt.HasValue &&
-                    x.TagAssignments.Any(t => !t.Tag.DeletedAt.HasValue && t.Tag.Slug.Equals(tagSlug, StringComparison.OrdinalIgnoreCase)) &&
-                    !x.Category.DeletedAt.HasValue);
+                    x.TagAssignments.Any(t => !t.Tag.DeletedAt.HasValue && t.Tag.Slug.Equals(tagSlug, StringComparison.OrdinalIgnoreCase)));
 
             var totalPage = ((double)countMatch / _siteSetttings.PageSize) + 0.49;
 
@@ -248,7 +244,13 @@ namespace Football.Show.Dal.Implement
         public async Task<ViewModels.MatchDetail> GetMatchDetail(string slug)
         {
             var match = await _dbContext.Matchs
-                .Where(x => x.Slug == slug)
+                .Where(x => x.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase))
+                .Include(x => x.ImageServer)
+                .Include(x => x.TagAssignments)
+                .Include(x => x.Category)
+                .Include(x => x.Clips)
+                .Include(x => x.Formations)
+                .Include(x => x.Substitutions)
                 .Select(x => new ViewModels.MatchDetail
                 {
                     Home = x.Home,
@@ -267,10 +269,10 @@ namespace Football.Show.Dal.Implement
                     Category = x.Category.Name,
                     CategorySlug = x.Category.Slug,
                     ImageUrl = $"{x.ImageServer.ServerUrl}/{x.ImageName}",
-                    Tags = x.TagAssignments.Select(t => new ViewModels.Tag {Slug = t.Tag.Slug, Name = t.Tag.Name}),
-                    Clips = x.Clips.Select(c =>
-                        new ViewModels.Clip {Name = c.Name, ClipType = c.ClipType, LinkType = c.LinkType, Url = c.Url}),
-                    Formations = x.Formations.Select(f => new ViewModels.Formation
+                    Tags = x.TagAssignments.Select(t => new ViewModels.Tag {Slug = t.Tag.Slug, Name = t.Tag.Name}).ToList(),
+                    Clips = x.Clips.OrderBy(c => c.ClipType).Select(c =>
+                        new ViewModels.Clip {Name = c.Name, ClipType = c.ClipType, LinkType = c.LinkType, Url = c.Url}).ToList(),
+                    Formations = x.Formations.OrderBy(f => f.Id).Select(f => new ViewModels.Formation
                     {
                         Name = f.Name,
                         Number = f.Number,
@@ -279,9 +281,9 @@ namespace Football.Show.Dal.Implement
                         SubsName = f.Substitution == null ? null : f.Substitution.Name,
                         SubsNumber = f.Substitution == null ? null : f.Substitution.Number,
                         SubsMinutes = f.Substitution == null ? null : f.Substitution.Minutes
-                    }),
-                    Substitutions = x.Substitutions.Select(s =>
-                        new ViewModels.Substitution {Name = s.Name, Number = s.Number, Type = s.Type})
+                    }).ToList(),
+                    Substitutions = x.Substitutions.OrderBy(s => s.Id).Select(s =>
+                        new ViewModels.Substitution {Name = s.Name, Number = s.Number, Type = s.Type}).ToList()
                 })
                 .FirstOrDefaultAsync();
 

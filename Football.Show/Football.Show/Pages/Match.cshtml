@@ -1,0 +1,141 @@
+﻿@page "{slug}"
+@model Football.Show.Pages.MatchModel
+@{
+    ViewData["Title"] = Model.MatchDetail.Title;
+}
+
+<h1>@Model.MatchDetail.Title</h1>
+<label class="label label-info"><span class="glyphicon glyphicon-time"></span> @string.Format("{0:MMM dd, yyyy}", Model.MatchDetail.MatchDate)</label>
+<hr />
+<div class="row">
+    <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="center-block text-center match-detail">
+            <img class="img-responsive img-thumbnail" src="@Model.MatchDetail.ImageUrl" alt="@Model.MatchDetail.Title" title="@Model.MatchDetail.Title" />
+        </div>
+    </div>
+    <div class="col-md-8 col-sm-6 col-xs-12">
+        <div class="row">
+            <div class="col-xs-12 match-detail">
+                Match: <strong>@Model.MatchDetail.Title</strong>
+            </div>
+            <div class="col-xs-12 match-detail">
+                League: <a href="/league/@Model.MatchDetail.CategorySlug" title="@Model.MatchDetail.Category"><strong>@Model.MatchDetail.Category</strong></a>
+            </div>
+            <div class="col-xs-12 match-detail">
+                Date: <strong>@string.Format("{0:dd MMMM yyyy}", Model.MatchDetail.MatchDate)</strong>
+            </div>
+            <div class="col-xs-12 match-detail">
+                Stadium: <strong>@Model.MatchDetail.Stadium</strong>
+            </div>
+            <div class="col-xs-12 match-detail">
+                Referee: <strong>@Model.MatchDetail.Referee</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-4 text-center">
+        <h3>@Model.MatchDetail.Home</h3>
+    </div>
+    <div class="col-xs-4 text-center">
+        <h3>@Model.MatchDetail.Score</h3>
+    </div>
+    <div class="col-xs-4 text-center">
+        <h3>@Model.MatchDetail.Away</h3>
+    </div>
+</div>
+@if (Model.MatchDetail.Formations != null && Model.MatchDetail.Formations.Any())
+{
+    <hr />
+    <h4>
+        Formations
+    </h4>
+    <div class="row">
+        <div class="col-xs-6 text-right">
+            <h5>@Model.MatchDetail.HomeManager</h5>
+            <div class="formation">
+                @foreach (var f in Model.MatchDetail.Formations.Where(x => x.Type == Entities.Enum.FormationType.Home))
+                {
+                    <div class="formation-item">
+                        <span class="number">@f.Number</span>
+                        <span class="name">@f.Name</span>
+                    </div>
+                    @if (f.IsSubstitution)
+                    {
+                        <div class="formation-sub-item">
+                            <span class="min">@f.SubsMinutes.</span>
+                            <span class="sub-number">@f.SubsNumber</span>
+                            <span class="sub-name">@f.SubsName</span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="col-xs-6 text-left">
+            <h5>@Model.MatchDetail.AwayManager</h5>
+            <div class="formation">
+                @foreach (var f in Model.MatchDetail.Formations.Where(x => x.Type == Entities.Enum.FormationType.Away))
+                {
+                    <div class="formation-item">
+                        <span class="number">@f.Number</span>
+                        <span class="name">@f.Name</span>
+                    </div>
+                    @if (f.IsSubstitution)
+                    {
+                        <div class="formation-sub-item">
+                            <span class="min">@f.SubsMinutes.</span>
+                            <span class="sub-number">@f.SubsNumber</span>
+                            <span class="sub-name">@f.SubsName</span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@if (Model.MatchDetail.Substitutions != null && Model.MatchDetail.Substitutions.Any())
+{
+    <hr />
+    <h4>Substitutions</h4>
+    <div class="row">
+        <div class="col-xs-6 text-right">
+            <div class="formation">
+                @foreach (var f in Model.MatchDetail.Substitutions.Where(x => x.Type == Entities.Enum.FormationType.Home))
+                {
+                    <div class="formation-item">
+                        <span class="number">@f.Number</span>
+                        <span class="name">@f.Name</span>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-xs-6 text-left">
+            <div class="formation">
+                @foreach (var f in Model.MatchDetail.Substitutions.Where(x => x.Type == Entities.Enum.FormationType.Away))
+                {
+                    <div class="formation-item">
+                        <span class="number">@f.Number</span>
+                        <span class="name">@f.Name</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@if (Model.MatchDetail.Tags != null && Model.MatchDetail.Tags.Any())
+{
+    <div class="row">
+        <div class="col-xs-12">
+            TAG:
+            @foreach (var tag in Model.MatchDetail.Tags)
+            {
+                <a href="/tag/@tag.Slug" title="@tag.Name">
+                    <label class="label label-default">@tag.Name</label>
+                </a>
+            }
+        </div>
+    </div>
+}

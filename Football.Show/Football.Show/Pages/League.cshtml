@@ -1,0 +1,10 @@
+﻿@page "{slug}/{currentPage?}"
+@model Football.Show.Pages.LeagueModel
+@{
+    ViewData["Title"] = Model.PagingResult.PageTitle;
+}
+
+<h1>@Model.PagingResult.PageTitle</h1>
+
+@await Html.PartialAsync("_ViewMatch", Model.PagingResult)
+

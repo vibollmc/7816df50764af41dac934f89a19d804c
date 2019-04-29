@@ -1,8 +1,14 @@
 /* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification 
 for details on configuring this project to bundle and minify static web assets. */
 body {
-    padding-top: 50px;
+    padding-top: 75px;
     padding-bottom: 20px;
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+    body {
+        padding-top: 125px;
+    }
 }
 
 a, a:active {
@@ -20,10 +26,12 @@ a, a:active {
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
-    margin-bottom: 30px;
-    margin-top: 30px;
+    margin-top: 15px;
 }
 
+    .body-content > h1 {
+        margin-bottom: 30px;
+    }
 /* Carousel */
 .carousel-caption p {
     font-size: 20px;
@@ -48,21 +56,51 @@ a, a:active {
     }
 }
 
-.match a {
+.match a, .navbar-inverse .navbar-nav > li > a {
     color: #111;
     text-decoration: none;
 }
-    .match:hover a {
-        color: #d61b1b;
-        text-decoration: none;
-    }
+.match:hover a, .navbar-inverse .navbar-nav > li > a:hover {
+    color: #d61b1b;
+    text-decoration: none;
+}
 
 .item-title-block {
-    padding-bottom: 35px
+    padding-bottom: 5px
 }
 
     .item-title-block > .title {
         max-width: 334px;
         margin-left: auto;
-        margin-right: auto
+        margin-right: auto;
+        min-height: 110px;
     }
+
+.navbar, .container > .navbar-header {
+    min-height: 75px;
+}
+
+.navbar .logo {
+    max-height: 70px;
+}
+
+.navbar-inverse {
+    background-color:#eee;
+    border-color: #eee;
+}
+
+.navbar-toggle {
+    margin-top: 19px;
+}
+.navbar-inverse .navbar-toggle .icon-bar {
+    background-color:#888;
+}
+@media (min-width: 768px) {
+    .navbar-nav {
+        margin-top:24px;
+    }
+}
+
+.match-detail {
+    margin-bottom: 15px;
+}
