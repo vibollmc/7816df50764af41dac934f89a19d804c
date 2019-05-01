@@ -16,5 +16,7 @@ namespace Football.Show.Dal.Context
         Task<ViewModels.PagingResult> GetMatchsByTag(string tagSlug, int currentPage);
 
         Task<ViewModels.MatchDetail> GetMatchDetail(string slug);
+
+        Task<IEnumerable<ViewModels.Match>> GetMatchsNewest(int? id);
     }
 }

@@ -7,6 +7,7 @@ namespace Football.Show.ViewModels
 {
     public class MatchDetail
     {
+        public int? Id { get; set; }
         public string Title { get; set; }
         public string Slug { get; set; }
         public DateTime? MatchDate { get; set; }
@@ -25,9 +26,9 @@ namespace Football.Show.ViewModels
         public string Category { get; set; }
         public string CategorySlug { get; set; }
 
-        public IEnumerable<Clip> Clips { get; set; }
-        public IEnumerable<Tag> Tags { get; set; }
-        public IEnumerable<Substitution> Substitutions { get; set; }
-        public IEnumerable<Formation> Formations { get; set; }
+        public IList<Clip> Clips { get; set; }
+        public IList<Tag> Tags { get; set; }
+        public IList<Substitution> Substitutions { get; set; }
+        public IList<Formation> Formations { get; set; }
     }
 }

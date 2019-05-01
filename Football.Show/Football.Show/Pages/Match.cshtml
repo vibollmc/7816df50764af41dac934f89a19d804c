@@ -1,0 +1,253 @@
+﻿@page "{slug}"
+@model Football.Show.Pages.MatchModel
+@{
+    ViewData["Title"] = Model.MatchDetail.Title;
+    ViewData["Description"] = $"Watch {Model.MatchDetail.Title} on football-highlights.tv";
+    ViewData["Canonical"] = $"http://football-highlights.tv/match/{Model.MatchDetail.Slug}";
+    ViewData["Image"] = Model.MatchDetail.ImageUrl;
+}
+
+<h1>@Model.MatchDetail.Title</h1>
+<label class="label label-info"><span class="glyphicon glyphicon-time"></span> @string.Format("{0:MMM dd, yyyy}", Model.MatchDetail.MatchDate)</label>
+<hr />
+<div class="row">
+    <div class="col-md-8 col-sm-12 col-xs-12">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="center-block text-center match-detail">
+                    <img class="img-responsive img-thumbnail" src="@Model.MatchDetail.ImageUrl" alt="@Model.MatchDetail.Title" title="@Model.MatchDetail.Title" />
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="row">
+                    <div class="col-xs-12 match-detail">
+                        Match: <strong>@Model.MatchDetail.Title</strong>
+                    </div>
+                    <div class="col-xs-12 match-detail">
+                        League: <a href="/league/@Model.MatchDetail.CategorySlug" title="@Model.MatchDetail.Category"><strong>@Model.MatchDetail.Category</strong></a>
+                    </div>
+                    <div class="col-xs-12 match-detail">
+                        Date: <strong>@string.Format("{0:dd MMMM yyyy}", Model.MatchDetail.MatchDate)</strong>
+                    </div>
+                    <div class="col-xs-12 match-detail">
+                        Stadium: <strong>@Model.MatchDetail.Stadium</strong>
+                    </div>
+                    <div class="col-xs-12 match-detail">
+                        Referee: <strong>@Model.MatchDetail.Referee</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        @if (Model.MatchDetail.Clips != null && Model.MatchDetail.Clips.Any())
+        {
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    @foreach (var clip in Model.MatchDetail.Clips)
+                    {
+                        <button id="video_@clip.ClipType" class="btn btn-default" link-clip="@clip.Url">@clip.Name</button>
+                    }
+                </div>
+                <div class="col-xs-12 text-center" id="video-wapper">
+
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <p>
+                        No video.
+                    </p>
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-xs-4 text-center">
+                <h3>@Model.MatchDetail.Home</h3>
+            </div>
+            <div class="col-xs-4 text-center">
+                <h3>@Model.MatchDetail.Score</h3>
+            </div>
+            <div class="col-xs-4 text-center">
+                <h3>@Model.MatchDetail.Away</h3>
+            </div>
+        </div>
+        @if (Model.MatchDetail.Formations != null && Model.MatchDetail.Formations.Any())
+        {
+            <hr />
+            <h4>
+                Formations
+            </h4>
+            <div class="row">
+                <div class="col-xs-6 text-right">
+                    <h6>@Model.MatchDetail.HomeManager</h6>
+                    <div class="formation">
+                        @foreach (var f in Model.MatchDetail.Formations.Where(x => x.Type == Entities.Enum.FormationType.Home))
+                        {
+                            <div class="formation-item">
+                                @if (f.IsSubstitution)
+                                {
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                }
+                                <span class="name">@f.Name</span>
+                                <span class="number text-center">@f.Number</span>
+                            </div>
+                            @if (f.IsSubstitution)
+                            {
+                                <div class="formation-sub-item">
+                                    <span class="glyphicon glyphicon-triangle-top"></span>
+                                    <span class="sub-name">@f.SubsName</span>
+                                    <span class="sub-number text-center">@f.SubsNumber</span>
+                                    <span class="min">@f.SubsMinutes.</span>
+                                    <span class="glyphicon glyphicon-arrow-left"></span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="col-xs-6 text-left">
+                    <h6>@Model.MatchDetail.AwayManager</h6>
+                    <div class="formation">
+                        @foreach (var f in Model.MatchDetail.Formations.Where(x => x.Type == Entities.Enum.FormationType.Away))
+                        {
+                            <div class="formation-item">
+                                <span class="number text-center background-blue">@f.Number</span>
+                                <span class="name">@f.Name</span>
+                                @if (f.IsSubstitution)
+                                {
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                }
+                            </div>
+                            @if (f.IsSubstitution)
+                            {
+                                <div class="formation-sub-item">
+                                    <span class="glyphicon glyphicon-arrow-right"></span>
+                                    <span class="min">@f.SubsMinutes.</span>
+                                    <span class="sub-number text-center background-blue">@f.SubsNumber</span>
+                                    <span class="sub-name">@f.SubsName</span>
+                                    <span class="glyphicon glyphicon-triangle-top"></span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.MatchDetail.Substitutions != null && Model.MatchDetail.Substitutions.Any())
+        {
+            <hr />
+            <h4>Substitutions</h4>
+            <div class="row">
+                <div class="col-xs-6 text-right">
+                    <div class="formation">
+                        @foreach (var f in Model.MatchDetail.Substitutions.Where(x => x.Type == Entities.Enum.FormationType.Home))
+                        {
+                            <div class="formation-item">
+                                <span class="name">@f.Name</span>
+                                <span class="number text-center">@f.Number</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="col-xs-6 text-left">
+                    <div class="formation">
+                        @foreach (var f in Model.MatchDetail.Substitutions.Where(x => x.Type == Entities.Enum.FormationType.Away))
+                        {
+                            <div class="formation-item">
+                                <span class="number text-center background-blue">@f.Number</span>
+                                <span class="name">@f.Name</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.MatchDetail.Tags != null && Model.MatchDetail.Tags.Any())
+        {
+            <div class="row">
+                <div class="col-xs-12">
+                    TAG:
+                    @foreach (var tag in Model.MatchDetail.Tags)
+                    {
+                        <a href="/tag/@tag.Slug" title="@tag.Name">
+                            <label class="label label-default">@tag.Name</label>
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-md-4 hidden-sm hidden-xs">
+        <div class="row">
+            <div class="col-xs-12">
+                <h3>Newest</h3>
+            </div>
+        </div>
+        <div class="row">
+            @foreach (var match in Model.MatchNewests)
+            {
+                <div class="col-xs-12 match">
+                    <div class="center-block text-center">
+                        <a href="/match/@match.Slug" title="@match.Title">
+                            <img class="img-thumbnail img-responsive" alt="@match.Title" title="@match.Title" src="@match.ImageUrl" />
+                        </a>
+                    </div>
+                    <div class="center-block text-center item-title-block">
+                        <div class="text-left title">
+                            <h4>
+                                <a href="/match/@match.Slug" title="@match.Title">@match.Title</a>
+                            </h4>
+                            <label class="label label-info"><span class="glyphicon glyphicon-time"></span> @string.Format("{0:MMM dd, yyyy}", match.MatchDate)</label>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(() => {
+            var $videoButton = $("button[id^='video_']");
+            var $videoWapper = $("#video-wapper");
+            if ($videoButton.length > 0) {
+
+                var height = $videoWapper.width() * 0.55;
+
+                var $iframe = '<iframe src="' + $videoButton.eq(0).attr("link-clip") + '" scrolling="no" frameborder="0" width="100%" height="' + height + '" allowfullscreen="yes"></iframe>';
+
+                $videoWapper.html($iframe);
+                $videoButton.eq(0).addClass("btn-danger").removeClass("btn-default");
+
+                $videoButton.click(function() {
+
+                    $(this).siblings().removeClass("btn-danger");
+
+                    var $ifr = '<iframe src="' + $(this).attr("link-clip") + '" scrolling="no" frameborder="0" width="100%" height="' + height + '" allowfullscreen="yes"></iframe>';
+
+                    $videoWapper.html($ifr);
+
+                    $(this).addClass("btn-danger");
+
+                    return false;
+                });
+            }
+        });
+
+        $(window).resize(function () {
+            var $videoWapper = $("#video-wapper");
+            var $iframe = $("#video-wapper > iframe");
+            if ($iframe.length > 0) {
+                var height = $videoWapper.width() * 0.55;
+
+                $iframe.attr("height", height);
+            }
+        })
+    </script>
+}

@@ -10,7 +10,8 @@ namespace Football.Show.ViewModels
         public int CurrentPage { get; set; }
         public int TotalPage { get; set; }
         public IEnumerable<Match> Matches { get; set; }
-
+        public string PageUrl { get; set; }
+        public string PageTitle { get; set; }
 
         public List<string> PagingGenerate
         {
@@ -41,7 +42,7 @@ namespace Football.Show.ViewModels
                     }
                     else
                     {
-                        var result = Enumerable.Range(CurrentPage - 4, CurrentPage + 4).Select(x => x.ToString()).ToList();
+                        var result = Enumerable.Range(CurrentPage - 4, 9).Select(x => x.ToString()).ToList();
 
                         result.Insert(0, "...");
                         result.Insert(0, "1");

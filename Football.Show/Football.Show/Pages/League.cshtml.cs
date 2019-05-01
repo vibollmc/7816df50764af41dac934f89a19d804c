@@ -9,17 +9,24 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Football.Show.Pages
 {
-    public class IndexModel : PageModel
+    public class LeagueModel : PageModel
     {
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IMatchRepository _matchRepository;
-        public IndexModel(IMatchRepository matchRepository)
+
+        public LeagueModel(ICategoryRepository categoryRepository, IMatchRepository matchRepository)
         {
+            _categoryRepository = categoryRepository;
             _matchRepository = matchRepository;
         }
 
         public PagingResult PagingResult;
-        public async Task OnGetAsync(string currentPage)
+        public async Task OnGetAsync(string slug, string currentPage)
         {
+            var category = await _categoryRepository.GetCategory(slug);
+
+            if (category == null) Redirect("/");
+
             var page = 1;
 
             if (!string.IsNullOrWhiteSpace(currentPage))
@@ -29,9 +36,9 @@ namespace Football.Show.Pages
 
             if (page < 1) page = 1;
 
-            PagingResult = await _matchRepository.GetMatchs(page);
-            PagingResult.PageUrl = "";
-            PagingResult.PageTitle = "Latest Highlights and Full Matches";
+            PagingResult = await _matchRepository.GetMatchsByCategory(slug, page);
+            PagingResult.PageUrl = $"/league/{slug}";
+            PagingResult.PageTitle = $"{category.Name} - Highlights and Full Matches";
         }
     }
 }

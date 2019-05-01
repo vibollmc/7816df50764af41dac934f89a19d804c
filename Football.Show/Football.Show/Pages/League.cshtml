@@ -1,12 +1,13 @@
-﻿@page "{currentPage?}"
-@model IndexModel
+﻿@page "{slug}/{currentPage?}"
+@model Football.Show.Pages.LeagueModel
 @{
     ViewData["Title"] = Model.PagingResult.PageTitle;
     ViewData["Description"] = "Watch Football Highlights and Full Matches on football-highlights.tv";
-    ViewData["Canonical"] = "http://football-highlights.tv";
+    ViewData["Canonical"] = $"http://football-highlights.tv{Model.PagingResult.PageUrl}";
     ViewData["Image"] = "http://football-highlights.tv/logo.png";
 }
 
 <h1>@Model.PagingResult.PageTitle</h1>
 
 @await Html.PartialAsync("_ViewMatch", Model.PagingResult)
+

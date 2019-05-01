@@ -9,17 +9,23 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Football.Show.Pages
 {
-    public class IndexModel : PageModel
+    public class TagModel : PageModel
     {
+        private readonly ITagRepository _tagRepository;
         private readonly IMatchRepository _matchRepository;
-        public IndexModel(IMatchRepository matchRepository)
+        public TagModel(ITagRepository tagRepository, IMatchRepository matchRepository)
         {
+            _tagRepository = tagRepository;
             _matchRepository = matchRepository;
         }
 
         public PagingResult PagingResult;
-        public async Task OnGetAsync(string currentPage)
+        public async Task OnGetAsync(string slug, string currentPage)
         {
+            var tag = await _tagRepository.GetTag(slug);
+
+            if (tag == null) Redirect("/");
+
             var page = 1;
 
             if (!string.IsNullOrWhiteSpace(currentPage))
@@ -29,9 +35,9 @@ namespace Football.Show.Pages
 
             if (page < 1) page = 1;
 
-            PagingResult = await _matchRepository.GetMatchs(page);
-            PagingResult.PageUrl = "";
-            PagingResult.PageTitle = "Latest Highlights and Full Matches";
+            PagingResult = await _matchRepository.GetMatchsByTag(slug, page);
+            PagingResult.PageUrl = $"/tag/{slug}" ;
+            PagingResult.PageTitle = $"{tag.Name} - Latest Highlights and Full Matches";
         }
     }
 }
