@@ -4,6 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - football-highlights.tv</title>
+    <meta name="description" content="@ViewData["Description"]" />
+    <link rel="canonical" href="@ViewData["Canonical"]" />
+
+    <meta property="og:title" content="@ViewData["Title"] - football-highlights.tv" />
+    <meta property="og:type" content="video.other" />
+    <meta property="og:description" content="@ViewData["Description"]" />
+    <meta property="og:url" content="@ViewData["Canonical"]" />
+    <meta property="og:image" content="@ViewData["Image"]" />
+    <meta property="og:site_name" content="Football-HighLights.tv" />
+
+    @await Component.InvokeAsync("Head")
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -18,9 +29,7 @@
 </head>
 <body>
     @await Component.InvokeAsync("Menu")
-
-    @*<partial name="_CookieConsentPartial" />*@
-
+        
     <div class="container body-content">
         @RenderBody()
         <hr />
@@ -49,5 +58,8 @@
     </environment>
 
     @RenderSection("Scripts", required: false)
+
+    @await Component.InvokeAsync("Script")
+
 </body>
 </html>

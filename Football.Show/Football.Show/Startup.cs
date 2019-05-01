@@ -58,6 +58,7 @@ namespace Football.Show
             services.AddTransient<IMatchRepository, MatchRepository>();
             services.AddTransient<ITagRepository, TagRepository>();
             services.AddTransient<ICategoryRepository, CategoryRepository>();
+            services.AddTransient<ICodePlugInRepository, CodePlugInRepository>();
             services.AddTransient<IFtpHelper, FtpHelper>();
             services.AddTransient<ICrawler, Crawler>();
             services.AddTransient<LoadDbContext, LoadDbContext>();

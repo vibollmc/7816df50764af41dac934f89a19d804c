@@ -14,6 +14,7 @@ namespace Football.Show.Dal
         public virtual DbSet<TagAssignment> TagAssignments { get; set; }
         public virtual DbSet<CrawlLink> CrawlLinks { get; set; }
         public virtual DbSet<ImageServer> ImageServers { get; set; }
+        public virtual DbSet<CodePlugIn> CodePlugIns { get; set; }
 
         public MainDbContext(DbContextOptions<MainDbContext> options) : base(options)
         {

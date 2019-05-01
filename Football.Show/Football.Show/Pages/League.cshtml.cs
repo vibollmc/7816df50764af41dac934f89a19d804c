@@ -38,7 +38,7 @@ namespace Football.Show.Pages
 
             PagingResult = await _matchRepository.GetMatchsByCategory(slug, page);
             PagingResult.PageUrl = $"/league/{slug}";
-            PagingResult.PageTitle = category.Name;
+            PagingResult.PageTitle = $"{category.Name} - Highlights and Full Matches";
         }
     }
 }

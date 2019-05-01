@@ -253,6 +253,7 @@ namespace Football.Show.Dal.Implement
                 .Include(x => x.Substitutions)
                 .Select(x => new ViewModels.MatchDetail
                 {
+                    Id = x.Id,
                     Home = x.Home,
                     Slug = x.Slug,
                     Away = x.Away,
@@ -288,6 +289,18 @@ namespace Football.Show.Dal.Implement
                 .FirstOrDefaultAsync();
 
             return match;
+        }
+
+        public async Task<IEnumerable<ViewModels.Match>> GetMatchsNewest(int? id)
+        {
+            return await _dbContext.Matchs
+                .Where(x => x.Id != id && !x.DeletedAt.HasValue)
+                .OrderByDescending(x => x.MatchDate)
+                .ThenBy(x => x.CreatedAt)
+                .Include(x => x.ImageServer)
+                .Take(6)
+                .Select(x => x.ToViewModel())
+                .ToListAsync();
         }
     }
 }

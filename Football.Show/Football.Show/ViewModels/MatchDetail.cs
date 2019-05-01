@@ -7,6 +7,7 @@ namespace Football.Show.ViewModels
 {
     public class MatchDetail
     {
+        public int? Id { get; set; }
         public string Title { get; set; }
         public string Slug { get; set; }
         public DateTime? MatchDate { get; set; }

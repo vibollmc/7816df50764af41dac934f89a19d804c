@@ -19,10 +19,13 @@ namespace Football.Show.Pages
         }
 
         public MatchDetail MatchDetail;
+        public IEnumerable<Match> MatchNewests;
 
         public async Task OnGetAsync(string slug)
         {
             MatchDetail = await _matchRepository.GetMatchDetail(slug);
+
+            MatchNewests = await _matchRepository.GetMatchsNewest(MatchDetail.Id);
         }
     }
 }

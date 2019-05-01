@@ -2,6 +2,9 @@
 @model IndexModel
 @{
     ViewData["Title"] = Model.PagingResult.PageTitle;
+    ViewData["Description"] = "Watch Football Highlights and Full Matches on football-highlights.tv";
+    ViewData["Canonical"] = "http://football-highlights.tv";
+    ViewData["Image"] = "http://football-highlights.tv/logo.png";
 }
 
 <h1>@Model.PagingResult.PageTitle</h1>

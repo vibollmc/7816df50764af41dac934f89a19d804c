@@ -1,0 +1,9 @@
+﻿@model IEnumerable<Football.Show.Entities.CodePlugIn>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var script in Model)
+    {
+        @Html.Raw(script.CodeText);
+    }
+}
