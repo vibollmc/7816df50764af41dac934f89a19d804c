@@ -43,7 +43,7 @@ namespace Football.Show.Utilities.Implement
             {
                 if (request.Method == "POST")
                 {
-                    string payload = request.Address.Query;
+                    string payload = request.Address.Query.Substring(1);
                     byte[] buff = Encoding.UTF8.GetBytes(payload.ToCharArray());
                     request.ContentLength = buff.Length;
                     request.ContentType = "application/x-www-form-urlencoded";
@@ -314,12 +314,16 @@ namespace Football.Show.Utilities.Implement
             {
                 match.HomeManager = divTeam1Roster.ChildNodes[1].InnerText;
                 formations.AddRange(divTeam1Roster.Descendants("li")
+                    .OrderBy(x => x.InnerStartIndex)
                     .Select(liNode => new Formation
                     {
                         Type = FormationType.Home,
                         Number = liNode.ChildNodes[0].InnerText.ToInt(),
                         Name = liNode.ChildNodes[1].InnerText,
-                        IsSubstitution = liNode.Attributes.Contains("class") && liNode.Attributes["class"].Value == "issub"
+                        IsSubstitution = liNode.Attributes.Contains("class") && liNode.Attributes["class"].Value == "issub",
+                        Scores = liNode.ChildNodes.Where(c => c.Attributes.Contains("class") && c.Attributes["class"].Value.Contains("list-goal")).Count(),
+                        YellowCard = liNode.ChildNodes.Where(c => c.Attributes.Contains("class") && (c.Attributes["class"].Value.Contains("list-yellowcard") || c.Attributes["class"].Value.Contains("list-yellowredcard"))).Count(),
+                        RedCard = liNode.ChildNodes.Where(c => c.Attributes.Contains("class") && c.Attributes["class"].Value.Contains("list-redcard")).Count(),
                     }));
             }
             var divTeam2Roster = ulNodes?.FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "team2roster");
@@ -327,12 +331,16 @@ namespace Football.Show.Utilities.Implement
             {
                 match.AwayManager = divTeam2Roster.ChildNodes[1].InnerText;
                 formations.AddRange(divTeam2Roster.Descendants("li")
+                    .OrderBy(x => x.InnerStartIndex)
                     .Select(liNode => new Formation
                     {
                         Type = FormationType.Away,
                         Number = liNode.ChildNodes[0].InnerText.ToInt(),
                         Name = liNode.ChildNodes[1].InnerText,
-                        IsSubstitution = liNode.Attributes.Contains("class") && liNode.Attributes["class"].Value == "issub"
+                        IsSubstitution = liNode.Attributes.Contains("class") && liNode.Attributes["class"].Value == "issub",
+                        Scores = liNode.ChildNodes.Where(c => c.Attributes.Contains("class") && c.Attributes["class"].Value.Contains("list-goal")).Count(),
+                        YellowCard = liNode.ChildNodes.Where(c => c.Attributes.Contains("class") && (c.Attributes["class"].Value.Contains("list-yellowcard") || c.Attributes["class"].Value.Contains("list-yellowredcard"))).Count(),
+                        RedCard = liNode.ChildNodes.Where(c => c.Attributes.Contains("class") && c.Attributes["class"].Value.Contains("list-redcard")).Count(),
                     }));
             }
 
@@ -341,6 +349,7 @@ namespace Football.Show.Utilities.Implement
             if (divTeam1Subs != null)
             {
                 substitutions.AddRange(divTeam1Subs.Descendants("li")
+                    .OrderBy(x => x.InnerStartIndex)
                     .Select(liNode => new Substitution
                     {
                         Type = FormationType.Home,
@@ -352,6 +361,7 @@ namespace Football.Show.Utilities.Implement
             if (divTeam2Subs != null)
             {
                 substitutions.AddRange(divTeam2Subs.Descendants("li")
+                    .OrderBy(x => x.InnerStartIndex)
                     .Select(liNode => new Substitution
                     {
                         Type = FormationType.Away,
@@ -367,6 +377,7 @@ namespace Football.Show.Utilities.Implement
             if (divteam1Actualsubs != null)
             {
                 actionSubstitutions.AddRange(divteam1Actualsubs.Descendants("li")
+                    .OrderBy(x => x.InnerStartIndex)
                     .Select(x => new ActionSubstitution
                         {
                             Min = x.ChildNodes[0].InnerText,
@@ -381,6 +392,7 @@ namespace Football.Show.Utilities.Implement
             if (divteam2Actualsubs != null)
             {
                 actionSubstitutions.AddRange(divteam2Actualsubs.Descendants("li")
+                    .OrderBy(x => x.InnerStartIndex)
                     .Select(x => new ActionSubstitution
                     {
                         Min = x.ChildNodes[0].InnerText,
@@ -406,7 +418,7 @@ namespace Football.Show.Utilities.Implement
             if (divNodes == null || !divNodes.Any()) return null;
 
             var divMainContent = divNodes.FirstOrDefault(x =>
-                x.Attributes.Contains("class") && x.Attributes["class"].Value == "td-ss-main-content");
+                x.Attributes.Contains("class") && (x.Attributes["class"].Value == "td-ss-main-content" || x.Attributes["class"].Value == "td_block_inner"));
 
             if (divMainContent == null) return null;
 

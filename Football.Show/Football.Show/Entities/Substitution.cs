@@ -12,6 +12,10 @@ namespace Football.Show.Entities
         public int? FormationId { get; set; }
         public int? MatchId { get; set; }
         public FormationType Type { get; set; }
+        public int YellowCard { get; set; }
+        public int RedCard { get; set; }
+        public int Scores { get; set; }
+
         public virtual Formation Formation { get; set; }
         public virtual Match Match { get; set; }
     }

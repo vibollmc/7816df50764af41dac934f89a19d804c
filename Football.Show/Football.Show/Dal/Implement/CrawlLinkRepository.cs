@@ -18,7 +18,7 @@ namespace Football.Show.Dal.Implement
 
         public async Task<CrawlLink> GetActive()
         {
-            return await _dbContext.CrawlLinks.FirstOrDefaultAsync(x => x.DeletedAt == null && !x.IsFinished || x.IsCircle);
+            return await _dbContext.CrawlLinks.FirstOrDefaultAsync(x => x.DeletedAt == null && (!x.IsFinished || x.IsCircle));
         }
 
         public async Task<bool> UpdateFinished(int? id)

@@ -35,7 +35,7 @@ namespace Football.Show.Pages
 
             if (page < 1) page = 1;
 
-            PagingResult = await _matchRepository.GetMatchsByTag(slug, page);
+            PagingResult = await _matchRepository.GetMatchsByTag(tag.Id, page);
             PagingResult.PageUrl = $"/tag/{slug}" ;
             PagingResult.PageTitle = $"{tag.Name} - Latest Highlights and Full Matches";
         }

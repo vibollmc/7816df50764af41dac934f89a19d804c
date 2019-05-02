@@ -24,14 +24,158 @@ namespace Football.Show.Dal.Implement
 
         public async Task<bool> CheckExsits(string slug)
         {
-            return await _dbContext.Matchs.AnyAsync(x => x.Slug == slug);
+            return await _dbContext.Matchs.AnyAsync(x => x.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase) && x.CreatedAt.Value.AddDays(-1) > DateTime.UtcNow);
+        }
+
+        private async Task<bool> Update(Match match, IList<Clip> clips, IList<Formation> formations, IList<Substitution> substitutions, IList<ActionSubstitution> actionSubstitutions)
+        {
+            using(var dbTransaction = await _dbContext.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var matchDb = await _dbContext.Matchs.FirstOrDefaultAsync(x => x.Slug.Equals(match.Slug));
+
+                    if (matchDb == null) return false;
+
+                    //save category
+                    var category = await _dbContext.Categories.FirstOrDefaultAsync(x => x.Name.Equals(match.Competition, StringComparison.OrdinalIgnoreCase));
+
+                    if (category == null)
+                    {
+                        category = new Category
+                        {
+                            Name = match.Competition,
+                            Slug = match.Competition.Replace(" ", "-").ToLower(),
+                            IsMenu = false
+                        };
+
+                        await _dbContext.Categories.AddAsync(category);
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+                    //Save match
+                    matchDb.CategoryId = category.Id;
+                    matchDb.Away = match.Away;
+                    matchDb.AwayManager = match.AwayManager;
+                    matchDb.AwayPersonScored = match.AwayPersonScored;
+                    matchDb.Competition = match.Competition;
+                    matchDb.Home = match.Home;
+                    matchDb.HomeManager = match.HomeManager;
+                    matchDb.HomePersonScored = match.HomePersonScored;
+                    matchDb.ImageName = match.ImageName;
+                    matchDb.ImageServerId = match.ImageServerId;
+                    matchDb.MatchDate = match.MatchDate;
+                    matchDb.Referee = match.Referee;
+                    matchDb.Score = match.Score;
+                    matchDb.Stadium = match.Stadium;
+                    matchDb.Title = match.Title;
+                    matchDb.UpdatedAt = DateTime.UtcNow;
+
+                    await _dbContext.SaveChangesAsync();
+
+                    foreach(var clip in clips)
+                    {
+                        var clipDb = await _dbContext.Clips.FirstOrDefaultAsync(x => x.ClipType == clip.ClipType && x.MatchId == matchDb.Id);
+
+                        if (clipDb == null)
+                        {
+                            clip.MatchId = matchDb.Id;
+                            await _dbContext.Clips.AddAsync(clip);
+                        }
+                        else
+                        {
+                            clipDb.ClipType = clip.ClipType;
+                            clipDb.LinkType = clip.LinkType;
+                            clipDb.Name = clip.Name;
+                            clipDb.Url = clip.Url;
+                            clipDb.UpdatedAt = DateTime.UtcNow;
+                        }
+
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+                    //Delete formation
+                    var formationDelete = _dbContext.Formations.Where(x => x.MatchId == matchDb.Id);
+                    _dbContext.Formations.RemoveRange(formationDelete);
+                    var subsDelete = _dbContext.Substitutions.Where(x => x.MatchId == matchDb.Id);
+                    _dbContext.Substitutions.RemoveRange(subsDelete);
+
+                    await _dbContext.SaveChangesAsync();
+
+                    //save formation
+                    if (formations != null)
+                    {
+                        var formationsAdded = formations.Where(x => !x.IsSubstitution).Select(x => new Formation
+                        {
+                            Name = x.Name,
+                            Type = x.Type,
+                            Number = x.Number,
+                            MatchId = match.Id,
+                            IsSubstitution = actionSubstitutions?.Any(y => y.Out.Equals(x.Name, StringComparison.OrdinalIgnoreCase)) ?? false
+                        }).ToList();
+
+                        await _dbContext.Formations.AddRangeAsync(formationsAdded);
+                        await _dbContext.SaveChangesAsync();
+
+                        //save substitution
+                        if (substitutions != null)
+                        {
+                            foreach (var substitution in substitutions)
+                            {
+                                substitution.MatchId = match.Id;
+                                var actionSubs = actionSubstitutions?.FirstOrDefault(x =>
+                                    x.In.Equals(substitution.Name, StringComparison.OrdinalIgnoreCase));
+
+                                if (actionSubs == null) continue;
+
+                                substitution.Minutes = actionSubs.Min.ToInt();
+                                var formation = formationsAdded.FirstOrDefault(x =>
+                                    x.Name.Equals(actionSubs.Out, StringComparison.OrdinalIgnoreCase));
+
+                                substitution.FormationId = formation?.Id;
+
+                                formation = formations
+                                    .FirstOrDefault(x => x.IsSubstitution
+                                        && x.Type == substitution.Type
+                                        && x.Name.Equals(actionSubs.In, StringComparison.OrdinalIgnoreCase));
+
+                                if (formation != null)
+                                {
+                                    substitution.Scores = formation.Scores;
+                                    substitution.RedCard = formation.RedCard;
+                                    substitution.YellowCard = formation.YellowCard;
+                                }
+                            }
+
+                            await _dbContext.Substitutions.AddRangeAsync(substitutions);
+                            await _dbContext.SaveChangesAsync();
+                        }
+                    }
+
+                    dbTransaction.Commit();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    dbTransaction.Rollback();
+
+                    Console.WriteLine(ex.Message);
+
+                    return false;
+                }
+            }
         }
 
         public async Task<bool> Add(Match match, IList<Clip> clips, IList<Formation> formations, IList<Substitution> substitutions, IList<ActionSubstitution> actionSubstitutions)
         {
             if (match == null || clips == null || string.IsNullOrWhiteSpace(match.Competition)) return false;
 
-            using (var dbTransaction = _dbContext.Database.BeginTransaction())
+            if (await _dbContext.Matchs.AnyAsync(x => x.Slug.Equals(match.Slug, StringComparison.OrdinalIgnoreCase)))
+            {
+                return await Update(match, clips, formations, substitutions, actionSubstitutions);
+            }
+
+            using (var dbTransaction = await _dbContext.Database.BeginTransactionAsync())
             {
                 try
                 {
@@ -87,16 +231,28 @@ namespace Football.Show.Dal.Implement
                             foreach (var substitution in substitutions)
                             {
                                 substitution.MatchId = match.Id;
-                                var actionSubs = actionSubstitutions?.FirstOrDefault(x =>
+                                var actionSubs = actionSubstitutions?.FirstOrDefault(x => x.Type == substitution.Type &&
                                     x.In.Equals(substitution.Name, StringComparison.OrdinalIgnoreCase));
 
                                 if (actionSubs == null) continue;
                                 
                                 substitution.Minutes = actionSubs.Min.ToInt();
-                                var formation = formationsAdded.FirstOrDefault(x =>
+                                var formation = formationsAdded.FirstOrDefault(x => x.Type == substitution.Type &&
                                     x.Name.Equals(actionSubs.Out, StringComparison.OrdinalIgnoreCase));
 
                                 substitution.FormationId = formation?.Id;
+
+                                formation = formations
+                                    .FirstOrDefault(x => x.IsSubstitution 
+                                        && x.Type == substitution.Type
+                                        && x.Name.Equals(actionSubs.In, StringComparison.OrdinalIgnoreCase));
+
+                                if (formation != null)
+                                {
+                                    substitution.Scores = formation.Scores;
+                                    substitution.RedCard = formation.RedCard;
+                                    substitution.YellowCard = formation.YellowCard;
+                                }
                             }
 
                             await _dbContext.Substitutions.AddRangeAsync(substitutions);
@@ -116,7 +272,7 @@ namespace Football.Show.Dal.Implement
                             tag1 = new Tag
                             {
                                 Name = match.Home,
-                                Slug = match.Home.Replace(" ", "-").ToLower()
+                                Slug = match.Home.Replace(" ", "-").Replace("&", "-").ToLower()
                             };
                             await _dbContext.Tags.AddAsync(tag1);
                         }
@@ -125,7 +281,7 @@ namespace Football.Show.Dal.Implement
                             tag2 = new Tag
                             {
                                 Name = match.Away,
-                                Slug = match.Away.Replace(" ", "-").ToLower()
+                                Slug = match.Away.Replace(" ", "-").Replace("&", "-").ToLower()
                             };
                             await _dbContext.Tags.AddAsync(tag2);
                         }
@@ -182,7 +338,7 @@ namespace Football.Show.Dal.Implement
             return result;
         }
 
-        public async Task<ViewModels.PagingResult> GetMatchsByCategory(string categorySlug, int currentPage)
+        public async Task<ViewModels.PagingResult> GetMatchsByCategory(int? categoryId, int currentPage)
         {
             var result = new ViewModels.PagingResult();
             
@@ -190,7 +346,7 @@ namespace Football.Show.Dal.Implement
                 .Where(
                     x => 
                         !x.DeletedAt.HasValue && 
-                        x.Category.Slug.Equals(categorySlug, StringComparison.OrdinalIgnoreCase) &&
+                        x.Category.Id == categoryId &&
                         !x.Category.DeletedAt.HasValue)
                 .Include(x => x.ImageServer)
                 .OrderByDescending(x => x.MatchDate)
@@ -201,7 +357,7 @@ namespace Football.Show.Dal.Implement
             var countMatch = await _dbContext.Matchs
                 .CountAsync(x => 
                     !x.DeletedAt.HasValue &&
-                    x.Category.Slug.Equals(categorySlug, StringComparison.OrdinalIgnoreCase) &&
+                    x.Category.Id == categoryId &&
                     !x.Category.DeletedAt.HasValue);
 
             var totalPage = ((double)countMatch / _siteSetttings.PageSize) + 0.49;
@@ -213,14 +369,14 @@ namespace Football.Show.Dal.Implement
             return result;
         }
 
-        public async Task<ViewModels.PagingResult> GetMatchsByTag(string tagSlug, int currentPage)
+        public async Task<ViewModels.PagingResult> GetMatchsByTag(int? tagId, int currentPage)
         {
             var result = new ViewModels.PagingResult();
             var matches = await _dbContext.Matchs
                 .Where(
                     x =>
                         !x.DeletedAt.HasValue &&
-                        x.TagAssignments.Any(t => !t.Tag.DeletedAt.HasValue && t.Tag.Slug.Equals(tagSlug, StringComparison.OrdinalIgnoreCase)))
+                        x.TagAssignments.Any(t => t.TagId == tagId))
                 .Include(x => x.ImageServer)
                 .OrderByDescending(x => x.MatchDate)
                 .ThenBy(x => x.CreatedAt)
@@ -230,7 +386,7 @@ namespace Football.Show.Dal.Implement
             var countMatch = await _dbContext.Matchs
                 .CountAsync(x =>
                     !x.DeletedAt.HasValue &&
-                    x.TagAssignments.Any(t => !t.Tag.DeletedAt.HasValue && t.Tag.Slug.Equals(tagSlug, StringComparison.OrdinalIgnoreCase)));
+                    x.TagAssignments.Any(t => t.TagId == tagId));
 
             var totalPage = ((double)countMatch / _siteSetttings.PageSize) + 0.49;
 

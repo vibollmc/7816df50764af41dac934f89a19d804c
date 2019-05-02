@@ -67,12 +67,14 @@
         <div class="row">
             <div class="col-xs-4 text-center">
                 <h3>@Model.MatchDetail.Home</h3>
+                <h6 id="HomePersonScored"></h6>
             </div>
             <div class="col-xs-4 text-center">
-                <h3>@Model.MatchDetail.Score</h3>
+                <h1 id="view_score"><a href="javascript:void(0)" onclick="$('#view_score').html('@Model.MatchDetail.Score')">Click here to view Scores.</a></h1>
             </div>
             <div class="col-xs-4 text-center">
                 <h3>@Model.MatchDetail.Away</h3>
+                <h6 id="AwayPersonScored"></h6>
             </div>
         </div>
         @if (Model.MatchDetail.Formations != null && Model.MatchDetail.Formations.Any())
@@ -99,9 +101,10 @@
                             {
                                 <div class="formation-sub-item">
                                     <span class="glyphicon glyphicon-triangle-top"></span>
+                                    <span class="min">@f.SubsMinutes'</span>
+                                    <span class="glyphicon glyphicon-time"></span>
                                     <span class="sub-name">@f.SubsName</span>
                                     <span class="sub-number text-center">@f.SubsNumber</span>
-                                    <span class="min">@f.SubsMinutes.</span>
                                     <span class="glyphicon glyphicon-arrow-left"></span>
                                 </div>
                             }
@@ -125,9 +128,10 @@
                             {
                                 <div class="formation-sub-item">
                                     <span class="glyphicon glyphicon-arrow-right"></span>
-                                    <span class="min">@f.SubsMinutes.</span>
                                     <span class="sub-number text-center background-blue">@f.SubsNumber</span>
                                     <span class="sub-name">@f.SubsName</span>
+                                    <span class="glyphicon glyphicon-time"></span>
+                                    <span class="min">@f.SubsMinutes'</span>
                                     <span class="glyphicon glyphicon-triangle-top"></span>
                                 </div>
                             }
@@ -174,9 +178,13 @@
                     TAG:
                     @foreach (var tag in Model.MatchDetail.Tags)
                     {
-                        <a href="/tag/@tag.Slug" title="@tag.Name">
-                            <label class="label label-default">@tag.Name</label>
-                        </a>
+                        
+                        <label class="label label-primary">
+                            <a href="/tag/@tag.Slug" title="@tag.Name">
+                                @tag.Name
+                            </a>
+                        </label>
+                        @Html.Raw("&ensp;")
                     }
                 </div>
             </div>
@@ -213,7 +221,7 @@
 
 @section Scripts {
     <script type="text/javascript">
-        $(document).ready(() => {
+        $(document).ready(function() {
             var $videoButton = $("button[id^='video_']");
             var $videoWapper = $("#video-wapper");
             if ($videoButton.length > 0) {
@@ -238,6 +246,14 @@
                     return false;
                 });
             }
+
+            $("#view_score").click(function () {
+                $("#view_score").html("@Model.MatchDetail.Score");
+
+                $("#HomePersonScored").html("@Html.Raw(string.IsNullOrWhiteSpace(Model.MatchDetail.HomePersonScored) ? "" : Model.MatchDetail.HomePersonScored.Replace("|", "<br/>"))");
+                
+                $("#AwayPersonScored").html("@Html.Raw(string.IsNullOrWhiteSpace(Model.MatchDetail.AwayPersonScored) ? "" : Model.MatchDetail.AwayPersonScored.Replace("|", "<br/>"))");
+            });
         });
 
         $(window).resize(function () {

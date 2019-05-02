@@ -11,6 +11,9 @@ namespace Football.Show.Entities
         public string Name { get; set; }
         public FormationType Type { get; set; }
         public bool IsSubstitution { get; set; }
+        public int YellowCard { get; set; }
+        public int RedCard { get; set; }
+        public int Scores { get; set; }
 
         public virtual Substitution Substitution { get; set; }
     }
