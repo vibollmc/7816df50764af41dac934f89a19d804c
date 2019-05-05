@@ -35,7 +35,7 @@ namespace Football.Show.Dal.Implement
             else crawlLink.Finished = 1;
 
             crawlLink.IsFinished = (crawlLink.FromPage < crawlLink.ToPage && crawlLink.Finished >= crawlLink.ToPage) || 
-                (crawlLink.FromPage > crawlLink.ToPage && crawlLink.Finished >= crawlLink.FromPage);
+                (crawlLink.FromPage >= crawlLink.ToPage && crawlLink.Finished >= crawlLink.FromPage);
 
             crawlLink.UpdatedAt = DateTime.UtcNow;
 

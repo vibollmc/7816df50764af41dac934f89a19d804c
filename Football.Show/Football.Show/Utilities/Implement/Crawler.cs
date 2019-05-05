@@ -187,6 +187,17 @@ namespace Football.Show.Utilities.Implement
                             x.InnerText.Contains("Stadium") &&
                             x.InnerText.Contains("Referee"));
 
+                if (divWpbWrapper == null)
+                {
+                    divWpbWrapper = divNodes?.FirstOrDefault(x =>
+                        x.Attributes.Contains("class") &&
+                        x.Attributes["class"].Value == "td-post-content" &&
+                        x.InnerText.Contains("Competition") &&
+                        x.InnerText.Contains("Date") &&
+                        x.InnerText.Contains("Stadium") &&
+                        x.InnerText.Contains("Referee"));
+                }
+
                 if (divWpbWrapper == null || !iframeNode.Any()) return false;
 
                 var acpPost = inputNodes?.FirstOrDefault(
@@ -206,12 +217,23 @@ namespace Football.Show.Utilities.Implement
                     clips = iframeNode.Where(x =>
                         x.Attributes.Contains("data-lazy-src") &&
                         !x.Attributes["data-lazy-src"].Value.Contains("facebook.com"))
-                    .Select((x, i) => new Clip
-                    {
-                        Url = x.Attributes["data-lazy-src"].Value,
-                        ClipType = ClipType.PreMatch,
-                        LinkType = LinkType.Embed,
-                        Name = "Full show"
+                    .Select((x, i) => {
+                        var clip = new Clip
+                        {
+                            Url = x.Attributes["data-lazy-src"].Value,
+                            ClipType = ClipType.PreMatch,
+                            LinkType = LinkType.Embed,
+                            Name = "Full show"
+                        };
+
+                        if (clip.Url.Contains("veuclips.com"))
+                        {
+                            var uriLink = new Uri(clip.Url);
+
+                            clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                        }
+
+                        return clip;
                     }).ToList();
                 }
 
@@ -257,7 +279,11 @@ namespace Football.Show.Utilities.Implement
                         match.Stadium = childNode.InnerText;
 
                     if (childNode.PreviousSibling.InnerText.Contains("Referee"))
+                    {
                         match.Referee = childNode.InnerText;
+
+                        break;
+                    }
                 }
 
                 if (match.MatchDate == null) match.MatchDate = matchLink.RDateTime;
