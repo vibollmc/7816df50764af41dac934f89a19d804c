@@ -115,6 +115,9 @@ a, a:active {
         .formation > .formation-item > .glyphicon.glyphicon-triangle-bottom:before {
             color: #d61b1b;
         }
+        .formation > .formation-item > .glyphicon.glyphicon-triangle-top:before {
+            color: forestgreen;
+        }
         .formation > .formation-item > .number {
             background-color: #800;
             color: #fff;
@@ -170,4 +173,34 @@ a, a:active {
 
 #video-wapper {
     margin-top: 15px;
+}
+
+.goal, .yellowcard, .redcard, .yellowredcard {
+    background: url('../football-icons-resize2.png') no-repeat;
+    background-size:10px;
+    width:10px;
+    height: 10px;
+    display: none;
+}
+
+.yellowcard {
+    background-position-x: 0px;
+    background-position-y: -2px;
+}
+.goal {
+    background-position-x: 0px;
+    background-position-y: -14px;
+}
+.redcard {
+    background-position-x: 0px;
+    background-position-y: -26px;
+}
+
+.yellowredcard {
+    background-position-x: 0px;
+    background-position-y: -39px;
+}
+
+.social {
+    margin-top: 20px;
 }

@@ -9,5 +9,6 @@ namespace Football.Show.ViewModels
     {
         public bool Enabled { get; set; }
         public int MinuteInterval { get; set; }
+        public int UpdateFromHours { get; set; }
     }
 }

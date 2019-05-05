@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Football.Show.Dal.Context;
 using Football.Show.Entities;
@@ -18,7 +19,11 @@ namespace Football.Show.Dal.Implement
 
         public async Task<CrawlLink> GetActive()
         {
-            return await _dbContext.CrawlLinks.FirstOrDefaultAsync(x => x.DeletedAt == null && (!x.IsFinished || x.IsCircle));
+            return await _dbContext.CrawlLinks
+                .OrderBy(x => x.IsCircle)
+                .OrderBy(x => x.UpdatedAt)
+                .ThenBy(x => x.CreatedAt)
+                .FirstOrDefaultAsync(x => x.DeletedAt == null && (!x.IsFinished || x.IsCircle));
         }
 
         public async Task<bool> UpdateFinished(int? id)

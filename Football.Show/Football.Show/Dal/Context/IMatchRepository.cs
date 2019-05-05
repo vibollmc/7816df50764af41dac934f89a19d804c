@@ -18,5 +18,7 @@ namespace Football.Show.Dal.Context
         Task<ViewModels.MatchDetail> GetMatchDetail(string slug);
 
         Task<IEnumerable<ViewModels.Match>> GetMatchsNewest(int? id);
+
+        Task<IEnumerable<ViewModels.XmlModel>> GetAllMatchLinks();
     }
 }

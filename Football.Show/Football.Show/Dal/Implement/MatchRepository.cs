@@ -7,6 +7,7 @@ using Football.Show.Entities;
 using Football.Show.Utilities;
 using Football.Show.Utilities.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace Football.Show.Dal.Implement
@@ -15,16 +16,24 @@ namespace Football.Show.Dal.Implement
     {
         private readonly MainDbContext _dbContext;
         private readonly ViewModels.SiteSetttings _siteSetttings;
+        private readonly ViewModels.TimerSettings _timerSettings;
+        private readonly string _domain;
 
-        public MatchRepository(LoadDbContext loadDbContext, IOptions<ViewModels.SiteSetttings> siteSetttings)
+        public MatchRepository(LoadDbContext loadDbContext,
+            IConfiguration configuration,
+            IOptions<ViewModels.SiteSetttings> siteSetttings, 
+            IOptions<ViewModels.TimerSettings> timerSettings)
         {
             _dbContext = loadDbContext.DbContext;
             _siteSetttings = siteSetttings.Value;
+            _timerSettings = timerSettings.Value;
+            _domain = configuration["DomainHosting"];
         }
 
         public async Task<bool> CheckExsits(string slug)
         {
-            return await _dbContext.Matchs.AnyAsync(x => x.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase) && x.CreatedAt.Value.AddDays(-1) > DateTime.UtcNow);
+            return await _dbContext.Matchs.AnyAsync(x => x.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase) 
+                && (x.UpdatedAt.HasValue ? x.UpdatedAt.Value.AddHours(_timerSettings.UpdateFromHours) : x.CreatedAt.Value.AddHours(_timerSettings.UpdateFromHours)) > DateTime.UtcNow);
         }
 
         private async Task<bool> Update(Match match, IList<Clip> clips, IList<Formation> formations, IList<Substitution> substitutions, IList<ActionSubstitution> actionSubstitutions)
@@ -111,7 +120,10 @@ namespace Football.Show.Dal.Implement
                             Type = x.Type,
                             Number = x.Number,
                             MatchId = match.Id,
-                            IsSubstitution = actionSubstitutions?.Any(y => y.Out.Equals(x.Name, StringComparison.OrdinalIgnoreCase)) ?? false
+                            IsSubstitution = actionSubstitutions?.Any(y => y.Out.Equals(x.Name, StringComparison.OrdinalIgnoreCase)) ?? false,
+                            RedCard = x.RedCard,
+                            Scores = x.Scores,
+                            YellowCard = x.YellowCard
                         }).ToList();
 
                         await _dbContext.Formations.AddRangeAsync(formationsAdded);
@@ -187,7 +199,7 @@ namespace Football.Show.Dal.Implement
                         category = new Category
                         {
                             Name = match.Competition,
-                            Slug = match.Competition.Replace(" ", "-").ToLower(),
+                            Slug = match.Competition.Replace(" & ", "-").Replace("&", "-").Replace(" ", "-").ToLower(),
                             IsMenu = false
                         };
 
@@ -219,7 +231,10 @@ namespace Football.Show.Dal.Implement
                             Type = x.Type,
                             Number = x.Number,
                             MatchId = match.Id,
-                            IsSubstitution = actionSubstitutions?.Any(y=>y.Out.Equals(x.Name, StringComparison.OrdinalIgnoreCase)) ?? false
+                            IsSubstitution = actionSubstitutions?.Any(y=>y.Out.Equals(x.Name, StringComparison.OrdinalIgnoreCase)) ?? false,
+                            RedCard = x.RedCard,
+                            Scores = x.Scores,
+                            YellowCard = x.YellowCard
                         }).ToList();
 
                         await _dbContext.Formations.AddRangeAsync(formationsAdded);
@@ -272,7 +287,7 @@ namespace Football.Show.Dal.Implement
                             tag1 = new Tag
                             {
                                 Name = match.Home,
-                                Slug = match.Home.Replace(" ", "-").Replace("&", "-").ToLower()
+                                Slug = match.Home.Replace(" & ", "-").Replace("&", "-").Replace(" ", "-").ToLower()
                             };
                             await _dbContext.Tags.AddAsync(tag1);
                         }
@@ -281,7 +296,7 @@ namespace Football.Show.Dal.Implement
                             tag2 = new Tag
                             {
                                 Name = match.Away,
-                                Slug = match.Away.Replace(" ", "-").Replace("&", "-").ToLower()
+                                Slug = match.Away.Replace(" & ", "-").Replace("&", "-").Replace(" ", "-").ToLower()
                             };
                             await _dbContext.Tags.AddAsync(tag2);
                         }
@@ -429,18 +444,34 @@ namespace Football.Show.Dal.Implement
                     Tags = x.TagAssignments.Select(t => new ViewModels.Tag {Slug = t.Tag.Slug, Name = t.Tag.Name}).ToList(),
                     Clips = x.Clips.OrderBy(c => c.ClipType).Select(c =>
                         new ViewModels.Clip {Name = c.Name, ClipType = c.ClipType, LinkType = c.LinkType, Url = c.Url}).ToList(),
-                    Formations = x.Formations.OrderBy(f => f.Id).Select(f => new ViewModels.Formation
+                    Formations = x.Formations.OrderBy(f => f.CreatedAt).Select(f => new ViewModels.Formation
                     {
                         Name = f.Name,
                         Number = f.Number,
                         Type = f.Type,
+                        YellowCard = f.YellowCard,
+                        RedCard = f.RedCard,
+                        Scores = f.Scores,
                         IsSubstitution = f.IsSubstitution,
                         SubsName = f.Substitution == null ? null : f.Substitution.Name,
                         SubsNumber = f.Substitution == null ? null : f.Substitution.Number,
-                        SubsMinutes = f.Substitution == null ? null : f.Substitution.Minutes
+                        SubsMinutes = f.Substitution == null ? null : f.Substitution.Minutes,
+                        SubsRedCard = f.Substitution == null ? 0 : f.Substitution.RedCard,
+                        SubsYellowCard = f.Substitution == null ? 0 : f.Substitution.YellowCard,
+                        SubsScores = f.Substitution == null ? 0 : f.Substitution.Scores,
+
                     }).ToList(),
-                    Substitutions = x.Substitutions.OrderBy(s => s.Id).Select(s =>
-                        new ViewModels.Substitution {Name = s.Name, Number = s.Number, Type = s.Type}).ToList()
+                    Substitutions = x.Substitutions.OrderBy(s => s.CreatedAt).Select(s =>
+                        new ViewModels.Substitution {
+                            Name = s.Name,
+                            Number = s.Number,
+                            Type = s.Type,
+                            IsSubstitution = s.FormationId.HasValue,
+                            SubsMinutes = s.Minutes,
+                            SubsRedCard = s.RedCard,
+                            SubsScores = s.Scores,
+                            SubsYellowCard = s.YellowCard
+                        }).ToList()
                 })
                 .FirstOrDefaultAsync();
 
@@ -456,6 +487,19 @@ namespace Football.Show.Dal.Implement
                 .Include(x => x.ImageServer)
                 .Take(6)
                 .Select(x => x.ToViewModel())
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<ViewModels.XmlModel>> GetAllMatchLinks()
+        {
+            return await _dbContext.Matchs
+                .Where(x => !x.DeletedAt.HasValue)
+                .Select(x => new ViewModels.XmlModel {
+                    Loc = $"http://{_domain}/match/{x.Slug}",
+                    LastMod = x.UpdatedAt.HasValue ? x.UpdatedAt.Value : x.CreatedAt.Value,
+                    Priority = 0.8,
+                    ChangeFreq = "daily"
+                })
                 .ToListAsync();
         }
     }

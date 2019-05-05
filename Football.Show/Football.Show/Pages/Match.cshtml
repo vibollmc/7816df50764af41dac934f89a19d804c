@@ -58,24 +58,27 @@
             <div class="row">
                 <div class="col-xs-12 text-center">
                     <p>
-                        No video.
+                        No videos.
                     </p>
                 </div>
             </div>
         }
 
         <div class="row">
-            <div class="col-xs-4 text-center">
-                <h3>@Model.MatchDetail.Home</h3>
-                <h6 id="HomePersonScored"></h6>
-            </div>
-            <div class="col-xs-4 text-center">
-                <h1 id="view_score"><a href="javascript:void(0)" onclick="$('#view_score').html('@Model.MatchDetail.Score')">Click here to view Scores.</a></h1>
-            </div>
-            <div class="col-xs-4 text-center">
-                <h3>@Model.MatchDetail.Away</h3>
-                <h6 id="AwayPersonScored"></h6>
-            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.MatchDetail.Score))
+            {
+                <div class="col-xs-4 text-center">
+                    <h3>@Model.MatchDetail.Home</h3>
+                    <h6 id="HomePersonScored"></h6>
+                </div>
+                <div class="col-xs-4 text-center">
+                    <h1 id="view_score"><a href="javascript:void(0)" onclick="$('#view_score').html('@Model.MatchDetail.Score')">Click here to view Scores.</a></h1>
+                </div>
+                <div class="col-xs-4 text-center">
+                    <h3>@Model.MatchDetail.Away</h3>
+                    <h6 id="AwayPersonScored"></h6>
+                </div>
+            }
         </div>
         @if (Model.MatchDetail.Formations != null && Model.MatchDetail.Formations.Any())
         {
@@ -94,12 +97,46 @@
                                 {
                                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                                 }
+                                @for (var i = 1; i <= f.Scores; i++)
+                                {
+                                    <span class="goal"></span>
+                                }
+                                @if (f.RedCard > 0)
+                                {
+                                    <span class="redcard"></span>
+                                }
+                                @if (f.YellowCard == 2)
+                                {
+                                    <span class="yellowredcard"></span>
+                                    <span class="yellowcard"></span>
+                                }
+                                else if (f.YellowCard == 1)
+                                {
+                                    <span class="yellowcard"></span>
+                                }
                                 <span class="name">@f.Name</span>
                                 <span class="number text-center">@f.Number</span>
                             </div>
                             @if (f.IsSubstitution)
                             {
                                 <div class="formation-sub-item">
+                                    @for (var i = 1; i <= f.SubsScores; i++)
+                                    {
+                                        <span class="goal"></span>
+                                    }
+                                    @if (f.SubsRedCard > 0)
+                                    {
+                                        <span class="redcard"></span>
+                                    }
+                                    @if (f.SubsYellowCard == 2)
+                                    {
+                                        <span class="yellowredcard"></span>
+                                        <span class="yellowcard"></span>
+                                    }
+                                    else if (f.SubsYellowCard == 1)
+                                    {
+                                        <span class="yellowcard"></span>
+                                    }
                                     <span class="glyphicon glyphicon-triangle-top"></span>
                                     <span class="min">@f.SubsMinutes'</span>
                                     <span class="glyphicon glyphicon-time"></span>
@@ -119,6 +156,23 @@
                             <div class="formation-item">
                                 <span class="number text-center background-blue">@f.Number</span>
                                 <span class="name">@f.Name</span>
+                                @if (f.YellowCard == 1)
+                                {
+                                    <span class="yellowcard"></span>
+                                }
+                                else if (f.YellowCard == 2)
+                                {
+                                    <span class="yellowcard"></span>
+                                    <span class="yellowredcard"></span>
+                                }
+                                @if (f.RedCard > 0)
+                                {
+                                    <span class="redcard"></span>
+                                }
+                                @for (var i = 1; i <= f.Scores; i++)
+                                {
+                                    <span class="goal"></span>
+                                }
                                 @if (f.IsSubstitution)
                                 {
                                     <span class="glyphicon glyphicon-triangle-bottom"></span>
@@ -133,6 +187,23 @@
                                     <span class="glyphicon glyphicon-time"></span>
                                     <span class="min">@f.SubsMinutes'</span>
                                     <span class="glyphicon glyphicon-triangle-top"></span>
+                                    @if (f.SubsYellowCard == 1)
+                                    {
+                                        <span class="yellowcard"></span>
+                                    }
+                                    else if (f.SubsYellowCard == 2)
+                                    {
+                                        <span class="yellowcard"></span>
+                                        <span class="yellowredcard"></span>
+                                    }
+                                    @if (f.SubsRedCard > 0)
+                                    {
+                                        <span class="redcard"></span>
+                                    }
+                                    @for (var i = 1; i <= f.SubsScores; i++)
+                                    {
+                                        <span class="goal"></span>
+                                    }
                                 </div>
                             }
                         }
@@ -151,6 +222,12 @@
                         @foreach (var f in Model.MatchDetail.Substitutions.Where(x => x.Type == Entities.Enum.FormationType.Home))
                         {
                             <div class="formation-item">
+                                @if (f.IsSubstitution)
+                                {
+                                    <span class="glyphicon glyphicon-triangle-top"></span>
+                                    <span class="min">@f.SubsMinutes'</span>
+                                    <span class="glyphicon glyphicon-time"></span>
+                                }
                                 <span class="name">@f.Name</span>
                                 <span class="number text-center">@f.Number</span>
                             </div>
@@ -164,6 +241,12 @@
                             <div class="formation-item">
                                 <span class="number text-center background-blue">@f.Number</span>
                                 <span class="name">@f.Name</span>
+                                @if (f.IsSubstitution)
+                                {
+                                    <span class="glyphicon glyphicon-time"></span>
+                                    <span class="min">@f.SubsMinutes'</span>
+                                    <span class="glyphicon glyphicon-triangle-top"></span>
+                                }
                             </div>
                         }
                     </div>
@@ -178,7 +261,7 @@
                     TAG:
                     @foreach (var tag in Model.MatchDetail.Tags)
                     {
-                        
+
                         <label class="label label-primary">
                             <a href="/tag/@tag.Slug" title="@tag.Name">
                                 @tag.Name
@@ -189,6 +272,15 @@
                 </div>
             </div>
         }
+
+        <div class="row">
+            <div class="col-xs-12 social">
+                <div class="fb-like" data-href="@ViewData["Canonical"]" data-width="" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="true"></div>
+            </div>
+            <div class="col-xs-12 social">
+                <div class="fb-comments" data-href="@ViewData["Canonical"]" data-width="100%" data-numposts="5"></div>
+            </div>
+        </div>
     </div>
     <div class="col-md-4 hidden-sm hidden-xs">
         <div class="row">
@@ -221,7 +313,7 @@
 
 @section Scripts {
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             var $videoButton = $("button[id^='video_']");
             var $videoWapper = $("#video-wapper");
             if ($videoButton.length > 0) {
@@ -231,9 +323,9 @@
                 var $iframe = '<iframe src="' + $videoButton.eq(0).attr("link-clip") + '" scrolling="no" frameborder="0" width="100%" height="' + height + '" allowfullscreen="yes"></iframe>';
 
                 $videoWapper.html($iframe);
-                $videoButton.eq(0).addClass("btn-danger").removeClass("btn-default");
+                $videoButton.eq(0).addClass("btn-danger");
 
-                $videoButton.click(function() {
+                $videoButton.click(function () {
 
                     $(this).siblings().removeClass("btn-danger");
 
@@ -247,13 +339,21 @@
                 });
             }
 
-            $("#view_score").click(function () {
-                $("#view_score").html("@Model.MatchDetail.Score");
+            if ($("#view_score").length > 0) {
 
-                $("#HomePersonScored").html("@Html.Raw(string.IsNullOrWhiteSpace(Model.MatchDetail.HomePersonScored) ? "" : Model.MatchDetail.HomePersonScored.Replace("|", "<br/>"))");
-                
-                $("#AwayPersonScored").html("@Html.Raw(string.IsNullOrWhiteSpace(Model.MatchDetail.AwayPersonScored) ? "" : Model.MatchDetail.AwayPersonScored.Replace("|", "<br/>"))");
-            });
+                $("#view_score").click(function () {
+                    $("#view_score").html("@Model.MatchDetail.Score");
+
+                    $("#HomePersonScored").html("@Html.Raw(string.IsNullOrWhiteSpace(Model.MatchDetail.HomePersonScored) ? "" : Model.MatchDetail.HomePersonScored.Replace("|", "<br/>"))");
+
+                    $("#AwayPersonScored").html("@Html.Raw(string.IsNullOrWhiteSpace(Model.MatchDetail.AwayPersonScored) ? "" : Model.MatchDetail.AwayPersonScored.Replace("|", "<br/>"))");
+
+                    $(".goal").css("display", "inline-block");
+                    $(".yellowcard").css("display", "inline-block");
+                    $(".redcard").css("display", "inline-block");
+                    $(".yellowredcard").css("display", "inline-block");
+                });
+            }
         });
 
         $(window).resize(function () {
@@ -264,6 +364,6 @@
 
                 $iframe.attr("height", height);
             }
-        })
+        });
     </script>
 }

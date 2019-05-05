@@ -19,7 +19,7 @@ namespace Football.Show.ViewModels
             {
                 if (TotalPage < 11)
                 {
-                    return Enumerable.Range(1, CurrentPage).Select(x => x.ToString()).ToList();
+                    return Enumerable.Range(1, TotalPage).Select(x => x.ToString()).ToList();
                 }
                 else
                 {
