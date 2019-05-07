@@ -22,9 +22,9 @@ namespace Football.Show.Pages
         public PagingResult PagingResult;
         public async Task OnGetAsync(string slug, string currentPage)
         {
-            var tag = await _tagRepository.GetTag(slug);
+            var tags = await _tagRepository.GetTags(slug);
 
-            if (tag == null) Redirect("/");
+            if (tags == null || !tags.Any()) Redirect("/");
 
             var page = 1;
 
@@ -35,9 +35,9 @@ namespace Football.Show.Pages
 
             if (page < 1) page = 1;
 
-            PagingResult = await _matchRepository.GetMatchsByTag(tag.Id, page);
+            PagingResult = await _matchRepository.GetMatchsByTag(page, tags.Select(x => x.Id.Value).ToArray());
             PagingResult.PageUrl = $"/tag/{slug}" ;
-            PagingResult.PageTitle = $"{tag.Name} - Latest Highlights and Full Matches";
+            PagingResult.PageTitle = $"{tags.First().Name} - Latest Highlights and Full Matches";
         }
     }
 }

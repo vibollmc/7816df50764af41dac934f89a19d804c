@@ -163,6 +163,7 @@ namespace JavCrawl.Utility.Implement
             });
 
             var searchListRequest = youtubeService.Search.List("snippet");
+            
             searchListRequest.Q = keyword;
             searchListRequest.Type = "video";
             searchListRequest.MaxResults = maxResult;

@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Football.Show.Dal;
+using Microsoft.EntityFrameworkCore;
 
 namespace Football.Show.Tests
 {
@@ -17,6 +19,7 @@ namespace Football.Show.Tests
     {
         private CookieCollection _cookies;
         private HtmlWeb _htmlWeb;
+        private MainDbContext _dbContext;
 
         [TestInitialize]
         public void Init()
@@ -25,6 +28,23 @@ namespace Football.Show.Tests
             _htmlWeb = new HtmlWeb();
 
             InitialHttpWeb();
+
+            var builder = new DbContextOptionsBuilder<MainDbContext>();
+            builder.UseMySql("Server=185.198.26.28;User Id=root;Password=ee6b8b18b0f83fa05;Database=fhighlights_prod");
+
+            _dbContext = new MainDbContext(builder.Options);
+        }
+
+        [TestMethod]
+        public void UpdateStadium()
+        {
+            foreach(var match in _dbContext.Matchs.Where(x => x.Stadium.Contains(";") && x.Stadium.Contains("&")))
+            {
+                match.Stadium = match.Stadium.HtmlDecode();
+            }
+            _dbContext.SaveChanges();
+
+            Assert.IsTrue(true);
         }
 
         private void InitialHttpWeb()

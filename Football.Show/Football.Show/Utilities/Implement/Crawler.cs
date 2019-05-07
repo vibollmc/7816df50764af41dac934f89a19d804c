@@ -270,17 +270,17 @@ namespace Football.Show.Utilities.Implement
                     if (childNode.PreviousSibling == null) continue;
 
                     if (childNode.PreviousSibling.InnerText.Contains("Competition"))
-                        match.Competition = childNode.InnerText;
+                        match.Competition = childNode.InnerText.HtmlDecode();
 
                     if (childNode.PreviousSibling.InnerText.Contains("Date"))
                         match.MatchDate = childNode.InnerText.ToDate();
 
                     if (childNode.PreviousSibling.InnerText.Contains("Stadium") && string.IsNullOrWhiteSpace(match.Stadium))
-                        match.Stadium = childNode.InnerText;
+                        match.Stadium = childNode.InnerText.HtmlDecode();
 
                     if (childNode.PreviousSibling.InnerText.Contains("Referee"))
                     {
-                        match.Referee = childNode.InnerText;
+                        match.Referee = childNode.InnerText.HtmlDecode();
 
                         break;
                     }
@@ -296,7 +296,7 @@ namespace Football.Show.Utilities.Implement
                     {
                         match.Home += " " + h2.InnerText;
                     }
-                    match.Home = match.Home.Trim();
+                    match.Home = match.Home.HtmlDecode().Trim();
 
                     foreach (var node in divHeaderTeam1.Descendants("div"))
                     {
@@ -327,7 +327,7 @@ namespace Football.Show.Utilities.Implement
                     {
                         match.Away += " " + h2.InnerText;
                     }
-                    match.Away = match.Away.Trim();
+                    match.Away = match.Away.HtmlDecode().Trim();
 
                     if (divHeaderTeam2.ChildNodes.Count > 1)
                     {
@@ -504,7 +504,7 @@ namespace Football.Show.Utilities.Implement
                         }
                         else
                         {
-                            matchLink.Name = aNode.InnerHtml.Replace("&#8211;", "–").Replace("&#038;","&");
+                            matchLink.Name = aNode.InnerHtml.HtmlDecode();
                             matchLink.Link = aNode.Attributes["href"].Value;
                         }
                     }

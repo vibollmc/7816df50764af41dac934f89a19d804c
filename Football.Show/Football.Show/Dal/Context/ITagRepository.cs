@@ -8,7 +8,7 @@ namespace Football.Show.Dal.Context
 {
     public interface ITagRepository
     {
-        Task<IEnumerable<Tag>> GetTags();
-        Task<Tag> GetTag(string slug);
+        Task<IList<ViewModels.XmlModel>> GetXmlTags();
+        Task<IEnumerable<Tag>> GetTags(string slug);
     }
 }

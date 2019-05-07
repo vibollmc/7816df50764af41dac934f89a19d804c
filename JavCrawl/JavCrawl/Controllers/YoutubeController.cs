@@ -46,7 +46,7 @@ namespace JavCrawl.Controllers
                 if (string.IsNullOrWhiteSpace(model.CommentText)) model.CommentText = _youtubeSettings.CommentDefault;
                 if (model.Max == null) model.Max = _youtubeSettings.MaxResultDefault;
 
-                Stars star = new Stars();
+                //Stars star = new Stars();
 
                 if (model.SelectedVideo != null && model.SelectedVideo.Count > 0)
                 {
@@ -55,16 +55,18 @@ namespace JavCrawl.Controllers
 
                 if (string.IsNullOrWhiteSpace(model.Search))
                 {
-                    star = await _dbRepository.GetStar();
+                    //                    star = await _dbRepository.GetStar();
 
-                    if (star != null)
-                    {
-                        model.Search = star.Title.Length > 10 ? star.Title : (star.Title + " jav star");
-                        model.CommentText = string.Format(@"http://javmile.com/pornstar/{0}
-{1} Video Sex, {1} JAV HD, Videos {1}, {1} sex
+                    //                    if (star != null)
+                    //                    {
+                    //                        model.Search = star.Title.Length > 10 ? star.Title : (star.Title + " jav star");
+                    //                        model.CommentText = string.Format(@"http://javmile.com/pornstar/{0}
+                    //{1} Video Sex, {1} JAV HD, Videos {1}, {1} sex
 
-#{0} #javhd #jav #xxx #asianvideo #porn #asiansex #sex #18+﻿", star.Slug, star.Title);
-                    }
+                    //#{0} #javhd #jav #xxx #asianvideo #porn #asiansex #sex #18+﻿", star.Slug, star.Title);
+                    //                    }
+
+                    model.Search = "football 2019";
                 }
 
                 if (!string.IsNullOrWhiteSpace(model.Search) && model.Max != null && model.Max > 0)

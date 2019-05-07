@@ -1,6 +1,7 @@
 ﻿using Football.Show.Dal.Context;
 using Football.Show.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,19 +12,33 @@ namespace Football.Show.Dal.Implement
     public class TagRepository : ITagRepository
     {
         private readonly MainDbContext _dbContext;
-        public TagRepository(LoadDbContext loadDbContext)
+        private readonly string _domain;
+
+        public TagRepository(LoadDbContext loadDbContext, IConfiguration configuration)
         {
             _dbContext = loadDbContext.DbContext;
+            _domain = configuration["DomainHosting"];
         }
-        public async Task<Tag> GetTag(string slug)
+        public async Task<IEnumerable<Tag>> GetTags(string slug)
         {
             return await _dbContext.Tags
-                .FirstOrDefaultAsync(x => x.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
+                .Where(x => x.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase) && !x.DeletedAt.HasValue)
+                .ToListAsync();
         }
 
-        public async Task<IEnumerable<Tag>> GetTags()
+        public async Task<IList<ViewModels.XmlModel>> GetXmlTags()
         {
-            return await _dbContext.Tags.Where(x => !x.DeletedAt.HasValue).OrderBy(x => x.Name).ToListAsync();
+            var date = DateTime.UtcNow;
+            return await _dbContext.Tags.Where(x => !x.DeletedAt.HasValue)
+                .Select(x => new ViewModels.XmlModel
+                {
+                    ChangeFreq = "daily",
+                    LastMod = date,
+                    Loc = $"http://{_domain}/tag/{x.Slug}",
+                    Priority = 0.8
+                })
+                .Distinct()
+                .ToListAsync();
         }
     }
 }

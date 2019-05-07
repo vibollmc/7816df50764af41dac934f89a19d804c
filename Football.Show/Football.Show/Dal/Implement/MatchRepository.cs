@@ -103,6 +103,13 @@ namespace Football.Show.Dal.Implement
                         await _dbContext.SaveChangesAsync();
                     }
 
+                    if (await _dbContext.Formations.AnyAsync(x => x.MatchId == matchDb.Id) &&
+                        await _dbContext.Substitutions.AnyAsync(x => x.MatchId == matchDb.Id))
+                    {
+                        dbTransaction.Commit();
+                        return true;
+                    }
+
                     //Delete formation
                     var formationDelete = _dbContext.Formations.Where(x => x.MatchId == matchDb.Id);
                     _dbContext.Formations.RemoveRange(formationDelete);
@@ -119,7 +126,7 @@ namespace Football.Show.Dal.Implement
                             Name = x.Name,
                             Type = x.Type,
                             Number = x.Number,
-                            MatchId = match.Id,
+                            MatchId = matchDb.Id,
                             IsSubstitution = actionSubstitutions?.Any(y => y.Out.Equals(x.Name, StringComparison.OrdinalIgnoreCase)) ?? false,
                             RedCard = x.RedCard,
                             Scores = x.Scores,
@@ -134,7 +141,7 @@ namespace Football.Show.Dal.Implement
                         {
                             foreach (var substitution in substitutions)
                             {
-                                substitution.MatchId = match.Id;
+                                substitution.MatchId = matchDb.Id;
                                 var actionSubs = actionSubstitutions?.FirstOrDefault(x =>
                                     x.In.Equals(substitution.Name, StringComparison.OrdinalIgnoreCase));
 
@@ -384,14 +391,14 @@ namespace Football.Show.Dal.Implement
             return result;
         }
 
-        public async Task<ViewModels.PagingResult> GetMatchsByTag(int? tagId, int currentPage)
+        public async Task<ViewModels.PagingResult> GetMatchsByTag(int currentPage, params int[] tagIds)
         {
             var result = new ViewModels.PagingResult();
             var matches = await _dbContext.Matchs
                 .Where(
                     x =>
                         !x.DeletedAt.HasValue &&
-                        x.TagAssignments.Any(t => t.TagId == tagId))
+                        x.TagAssignments.Any(t => tagIds.Contains(t.TagId)))
                 .Include(x => x.ImageServer)
                 .OrderByDescending(x => x.MatchDate)
                 .ThenBy(x => x.CreatedAt)
@@ -401,7 +408,7 @@ namespace Football.Show.Dal.Implement
             var countMatch = await _dbContext.Matchs
                 .CountAsync(x =>
                     !x.DeletedAt.HasValue &&
-                    x.TagAssignments.Any(t => t.TagId == tagId));
+                    x.TagAssignments.Any(t => tagIds.Contains(t.TagId)));
 
             var totalPage = ((double)countMatch / _siteSetttings.PageSize) + 0.49;
 
@@ -490,7 +497,7 @@ namespace Football.Show.Dal.Implement
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<ViewModels.XmlModel>> GetAllMatchLinks()
+        public async Task<IList<ViewModels.XmlModel>> GetAllMatchLinks()
         {
             return await _dbContext.Matchs
                 .Where(x => !x.DeletedAt.HasValue)

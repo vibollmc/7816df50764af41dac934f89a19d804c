@@ -38,23 +38,16 @@ namespace Football.Show.Pages
                     Links = categories.Select(x => new ViewModels.XmlModel
                     {
                         Loc = $"http://{_domain}/league/{x.Slug}",
-                        LastMod = x.UpdatedAt.HasValue ? x.UpdatedAt.Value : x.CreatedAt.Value,
+                        LastMod = DateTime.UtcNow,
                         Priority = 0.8,
                         ChangeFreq = "daily"
                     }).ToList();
                     break;
                 case "tag":
-                    var tags = await _tagRepository.GetTags();
-                    Links = tags.Select(x => new ViewModels.XmlModel
-                    {
-                        Loc = $"http://{_domain}/tag/{x.Slug}",
-                        LastMod = x.UpdatedAt.HasValue ? x.UpdatedAt.Value : x.CreatedAt.Value,
-                        Priority = 0.8,
-                        ChangeFreq = "daily"
-                    }).ToList();
+                    Links = await _tagRepository.GetXmlTags();
                     break;
                 case "match":
-                    Links = (await _matchRepository.GetAllMatchLinks()).ToList();
+                    Links = await _matchRepository.GetAllMatchLinks();
                     break;
             }
 

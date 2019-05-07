@@ -13,12 +13,12 @@ namespace Football.Show.Dal.Context
 
         Task<ViewModels.PagingResult> GetMatchs(int currentPage);
         Task<ViewModels.PagingResult> GetMatchsByCategory(int? categoryId, int currentPage);
-        Task<ViewModels.PagingResult> GetMatchsByTag(int? tagId, int currentPage);
+        Task<ViewModels.PagingResult> GetMatchsByTag(int currentPage, params int[] tagIds);
 
         Task<ViewModels.MatchDetail> GetMatchDetail(string slug);
 
         Task<IEnumerable<ViewModels.Match>> GetMatchsNewest(int? id);
 
-        Task<IEnumerable<ViewModels.XmlModel>> GetAllMatchLinks();
+        Task<IList<ViewModels.XmlModel>> GetAllMatchLinks();
     }
 }

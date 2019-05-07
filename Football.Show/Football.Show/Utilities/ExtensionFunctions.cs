@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Web;
 
 namespace Football.Show.Utilities
 {
@@ -102,6 +104,14 @@ namespace Football.Show.Utilities
                 Title = match.Title,
                 ImageUrl = $"{match.ImageServer.ServerUrl}/{match.ImageName}"
             };
+        }
+
+        public static string HtmlDecode(this string htmlText)
+        {
+            var stringWriter = new StringWriter();
+
+            HttpUtility.HtmlDecode(htmlText, stringWriter);
+            return stringWriter.ToString();
         }
     }
 }
