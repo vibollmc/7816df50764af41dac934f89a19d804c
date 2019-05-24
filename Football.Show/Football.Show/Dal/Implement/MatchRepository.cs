@@ -33,7 +33,7 @@ namespace Football.Show.Dal.Implement
         public async Task<bool> CheckExsits(string slug)
         {
             return await _dbContext.Matchs.AnyAsync(x => x.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase) 
-                && x.CreatedAt.Value > DateTime.UtcNow.AddHours(_timerSettings.UpdateFromHours));
+                && !(x.CreatedAt.Value > DateTime.UtcNow.AddHours(_timerSettings.UpdateFromHours) && x.CreatedAt.Value <= DateTime.UtcNow));
         }
 
         private async Task<bool> Update(Match match, IList<Clip> clips, IList<Formation> formations, IList<Substitution> substitutions, IList<ActionSubstitution> actionSubstitutions)

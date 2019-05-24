@@ -15,34 +15,32 @@
     <div class="">
 		<div class="clearfix"></div>
 		<center>
+			<!--
+			The div tag below is used to insert the advertisement, the id value match with param "display" in the Javascript code
+			In case you use the code multiple times then be sure that every id is unique!
+			-->
+			<div id="ea_5112237_node">&nbsp;</div>
 
-<!--
-The div tag below is used to insert the advertisement, the id value match with param "display" in the Javascript code
-In case you use the code multiple times then be sure that every id is unique!
--->
-<div id="ea_3558995_node">&nbsp;</div>
+			<script type="text/javascript" language="javascript" charset="utf-8">
+				/*
+				code below check and load eaCtrl, its recommended to load this with a normal javascript tag in the top of your page to speedup
+				if you have Eactrl installed then you dont need this part, also if you use multiple codes than only the first one need this
+				*/ 
 
-<script type="text/javascript" language="javascript" charset="utf-8">
-/*
-code below check and load eaCtrl, its recommended to load this with a normal javascript tag in the top of your page to speedup
-if you have Eactrl installed then you dont need this part, also if you use multiple codes than only the first one need this
-*/ 
+				if (typeof eaCtrl =="undefined"){ 
+					var eaCtrlRecs=[];
+					var eaCtrl = {add:function(ag){eaCtrlRecs.push(ag)}};
+					var js = document.createElement('script');
+					js.setAttribute("src","//go.ero-advertising.com/loadeactrl.go?pid=103546&siteid=936737&spaceid=5112237");
+					document.head.appendChild(js);
+				}
+				/*
+				End load eactrl 
 
-if (typeof eaCtrl =="undefined"){ 
-	var eaCtrlRecs=[];
-	var eaCtrl = {add:function(ag){eaCtrlRecs.push(ag)}};
-	var js = document.createElement('script');
-	js.setAttribute("src","//go.ero-advertising.com/loadeactrl.go?pid=103546&siteid=936737&spaceid=3558995");
-	document.head.appendChild(js);
-}
-/*
-End load eactrl 
-
-Command eaCtrl to load ads
-*/
-eaCtrl.add({"display":"ea_3558995_node","sid":3558995,"plugin":"banner","traffic_type":"all","subid":""});
-</script>
-
+				Command eaCtrl to load ads
+				*/
+				eaCtrl.add({"display":"ea_5112237_node","sid":5112237,"plugin":"banner","traffic_type":"all","subid":""});
+			</script>
 		</center>
 		<div class="clearfix"></div>
         <div class="header-section player-group" style="padding:0;">
@@ -74,6 +72,73 @@ eaCtrl.add({"display":"ea_3558995_node","sid":3558995,"plugin":"banner","traffic
                             @endforeach
                         </div>
                     </div>
+					
+					<div class="clearfix"></div>
+					<center>	
+						<div class="row">
+							<div class="col-md-6">
+								<center>
+									<!--
+									The div tag below is used to insert the advertisement, the id value match with param "display" in the Javascript code
+									In case you use the code multiple times then be sure that every id is unique!
+									-->
+									<div id="ea_3553950_node">&nbsp;</div>
+
+									<script type="text/javascript" language="javascript" charset="utf-8">
+									/*
+									code below check and load eaCtrl, its recommended to load this with a normal javascript tag in the top of your page to speedup
+									if you have Eactrl installed then you dont need this part, also if you use multiple codes than only the first one need this
+									*/ 
+
+									if (typeof eaCtrl =="undefined"){ 
+										var eaCtrlRecs=[];
+										var eaCtrl = {add:function(ag){eaCtrlRecs.push(ag)}};
+										var js = document.createElement('script');
+										js.setAttribute("src","//go.ero-advertising.com/loadeactrl.go?pid=103546&siteid=936737&spaceid=3553950");
+										document.head.appendChild(js);
+									}
+									/*
+									End load eactrl 
+
+									Command eaCtrl to load ads
+									*/
+									eaCtrl.add({"display":"ea_3553950_node","sid":3553950,"plugin":"banner","traffic_type":"all","subid":""});
+									</script>
+								</center>
+							</div>
+							<div class="col-md-6">
+								<center>
+									<!--
+									The div tag below is used to insert the advertisement, the id value match with param "display" in the Javascript code
+									In case you use the code multiple times then be sure that every id is unique!
+									-->
+									<div id="ea_3553952_node">&nbsp;</div>
+
+									<script type="text/javascript" language="javascript" charset="utf-8">
+										/*
+										code below check and load eaCtrl, its recommended to load this with a normal javascript tag in the top of your page to speedup
+										if you have Eactrl installed then you dont need this part, also if you use multiple codes than only the first one need this
+										*/ 
+
+										if (typeof eaCtrl =="undefined"){ 
+											var eaCtrlRecs=[];
+											var eaCtrl = {add:function(ag){eaCtrlRecs.push(ag)}};
+											var js = document.createElement('script');
+											js.setAttribute("src","//go.ero-advertising.com/loadeactrl.go?pid=103546&siteid=936737&spaceid=3553952");
+											document.head.appendChild(js);
+										}
+										/*
+										End load eactrl 
+
+										Command eaCtrl to load ads
+										*/
+										eaCtrl.add({"display":"ea_3553952_node","sid":3553952,"plugin":"banner","traffic_type":"all","subid":""});
+									</script>
+								</center>
+							</div>
+						</div>
+					</center>
+					
                 </div>
                 @endif
                 @if(count($part_type) > 0)
@@ -216,37 +281,7 @@ eaCtrl.add({"display":"ea_3558995_node","sid":3558995,"plugin":"banner","traffic
                 </script>
                     @endif
                 @endif
-                <div class="clearfix"></div>
-				<center>	
-
-<!--
-The div tag below is used to insert the advertisement, the id value match with param "display" in the Javascript code
-In case you use the code multiple times then be sure that every id is unique!
--->
-<div id="ea_3553952_node">&nbsp;</div>
-
-<script type="text/javascript" language="javascript" charset="utf-8">
-/*
-code below check and load eaCtrl, its recommended to load this with a normal javascript tag in the top of your page to speedup
-if you have Eactrl installed then you dont need this part, also if you use multiple codes than only the first one need this
-*/ 
-
-if (typeof eaCtrl =="undefined"){ 
-	var eaCtrlRecs=[];
-	var eaCtrl = {add:function(ag){eaCtrlRecs.push(ag)}};
-	var js = document.createElement('script');
-	js.setAttribute("src","//go.ero-advertising.com/loadeactrl.go?pid=103546&siteid=936737&spaceid=3553952");
-	document.head.appendChild(js);
-}
-/*
-End load eactrl 
-
-Command eaCtrl to load ads
-*/
-eaCtrl.add({"display":"ea_3553952_node","sid":3553952,"plugin":"banner","traffic_type":"all","subid":""});
-</script>
-
-				</center>
+                
 				<div class="clearfix"></div>
             </div>
             <div class="col-md-6">
