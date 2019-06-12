@@ -16,6 +16,7 @@ namespace SplitSSH
         private static string _backupFolder => ConfigurationManager.AppSettings["SSHFolderBackup"];
         private static string _linkDownloadSSH => ConfigurationManager.AppSettings["LinkDownloadSSH"];
         private static string _linkUpdateSSH => ConfigurationManager.AppSettings["LinkUpdateSSH"];
+        private static string _sSHSplitFolder => ConfigurationManager.AppSettings["SSHSplit"];
         private static int _numberVPS
         {
             get
@@ -81,10 +82,15 @@ namespace SplitSSH
 
                 var zipPath = $"{_sshFolderBase}\\{i + 1:000}.zip";
                 var checkPath = $"{_sshFolderBase}\\{i + 1:000}.txt";
+
+                var splitFile = $"{_sSHSplitFolder}\\{i + 1:000}.txt";
                 
                 if (File.Exists(_proxiesFile)) File.Delete(_proxiesFile);
 
                 File.WriteAllLines(_proxiesFile, line);
+
+                if (File.Exists(splitFile)) File.Delete(splitFile);
+                File.WriteAllLines(splitFile, line);
 
                 if (File.Exists(zipPath)) File.Delete(zipPath);
 

@@ -346,7 +346,7 @@ namespace Football.Show.Dal.Implement
                 .Where(x => !x.DeletedAt.HasValue)
                 .Include(x => x.ImageServer)
                 .OrderByDescending(x => x.MatchDate)
-                .ThenBy(x => x.CreatedAt)
+                .ThenByDescending(x => x.CreatedAt)
                 .Page(currentPage, _siteSetttings.PageSize)
                 .Select(x => x.ToViewModel()).ToListAsync();
 
@@ -372,7 +372,7 @@ namespace Football.Show.Dal.Implement
                         !x.Category.DeletedAt.HasValue)
                 .Include(x => x.ImageServer)
                 .OrderByDescending(x => x.MatchDate)
-                .ThenBy(x => x.CreatedAt)
+                .ThenByDescending(x => x.CreatedAt)
                 .Page(currentPage, _siteSetttings.PageSize)
                 .Select(x => x.ToViewModel()).ToListAsync();
 
@@ -401,7 +401,7 @@ namespace Football.Show.Dal.Implement
                         x.TagAssignments.Any(t => tagIds.Contains(t.TagId)))
                 .Include(x => x.ImageServer)
                 .OrderByDescending(x => x.MatchDate)
-                .ThenBy(x => x.CreatedAt)
+                .ThenByDescending(x => x.CreatedAt)
                 .Page(currentPage, _siteSetttings.PageSize)
                 .Select(x => x.ToViewModel()).ToListAsync();
 
@@ -490,7 +490,7 @@ namespace Football.Show.Dal.Implement
             return await _dbContext.Matchs
                 .Where(x => x.Id != id && !x.DeletedAt.HasValue)
                 .OrderByDescending(x => x.MatchDate)
-                .ThenBy(x => x.CreatedAt)
+                .ThenByDescending(x => x.CreatedAt)
                 .Include(x => x.ImageServer)
                 .Take(6)
                 .Select(x => x.ToViewModel())
