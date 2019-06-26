@@ -157,6 +157,69 @@ namespace Football.Show.Utilities.Implement
             return clips;
         }
 
+        private Clip GetMatchClip(string link, int? type)
+        {
+            var htmlDoc = _htmlWeb.Load(link);
+            var articleNode = htmlDoc.DocumentNode.Descendants("article").FirstOrDefault();
+
+            var iframeNode = articleNode?.Descendants("iframe");
+            var divNodes = articleNode?.Descendants("div");
+
+            var clips = iframeNode.Where(x =>
+                        x.Attributes.Contains("data-lazy-src") &&
+                        !x.Attributes["data-lazy-src"].Value.Contains("facebook.com"))
+                    .Select((x, i) => {
+                        var clip = new Clip
+                        {
+                            Url = x.Attributes["data-lazy-src"].Value,
+                            ClipType = type == null ? ClipType.PostMatch : (ClipType)type.Value,
+                            LinkType = LinkType.Embed,
+                            Name = "Full show"
+                        };
+
+                        if (clip.Url.Contains("veuclips.com"))
+                        {
+                            var uriLink = new Uri(clip.Url);
+
+                            clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                        }
+
+                        return clip;
+                    }).ToList();
+
+            if (!clips.Any())
+            {
+                var iframe = divNodes
+                    ?.FirstOrDefault(x => x.Attributes.Contains("id") && x.Attributes["id"].Value == "acp_content")
+                    ?.Descendants("noscript").FirstOrDefault()
+                    ?.Descendants("iframe").FirstOrDefault(x => x.Attributes.Contains("src"));
+
+                if (iframe != null)
+                {
+                    var url = iframe.Attributes["src"].Value;
+
+                    var clip = new Clip
+                    {
+                        Url = url,
+                        ClipType = ClipType.PreMatch,
+                        LinkType = LinkType.Embed,
+                        Name = "Full show"
+                    };
+
+                    if (clip.Url.Contains("veuclips.com"))
+                    {
+                        var uriLink = new Uri(clip.Url);
+
+                        clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                    }
+
+                    clips.Add(clip);
+                }
+            }
+
+            return clips.FirstOrDefault();
+        }
+
         private async Task<bool> SaveMatch(MatchLink matchLink)
         {
             try
@@ -217,7 +280,8 @@ namespace Football.Show.Utilities.Implement
                     clips = iframeNode.Where(x =>
                         x.Attributes.Contains("data-lazy-src") &&
                         !x.Attributes["data-lazy-src"].Value.Contains("facebook.com"))
-                    .Select((x, i) => {
+                    .Select((x, i) =>
+                    {
                         var clip = new Clip
                         {
                             Url = x.Attributes["data-lazy-src"].Value,
@@ -235,6 +299,56 @@ namespace Football.Show.Utilities.Implement
 
                         return clip;
                     }).ToList();
+
+                    if (!clips.Any())
+                    {
+                        var iframe = divNodes
+                            ?.FirstOrDefault(x => x.Attributes.Contains("id") && x.Attributes["id"].Value == "acp_content")
+                            ?.Descendants("noscript").FirstOrDefault()
+                            ?.Descendants("iframe").FirstOrDefault(x => x.Attributes.Contains("src"));
+
+                        if (iframe != null)
+                        {
+                            var link = iframe.Attributes["src"].Value;
+
+                            var clip = new Clip
+                            {
+                                Url = link,
+                                ClipType = ClipType.PreMatch,
+                                LinkType = LinkType.Embed,
+                                Name = "Full show"
+                            };
+
+                            if (clip.Url.Contains("veuclips.com"))
+                            {
+                                var uriLink = new Uri(clip.Url);
+
+                                clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                            }
+
+                            clips.Add(clip);
+                        }
+                    }
+
+                    var liItem = ulNodes?.FirstOrDefault(x => x.Attributes.Contains("id") && x.Attributes["id"].Value == "acp_paging_menu")
+                            ?.Descendants("li").Where(x => x.Attributes.Contains("id") && x.Attributes["id"].Value.StartsWith("item"));
+                    if (liItem != null)
+                    {
+                        foreach (var li in liItem)
+                        {
+                            var aNode = li?.Descendants("a")?.FirstOrDefault(x => x.Attributes.Contains("href"));
+                            if (aNode != null)
+                            {
+                                var link = aNode.Attributes["href"].Value;
+                                var clip = GetMatchClip(link, Convert.ToInt32(li.Attributes["id"].Value.Replace("item", "")));
+                                clips.Add(clip);
+                            }
+                            else if (clips.Any())
+                            {
+                                clips.First().ClipType = (ClipType)Convert.ToInt32(li.Attributes["id"].Value.Replace("item", ""));
+                            }
+                        }
+                    }
                 }
 
                 if (clips != null)
