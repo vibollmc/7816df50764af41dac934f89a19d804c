@@ -247,8 +247,7 @@ namespace Football.Show.Utilities.Implement
                         x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "wpb_wrapper" &&
                             x.InnerText.Contains("Competition") &&
                             x.InnerText.Contains("Date") &&
-                            x.InnerText.Contains("Stadium") &&
-                            x.InnerText.Contains("Referee"));
+                            x.InnerText.Contains("Stadium"));
 
                 if (divWpbWrapper == null)
                 {
@@ -257,8 +256,7 @@ namespace Football.Show.Utilities.Implement
                         x.Attributes["class"].Value == "td-post-content" &&
                         x.InnerText.Contains("Competition") &&
                         x.InnerText.Contains("Date") &&
-                        x.InnerText.Contains("Stadium") &&
-                        x.InnerText.Contains("Referee"));
+                        x.InnerText.Contains("Stadium"));
                 }
 
                 if (divWpbWrapper == null || !iframeNode.Any()) return false;
@@ -341,7 +339,8 @@ namespace Football.Show.Utilities.Implement
                             {
                                 var link = aNode.Attributes["href"].Value;
                                 var clip = GetMatchClip(link, Convert.ToInt32(li.Attributes["id"].Value.Replace("item", "")));
-                                clips.Add(clip);
+                                if (clip != null)
+                                    clips.Add(clip);
                             }
                             else if (clips.Any())
                             {
@@ -392,7 +391,7 @@ namespace Football.Show.Utilities.Implement
                     if (childNode.PreviousSibling.InnerText.Contains("Stadium") && string.IsNullOrWhiteSpace(match.Stadium))
                         match.Stadium = childNode.InnerText.HtmlDecode();
 
-                    if (childNode.PreviousSibling.InnerText.Contains("Referee"))
+                    if (childNode.PreviousSibling.InnerText.Contains("Referee") && !childNode.InnerText.Contains("jQuery"))
                     {
                         match.Referee = childNode.InnerText.HtmlDecode();
 
