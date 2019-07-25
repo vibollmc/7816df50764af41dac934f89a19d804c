@@ -145,6 +145,13 @@ namespace Football.Show.Utilities.Implement
                     link = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
                 }
 
+                if (link.Contains("viuclips.net"))
+                {
+                    var uriLink = new Uri(link);
+
+                    link = $"https://yfl.viuclips.net/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                }
+
                 clips.Add(new Clip
                 {
                     ClipType = (ClipType)i,
@@ -184,6 +191,13 @@ namespace Football.Show.Utilities.Implement
                             clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
                         }
 
+                        if (clip.Url.Contains("viuclips.net"))
+                        {
+                            var uriLink = new Uri(clip.Url);
+
+                            clip.Url = $"https://yfl.viuclips.net/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                        }
+
                         return clip;
                     }).ToList();
 
@@ -211,6 +225,13 @@ namespace Football.Show.Utilities.Implement
                         var uriLink = new Uri(clip.Url);
 
                         clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                    }
+
+                    if (clip.Url.Contains("viuclips.net"))
+                    {
+                        var uriLink = new Uri(clip.Url);
+
+                        clip.Url = $"https://yfl.viuclips.net/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
                     }
 
                     clips.Add(clip);
@@ -295,6 +316,13 @@ namespace Football.Show.Utilities.Implement
                             clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
                         }
 
+                        if (clip.Url.Contains("viuclips.net"))
+                        {
+                            var uriLink = new Uri(clip.Url);
+
+                            clip.Url = $"https://yfl.viuclips.net/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                        }
+
                         return clip;
                     }).ToList();
 
@@ -322,6 +350,13 @@ namespace Football.Show.Utilities.Implement
                                 var uriLink = new Uri(clip.Url);
 
                                 clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                            }
+
+                            if (clip.Url.Contains("viuclips.net"))
+                            {
+                                var uriLink = new Uri(clip.Url);
+
+                                clip.Url = $"https://yfl.viuclips.net/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
                             }
 
                             clips.Add(clip);
