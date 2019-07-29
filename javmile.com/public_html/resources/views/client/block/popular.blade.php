@@ -34,6 +34,7 @@
 		</script>
 	</center>
 	<div class="clearfix"></div>
+	<br />
     @foreach($popular as $key => $item)
         @include('client.block.film-block-item')
     @endforeach
