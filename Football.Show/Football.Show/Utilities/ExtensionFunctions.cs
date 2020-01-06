@@ -49,13 +49,13 @@ namespace Football.Show.Utilities
             return null;
         }
         /// <summary>
-        /// Convert string with format 'dd MMMM yyyy' to datetime?
+        /// Convert string with format 'ddd, dd MMM yyyy' to datetime?
         /// </summary>
         /// <param name="input">string input</param>
         /// <returns>datetime value</returns>
         public static DateTime? ToDate(this string input)
         {
-            return input.ToDateTime("d MMMM yyyy");
+            return input.ToDateTime("ddd, dd MMM yyyy");
         }
 
         /// <summary>

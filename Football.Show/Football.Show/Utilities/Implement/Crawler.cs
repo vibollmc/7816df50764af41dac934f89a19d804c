@@ -11,6 +11,7 @@ using Football.Show.Entities.Enum;
 using Football.Show.Utilities.Context;
 using Football.Show.Utilities.Model;
 using HtmlAgilityPack;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Football.Show.Utilities.Implement
 {
@@ -173,12 +174,12 @@ namespace Football.Show.Utilities.Implement
             var divNodes = articleNode?.Descendants("div");
 
             var clips = iframeNode.Where(x =>
-                        x.Attributes.Contains("data-lazy-src") &&
-                        !x.Attributes["data-lazy-src"].Value.Contains("facebook.com"))
+                        x.Attributes.Contains("src") &&
+                        !x.Attributes["src"].Value.Contains("facebook.com"))
                     .Select((x, i) => {
                         var clip = new Clip
                         {
-                            Url = x.Attributes["data-lazy-src"].Value,
+                            Url = x.Attributes["src"].Value,
                             ClipType = type == null ? ClipType.PostMatch : (ClipType)type.Value,
                             LinkType = LinkType.Embed,
                             Name = "Full show"
@@ -191,12 +192,18 @@ namespace Football.Show.Utilities.Implement
                             clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
                         }
 
-                        if (clip.Url.Contains("viuclips.net"))
+                        else if (clip.Url.Contains("viuclips.net"))
                         {
                             var uriLink = new Uri(clip.Url);
 
                             clip.Url = $"https://yfl.viuclips.net/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
                         }
+                        else if (clip.Url.Contains("evideohat.com"))
+                        {
+                            var uriLink = new Uri(clip.Url);
+                            clip.Url = $"https://yfl.evideohat.com/embed00/{uriLink.Segments[uriLink.Segments.Length - 1]}";
+                        }
+
 
                         return clip;
                     }).ToList();
@@ -227,11 +234,16 @@ namespace Football.Show.Utilities.Implement
                         clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
                     }
 
-                    if (clip.Url.Contains("viuclips.net"))
+                    else if (clip.Url.Contains("viuclips.net"))
                     {
                         var uriLink = new Uri(clip.Url);
 
                         clip.Url = $"https://yfl.viuclips.net/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                    }
+                    else if (clip.Url.Contains("evideohat.com"))
+                    {
+                        var uriLink = new Uri(clip.Url);
+                        clip.Url = $"https://yfl.evideohat.com/embed00/{uriLink.Segments[uriLink.Segments.Length - 1]}";
                     }
 
                     clips.Add(clip);
@@ -297,13 +309,13 @@ namespace Football.Show.Utilities.Implement
                 if (clips == null || !clips.Any())
                 {
                     clips = iframeNode.Where(x =>
-                        x.Attributes.Contains("data-lazy-src") &&
-                        !x.Attributes["data-lazy-src"].Value.Contains("facebook.com"))
+                        x.Attributes.Contains("src") &&
+                        !x.Attributes["src"].Value.Contains("facebook.com"))
                     .Select((x, i) =>
                     {
                         var clip = new Clip
                         {
-                            Url = x.Attributes["data-lazy-src"].Value,
+                            Url = x.Attributes["src"].Value,
                             ClipType = ClipType.PreMatch,
                             LinkType = LinkType.Embed,
                             Name = "Full show"
@@ -316,11 +328,16 @@ namespace Football.Show.Utilities.Implement
                             clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
                         }
 
-                        if (clip.Url.Contains("viuclips.net"))
+                        else if (clip.Url.Contains("viuclips.net"))
                         {
                             var uriLink = new Uri(clip.Url);
 
                             clip.Url = $"https://yfl.viuclips.net/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                        }
+                        else if (clip.Url.Contains("evideohat.com"))
+                        {
+                            var uriLink = new Uri(clip.Url);
+                            clip.Url = $"https://yfl.evideohat.com/embed00/{uriLink.Segments[uriLink.Segments.Length - 1]}";
                         }
 
                         return clip;
@@ -352,11 +369,16 @@ namespace Football.Show.Utilities.Implement
                                 clip.Url = $"https://yfl.veuclips.com/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
                             }
 
-                            if (clip.Url.Contains("viuclips.net"))
+                            else if (clip.Url.Contains("viuclips.net"))
                             {
                                 var uriLink = new Uri(clip.Url);
 
                                 clip.Url = $"https://yfl.viuclips.net/embed/{uriLink.Segments[uriLink.Segments.Length - 1]}?autoplay=1&htmlplayer=1";
+                            }
+                            else if (clip.Url.Contains("evideohat.com"))
+                            {
+                                var uriLink = new Uri(clip.Url);
+                                clip.Url = $"https://yfl.evideohat.com/embed00/{uriLink.Segments[uriLink.Segments.Length - 1]}";
                             }
 
                             clips.Add(clip);
@@ -637,10 +659,11 @@ namespace Football.Show.Utilities.Implement
                 foreach (var node in nodeBlock.ChildNodes)
                 {
                     var timeNode = node.Descendants("time");
+                    if (!timeNode.Any()) continue;
 
                     var matchLink = new MatchLink();
 
-                    if (timeNode.Any()) matchLink.Date = timeNode.First().InnerHtml;
+                    matchLink.Date = timeNode.First().InnerHtml;
 
                     var aNodes = node.Descendants("a");
 
