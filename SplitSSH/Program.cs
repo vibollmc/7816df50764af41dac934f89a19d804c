@@ -18,7 +18,9 @@ namespace SplitSSH
 
         private static string _sshFolderBase => ConfigurationManager.AppSettings["SSHFolderBase"];
         private static string _backupFolder => ConfigurationManager.AppSettings["SSHFolderBackup"];
+        private static string _backupFolder2  => ConfigurationManager.AppSettings["SSHFolderBackup2"];
         private static string _linkDownloadSSH => ConfigurationManager.AppSettings["LinkDownloadSSH"];
+        private static string _linkDownloadSSH2 => ConfigurationManager.AppSettings["LinkDownloadSSH2"];
         private static string _linkUpdateSSH => ConfigurationManager.AppSettings["LinkUpdateSSH"];
         private static string _sSHSplitFolder => ConfigurationManager.AppSettings["SSHSplit"];
         private static int _numberVPS => int.TryParse(ConfigurationManager.AppSettings["NumberVPS"], out var number) ? number : 1;
@@ -29,6 +31,7 @@ namespace SplitSSH
         private static string _sqliteFile => $"{_lolbotFolderBase}\\config\\proxies.sqlite";
 
         private static string _sshFileDownloaded => $"{_sshFolderBase}\\ssh.txt";
+        private static string _sshFileDownloaded2 => $"{_sshFolderBase}\\ssh2.txt";
         private static string _sshOld => $"{_sshFolderBase}\\old.txt";
         private static string _configFolder => $"{_sshFolderBase}\\config";
         private static string _proxiesFile => $"{_sshFolderBase}\\config\\proxies.txt";
@@ -44,6 +47,15 @@ namespace SplitSSH
             CopyOldFile();
 
             DownloadFile();
+
+            var lines = File.ReadAllLines(_sshFileDownloaded);
+            if (lines.Length < 10)
+            {
+                if (!File.Exists(_sshFileDownloaded2)) return;
+
+                lines = File.ReadAllLines(_sshFileDownloaded2);
+                if (lines.Length < 10) return;
+            }
 
             SplitSSH();
 
@@ -70,21 +82,44 @@ namespace SplitSSH
             AddLog("Starting download ssh from bitsocks...");
 
             if (!Directory.Exists(_sshFolderBase)) Directory.CreateDirectory(_sshFolderBase);
-            if (!Directory.Exists(_backupFolder)) Directory.CreateDirectory(_backupFolder);
 
             var webClient = new WebClient();
-
+            AddLog("Downloading link 1...");
             webClient.DownloadFile(_linkDownloadSSH, _sshFileDownloaded);
+
+            
+            if (File.Exists(_linkDownloadSSH2)) File.Delete(_linkDownloadSSH2);
+            if (!string.IsNullOrWhiteSpace(_linkDownloadSSH2))
+            {
+                AddLog("Downloading link 2...");
+                webClient.DownloadFile(_linkDownloadSSH2, _sshFileDownloaded2);
+            }
+
             if (!string.IsNullOrWhiteSpace(_backupFolder))
-                File.Copy(_sshFileDownloaded, $"{_backupFolder}\\{DateTime.Now:yyyyMMddHHmmss}.txt");
+            {
+                if (!Directory.Exists(_backupFolder)) Directory.CreateDirectory(_backupFolder);
+                File.Copy(_sshFileDownloaded, $"{_backupFolder}\\1_{DateTime.Now:yyyyMMddHHmmss}.txt");
+
+                if (File.Exists(_linkDownloadSSH2))
+                {
+                    File.Copy(_sshFileDownloaded2, $"{_backupFolder}\\2_{DateTime.Now:yyyyMMddHHmmss}.txt");
+                }
+            }
+
             AddLog("Download ssh finined.");
         }
 
         static void SplitSSH()
         {
-            AddLog("Starting split ssh for bots...");
+            AddLog("Starting split ssh for 9hits...");
             var lines = File.ReadAllLines(_sshFileDownloaded);
-            if (lines.Length < 10) return;
+            if (lines.Length < 10)
+            {
+                if (!File.Exists(_sshFileDownloaded2)) return;
+                
+                lines = File.ReadAllLines(_sshFileDownloaded2);
+                if (lines.Length < 10) return;
+            }
 
             var max = ((int) lines.Length / _numberVPS) + 1;
 
@@ -99,14 +134,14 @@ namespace SplitSSH
 
                 var zipPath = $"{_sshFolderBase}\\{i + 1:000}.zip";
                 var checkPath = $"{_sshFolderBase}\\{i + 1:000}.txt";
-                var splitFile = $"{_sSHSplitFolder}\\{i + 1:000}.txt";
+                //var splitFile = $"{_sSHSplitFolder}\\{i + 1:000}.txt";
 
                 if (File.Exists(_proxiesFile)) File.Delete(_proxiesFile);
 
                 File.WriteAllLines(_proxiesFile, line);
 
-                if (File.Exists(splitFile)) File.Delete(splitFile);
-                File.WriteAllLines(splitFile, line);
+                //if (File.Exists(splitFile)) File.Delete(splitFile);
+                //File.WriteAllLines(splitFile, line);
 
                 if (File.Exists(zipPath)) File.Delete(zipPath);
 
@@ -126,11 +161,35 @@ namespace SplitSSH
 
         static void MakeList()
         {
+            AddLog("Starting split ssh for lolbot...");
+            string[] lines;
+            if (File.Exists(_sshFileDownloaded2))
+                lines = File.ReadAllLines(_sshFileDownloaded2);
+            else
+                lines = File.ReadAllLines(_sshFileDownloaded);
+
+            if (lines.Length < 10) return;
+
+            var max = ((int)lines.Length / _numberVPS2) + 1;
+
+            for (var i = 0; i < _numberVPS2; i++)
+            {
+                var line = lines.Skip(i * max).Take(max).ToArray();
+
+                var splitFile = $"{_sSHSplitFolder}\\{i + 1:000}.txt";
+
+                if (File.Exists(splitFile)) File.Delete(splitFile);
+
+                File.WriteAllLines(splitFile, line);
+            }
+
+            AddLog("splited ssh for lolbot.");
+
             AddLog("Making list proxies for lolbot...");
             for (var i = 1; i <= _numberVPS2; i++)
             {
                 var splitFile = $"{_sSHSplitFolder}\\{i:000}.txt";
-                var lines = File.ReadAllLines(splitFile);
+                lines = File.ReadAllLines(splitFile);
                 var index = 0;
 
                 if (File.Exists(_sqliteFile)) File.Delete(_sqliteFile);
