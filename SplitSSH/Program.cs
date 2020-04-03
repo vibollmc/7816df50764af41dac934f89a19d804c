@@ -15,27 +15,29 @@ namespace SplitSSH
 {
     class Program
     {
+        private static int LolbotSSHMain => int.TryParse(ConfigurationManager.AppSettings["LolbotSSHMain"], out var number) ? number : 1;
+        private static bool Mix2SSHProvice => ConfigurationManager.AppSettings["Mix2SSHProvice"] == "true";
+        private static bool Mix2SSHProvice2 => ConfigurationManager.AppSettings["Mix2SSHProvice2"] == "true";
+        private static string SshFolderBase => ConfigurationManager.AppSettings["SSHFolderBase"];
+        private static string BackupFolder => ConfigurationManager.AppSettings["SSHFolderBackup"];
+        private static string BackupFolder2  => ConfigurationManager.AppSettings["SSHFolderBackup2"];
+        private static string LinkDownloadSsh => ConfigurationManager.AppSettings["LinkDownloadSSH"];
+        private static string LinkDownloadSsh2 => ConfigurationManager.AppSettings["LinkDownloadSSH2"];
+        private static string LinkUpdateSsh => ConfigurationManager.AppSettings["LinkUpdateSSH"];
+        private static string SShSplitFolder => ConfigurationManager.AppSettings["SSHSplit"];
+        private static int NumberVps => int.TryParse(ConfigurationManager.AppSettings["NumberVPS"], out var number) ? number : 1;
 
-        private static string _sshFolderBase => ConfigurationManager.AppSettings["SSHFolderBase"];
-        private static string _backupFolder => ConfigurationManager.AppSettings["SSHFolderBackup"];
-        private static string _backupFolder2  => ConfigurationManager.AppSettings["SSHFolderBackup2"];
-        private static string _linkDownloadSSH => ConfigurationManager.AppSettings["LinkDownloadSSH"];
-        private static string _linkDownloadSSH2 => ConfigurationManager.AppSettings["LinkDownloadSSH2"];
-        private static string _linkUpdateSSH => ConfigurationManager.AppSettings["LinkUpdateSSH"];
-        private static string _sSHSplitFolder => ConfigurationManager.AppSettings["SSHSplit"];
-        private static int _numberVPS => int.TryParse(ConfigurationManager.AppSettings["NumberVPS"], out var number) ? number : 1;
+        private static int NumberVps2 => int.TryParse(ConfigurationManager.AppSettings["NumberVPS2"], out var number) ? number : 1;
+        private static string LolbotFolderBase => ConfigurationManager.AppSettings["LolbotFolderBase"];
 
-        private static int _numberVPS2 => int.TryParse(ConfigurationManager.AppSettings["NumberVPS2"], out var number) ? number : 1;
-        private static string _lolbotFolderBase => ConfigurationManager.AppSettings["LolbotFolderBase"];
+        private static string SqliteFile => $"{LolbotFolderBase}\\config\\proxies.sqlite";
 
-        private static string _sqliteFile => $"{_lolbotFolderBase}\\config\\proxies.sqlite";
-
-        private static string _sshFileDownloaded => $"{_sshFolderBase}\\ssh.txt";
-        private static string _sshFileDownloaded2 => $"{_sshFolderBase}\\ssh2.txt";
-        private static string _sshOld => $"{_sshFolderBase}\\old.txt";
-        private static string _configFolder => $"{_sshFolderBase}\\config";
-        private static string _proxiesFile => $"{_sshFolderBase}\\config\\proxies.txt";
-        private static string _customversionFile => $"{_sshFolderBase}\\custom-version.txt";
+        private static string SshFileDownloaded => $"{SshFolderBase}\\ssh.txt";
+        private static string SshFileDownloaded2 => $"{SshFolderBase}\\ssh2.txt";
+        private static string SshOld => $"{SshFolderBase}\\old.txt";
+        private static string ConfigFolder => $"{SshFolderBase}\\config";
+        private static string ProxiesFile => $"{SshFolderBase}\\config\\proxies.txt";
+        private static string CustomversionFile => $"{SshFolderBase}\\custom-version.txt";
 
         static void Main(string[] args)
         {
@@ -48,16 +50,16 @@ namespace SplitSSH
 
             DownloadFile();
 
-            var lines = File.ReadAllLines(_sshFileDownloaded);
+            var lines = File.ReadAllLines(SshFileDownloaded);
             if (lines.Length < 10)
             {
-                if (!File.Exists(_sshFileDownloaded2)) return;
+                if (!File.Exists(SshFileDownloaded2)) return;
 
-                lines = File.ReadAllLines(_sshFileDownloaded2);
+                lines = File.ReadAllLines(SshFileDownloaded2);
                 if (lines.Length < 10) return;
             }
 
-            SplitSSH();
+            SplitSsh();
 
             ftpHelper.Upload9Hit();
 
@@ -72,8 +74,8 @@ namespace SplitSSH
         static void CopyOldFile()
         {
             AddLog("Copy to old file.");
-            if (File.Exists(_sshFileDownloaded))
-                File.Copy(_sshFileDownloaded, _sshOld, true);
+            if (File.Exists(SshFileDownloaded))
+                File.Copy(SshFileDownloaded, SshOld, true);
         }
 
 
@@ -81,75 +83,86 @@ namespace SplitSSH
         {
             AddLog("Starting download ssh from bitsocks...");
 
-            if (!Directory.Exists(_sshFolderBase)) Directory.CreateDirectory(_sshFolderBase);
+            if (!Directory.Exists(SshFolderBase)) Directory.CreateDirectory(SshFolderBase);
 
             var webClient = new WebClient();
             AddLog("Downloading link 1...");
-            webClient.DownloadFile(_linkDownloadSSH, _sshFileDownloaded);
+            webClient.DownloadFile(LinkDownloadSsh, SshFileDownloaded);
 
             
-            if (File.Exists(_linkDownloadSSH2)) File.Delete(_linkDownloadSSH2);
-            if (!string.IsNullOrWhiteSpace(_linkDownloadSSH2))
+            if (File.Exists(LinkDownloadSsh2)) File.Delete(LinkDownloadSsh2);
+            if (!string.IsNullOrWhiteSpace(LinkDownloadSsh2))
             {
                 AddLog("Downloading link 2...");
-                webClient.DownloadFile(_linkDownloadSSH2, _sshFileDownloaded2);
+                webClient.DownloadFile(LinkDownloadSsh2, SshFileDownloaded2);
             }
 
-            if (!string.IsNullOrWhiteSpace(_backupFolder))
+            if (!string.IsNullOrWhiteSpace(BackupFolder))
             {
-                if (!Directory.Exists(_backupFolder)) Directory.CreateDirectory(_backupFolder);
-                File.Copy(_sshFileDownloaded, $"{_backupFolder}\\1_{DateTime.Now:yyyyMMddHHmmss}.txt");
+                if (!Directory.Exists(BackupFolder)) Directory.CreateDirectory(BackupFolder);
+                File.Copy(SshFileDownloaded, $"{BackupFolder}\\1_{DateTime.Now:yyyyMMddHHmmss}.txt");
 
-                if (File.Exists(_linkDownloadSSH2))
+                if (File.Exists(LinkDownloadSsh2))
                 {
-                    File.Copy(_sshFileDownloaded2, $"{_backupFolder}\\2_{DateTime.Now:yyyyMMddHHmmss}.txt");
+                    File.Copy(SshFileDownloaded2, $"{BackupFolder}\\2_{DateTime.Now:yyyyMMddHHmmss}.txt");
                 }
             }
 
             AddLog("Download ssh finined.");
         }
 
-        static void SplitSSH()
+        static void SplitSsh()
         {
             AddLog("Starting split ssh for 9hits...");
-            var lines = File.ReadAllLines(_sshFileDownloaded);
-            if (lines.Length < 10)
+            var lines = new List<string>();
+            lines.AddRange(File.ReadAllLines(SshFileDownloaded));
+            var useFile1 = true;
+            if (lines.Count < 10)
             {
-                if (!File.Exists(_sshFileDownloaded2)) return;
-                
-                lines = File.ReadAllLines(_sshFileDownloaded2);
-                if (lines.Length < 10) return;
+                if (!File.Exists(SshFileDownloaded2)) return;
+                useFile1 = false;
+                lines.AddRange(File.ReadAllLines(SshFileDownloaded2));
+                if (lines.Count < 10) return;
             }
 
-            var max = ((int) lines.Length / _numberVPS) + 1;
+            if (Mix2SSHProvice && useFile1 && File.Exists(SshFileDownloaded2))
+            {
+                var lines2 = File.ReadAllLines(SshFileDownloaded2);
+                if (lines2.Length > 10)
+                {
+                    lines.AddRange(lines2);
+                }
+            }
 
-            var currentVersion = Convert.ToInt32(File.ReadAllText(_customversionFile));
+            var max = ((int) lines.Count / NumberVps) + 1;
 
-            File.Delete(_customversionFile);
-            File.WriteAllText(_customversionFile, (currentVersion + 1).ToString());
+            var currentVersion = Convert.ToInt32(File.ReadAllText(CustomversionFile));
 
-            for (var i = 0; i < _numberVPS; i++)
+            File.Delete(CustomversionFile);
+            File.WriteAllText(CustomversionFile, (currentVersion + 1).ToString());
+
+            for (var i = 0; i < NumberVps; i++)
             {
                 var line = lines.Skip(i * max).Take(max).ToArray();
 
-                var zipPath = $"{_sshFolderBase}\\{i + 1:000}.zip";
-                var checkPath = $"{_sshFolderBase}\\{i + 1:000}.txt";
+                var zipPath = $"{SshFolderBase}\\{i + 1:000}.zip";
+                var checkPath = $"{SshFolderBase}\\{i + 1:000}.txt";
                 //var splitFile = $"{_sSHSplitFolder}\\{i + 1:000}.txt";
 
-                if (File.Exists(_proxiesFile)) File.Delete(_proxiesFile);
+                if (File.Exists(ProxiesFile)) File.Delete(ProxiesFile);
 
-                File.WriteAllLines(_proxiesFile, line);
+                File.WriteAllLines(ProxiesFile, line);
 
                 //if (File.Exists(splitFile)) File.Delete(splitFile);
                 //File.WriteAllLines(splitFile, line);
 
                 if (File.Exists(zipPath)) File.Delete(zipPath);
 
-                ZipFile.CreateFromDirectory(_configFolder, zipPath, CompressionLevel.Optimal, true);
+                ZipFile.CreateFromDirectory(ConfigFolder, zipPath, CompressionLevel.Optimal, true);
 
                 if (File.Exists(checkPath)) File.Delete(checkPath);
 
-                var checkContent = $"{currentVersion + 1}|{_linkUpdateSSH}/{i + 1:000}.zip";
+                var checkContent = $"{currentVersion + 1}|{LinkUpdateSsh}/{i + 1:000}.zip";
 
                 File.WriteAllText(checkPath, checkContent);
 
@@ -162,21 +175,49 @@ namespace SplitSSH
         static void MakeList()
         {
             AddLog("Starting split ssh for lolbot...");
-            string[] lines;
-            if (File.Exists(_sshFileDownloaded2))
-                lines = File.ReadAllLines(_sshFileDownloaded2);
-            else
-                lines = File.ReadAllLines(_sshFileDownloaded);
 
-            if (lines.Length < 10) return;
+            var sshFile1 = SshFileDownloaded2;
+            var sshFile2 = SshFileDownloaded;
 
-            var max = ((int)lines.Length / _numberVPS2) + 1;
+            if (LolbotSSHMain != 2)
+            {
+                sshFile1 = SshFileDownloaded;
+                sshFile2 = SshFileDownloaded2;
+            }
 
-            for (var i = 0; i < _numberVPS2; i++)
+            var lines = new List<string>();
+            var useFile1 = true;
+
+            if (File.Exists(sshFile1)) lines.AddRange(File.ReadAllLines(sshFile1));
+            
+            if (lines.Count < 10)
+            {
+                if (!File.Exists(sshFile2)) return;
+                useFile1 = false;
+                lines.AddRange(File.ReadAllLines(sshFile2));
+                if (lines.Count < 10) return;
+            }
+
+            if (Mix2SSHProvice && useFile1 && File.Exists(sshFile2))
+            {
+                var lines2 = File.ReadAllLines(sshFile2);
+                if (lines2.Length > 10)
+                {
+                    lines.AddRange(lines2);
+                }
+            }
+
+
+
+            if (lines.Count < 10) return;
+
+            var max = ((int)lines.Count / NumberVps2) + 1;
+
+            for (var i = 0; i < NumberVps2; i++)
             {
                 var line = lines.Skip(i * max).Take(max).ToArray();
 
-                var splitFile = $"{_sSHSplitFolder}\\{i + 1:000}.txt";
+                var splitFile = $"{SShSplitFolder}\\{i + 1:000}.txt";
 
                 if (File.Exists(splitFile)) File.Delete(splitFile);
 
@@ -186,17 +227,20 @@ namespace SplitSSH
             AddLog("splited ssh for lolbot.");
 
             AddLog("Making list proxies for lolbot...");
-            for (var i = 1; i <= _numberVPS2; i++)
+            for (var i = 1; i <= NumberVps2; i++)
             {
-                var splitFile = $"{_sSHSplitFolder}\\{i:000}.txt";
-                lines = File.ReadAllLines(splitFile);
+                var splitFile = $"{SShSplitFolder}\\{i:000}.txt";
+
+                lines = new List<string>(); 
+                lines.AddRange(File.ReadAllLines(splitFile));
+
                 var index = 0;
 
-                if (File.Exists(_sqliteFile)) File.Delete(_sqliteFile);
+                if (File.Exists(SqliteFile)) File.Delete(SqliteFile);
 
-                SQLiteConnection.CreateFile(_sqliteFile);
+                SQLiteConnection.CreateFile(SqliteFile);
 
-                using (var connection = new SQLiteConnection($"URI=file:{_sqliteFile}"))
+                using (var connection = new SQLiteConnection($"URI=file:{SqliteFile}"))
                 {
                     connection.Open();
 
@@ -267,17 +311,17 @@ namespace SplitSSH
                 }
 
                 //Zipping
-                var zipPath = $"{_lolbotFolderBase}\\{i:000}.zip";
+                var zipPath = $"{LolbotFolderBase}\\{i:000}.zip";
                 if (File.Exists(zipPath)) File.Delete(zipPath);
-                var lolConfigFolder = $"{_lolbotFolderBase}\\config";
+                var lolConfigFolder = $"{LolbotFolderBase}\\config";
                 ZipFile.CreateFromDirectory(lolConfigFolder, zipPath, CompressionLevel.Optimal, true);
 
                 AddLog($"LolBot {i:000} completed.");
             }
 
 
-            var currentVersion = Convert.ToInt32(File.ReadAllText(_customversionFile));
-            var checkPath = $"{_lolbotFolderBase}\\check.txt";
+            var currentVersion = Convert.ToInt32(File.ReadAllText(CustomversionFile));
+            var checkPath = $"{LolbotFolderBase}\\check.txt";
             if (File.Exists(checkPath)) File.Delete(checkPath);
             File.WriteAllText(checkPath, $"{currentVersion}");
             AddLog($"Changed custom version.");
