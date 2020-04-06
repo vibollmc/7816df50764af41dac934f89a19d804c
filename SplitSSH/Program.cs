@@ -198,7 +198,7 @@ namespace SplitSSH
                 if (lines.Count < 10) return;
             }
 
-            if (Mix2SSHProvice && useFile1 && File.Exists(sshFile2))
+            if (Mix2SSHProvice2 && useFile1 && File.Exists(sshFile2))
             {
                 var lines2 = File.ReadAllLines(sshFile2);
                 if (lines2.Length > 10)
