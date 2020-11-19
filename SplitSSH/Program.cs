@@ -23,6 +23,7 @@ namespace SplitSSH
         private static string BackupFolder2  => ConfigurationManager.AppSettings["SSHFolderBackup2"];
         private static string LinkDownloadSsh => ConfigurationManager.AppSettings["LinkDownloadSSH"];
         private static string LinkDownloadSsh2 => ConfigurationManager.AppSettings["LinkDownloadSSH2"];
+        private static string LinkDownloadSsh3 => ConfigurationManager.AppSettings["LinkDownloadSSH3"];
         private static string LinkUpdateSsh => ConfigurationManager.AppSettings["LinkUpdateSSH"];
         private static string SShSplitFolder => ConfigurationManager.AppSettings["SSHSplit"];
         private static int NumberVps => int.TryParse(ConfigurationManager.AppSettings["NumberVPS"], out var number) ? number : 1;
@@ -34,6 +35,7 @@ namespace SplitSSH
 
         private static string SshFileDownloaded => $"{SshFolderBase}\\ssh.txt";
         private static string SshFileDownloaded2 => $"{SshFolderBase}\\ssh2.txt";
+        private static string SshFileDownloaded3 => $"{SshFolderBase}\\ssh3.txt";
         private static string SshOld => $"{SshFolderBase}\\old.txt";
         private static string ConfigFolder => $"{SshFolderBase}\\config";
         private static string ProxiesFile => $"{SshFolderBase}\\config\\proxies.txt";
@@ -46,7 +48,7 @@ namespace SplitSSH
 
             var ftpHelper = new FtpHelper(AddLog);
 
-            CopyOldFile();
+            //CopyOldFile();
 
             DownloadFile();
 
@@ -97,6 +99,13 @@ namespace SplitSSH
                 webClient.DownloadFile(LinkDownloadSsh2, SshFileDownloaded2);
             }
 
+            if (File.Exists(LinkDownloadSsh3)) File.Delete(LinkDownloadSsh3);
+            if (!string.IsNullOrWhiteSpace(LinkDownloadSsh3))
+            {
+                AddLog("Downloading link 3...");
+                webClient.DownloadFile(LinkDownloadSsh3, SshFileDownloaded3);
+            }
+
             if (!string.IsNullOrWhiteSpace(BackupFolder))
             {
                 if (!Directory.Exists(BackupFolder)) Directory.CreateDirectory(BackupFolder);
@@ -105,6 +114,11 @@ namespace SplitSSH
                 if (File.Exists(LinkDownloadSsh2))
                 {
                     File.Copy(SshFileDownloaded2, $"{BackupFolder}\\2_{DateTime.Now:yyyyMMddHHmmss}.txt");
+                }
+
+                if (File.Exists(LinkDownloadSsh3))
+                {
+                    File.Copy(SshFileDownloaded3, $"{BackupFolder}\\3_{DateTime.Now:yyyyMMddHHmmss}.txt");
                 }
             }
 
@@ -131,6 +145,15 @@ namespace SplitSSH
                 if (lines2.Length > 10)
                 {
                     lines.AddRange(lines2);
+                }
+            }
+
+            if (Mix2SSHProvice && File.Exists(SshFileDownloaded3))
+            {
+                var lines3 = File.ReadAllLines(SshFileDownloaded3);
+                if (lines3.Length > 10)
+                {
+                    lines.AddRange(lines3);
                 }
             }
 
